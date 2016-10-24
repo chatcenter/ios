@@ -7,11 +7,12 @@ Exampleプロジェクトが含まれています。
 ### 2. Pod install
 Exampleフォルダにてpod installを実行してください
 ### 3. アプリトークンとOrg Uidを設定
+
 ![sample1](https://github.com/chatcenter/ios/blob/master/Images/sample1.png)
 サンプルプロジェクトを開き、ViewController.m内のアプリトークンとOrg Uidを設定してください。
 アプリトークンとOrg Uidはダッシュボードから確認できます。
 ### 4.　アプリケーションを起動
-![sample2](https://github.com/chatcenter/ios/blob/master/Images/sample2.png)
+<img src="https://github.com/chatcenter/ios/blob/master/Images/sample2.png" width="320" height="568">
 
 ## SDKをアプリに組み込む
 ### Xcodeでの設定
