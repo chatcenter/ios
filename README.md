@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDKインストールガイド Ver. 1.0.6
+# ChatCenteriO iOS SDKインストールガイド Ver. 1.0.7
 
 ## Getting Started
 ### 1. サンプルプロジェクトをダウンロード
