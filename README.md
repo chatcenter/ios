@@ -633,37 +633,3 @@ ChatCenterDelegateの以下のメソッドを任意の場所に挿入してく�
 }
 …
 ```
-
-#### 9. ビデオチャット機能(β)
-[Twilio Video(β)](https://www.twilio.com/video)を使用したビデオチャット機能を提供しています。ビデオチャット機能をご使用になる場合は、以下に従って[Twilio Video(β)](https://www.twilio.com/video)のインストール及び設定の編集をしていただく必要がございます。
-
-##### 9-1. Twilio Videoのインストール
-Cocoa Podよりインストールをお願いします。以下のようにpodfileにてsourceおよびpodをご指定ください。
-
-```例
- platform :ios, '8.1'
-…
-
-target 'ChatCenterDemo' do
-  source 'https://github.com/twilio/cocoapod-specs'
-  pod 'TwilioConversationsClient'
-end
-…
-```
-
-##### 9-2. ビデオチャット機能を有効化するためのMacroの設定
-SDKにて、ビデオチャット機能を有効化するために、下図のように “プロジェクト > Build Settings > Apple LLVM 7.0 - Processing > Processor Macros” にCC_VIDEO=1とご指定してください。
-![video_macro](https://github.com/chatcenter/ios/blob/master/Images/video_macro.png)
-
-##### 9-3. Plistの編集
-ビデオチャット機能では、端末のカメラ及びマイクにアクセスするためアクセス許可を促す必要があります。そのためInfo.plistに許諾表示の追記が必要です。下記のように”NSCameraUsageDescription”及び”NSMicrophoneUsageDescription”の追加をお願いします。設定する文言は任意で構いません(ユーザーにアクセス許可を求める際に表示されます)。
-![video_plist](https://github.com/chatcenter/ios/blob/master/Images/video_plist.png)
-
-ソースでは以下のようになります。
-
-```
-<key>NSCameraUsageDescription</key>
-<string>ビデオチャットにて使用するためにアクセスします</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>ビデオチャットにて使用するためにアクセスします</string>
-```
