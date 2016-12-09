@@ -1,0 +1,18 @@
+
+/* Class = "UILabel"; text = "Business Funnel"; ObjectID = "1tX-w7-08H"; */
+"1tX-w7-08H.text" = "Business Funnel";
+
+/* Class = "UILabel"; text = "Status (1/5)"; ObjectID = "C6u-1A-itl"; */
+"C6u-1A-itl.text" = "Status (1/5)";
+
+/* Class = "UILabel"; text = "Message Status"; ObjectID = "DAA-MZ-bD4"; */
+"DAA-MZ-bD4.text" = "Message Status";
+
+/* Class = "UILabel"; text = "99999"; ObjectID = "QJA-ft-DIM"; */
+"QJA-ft-DIM.text" = "99999";
+
+/* Class = "UITextField"; placeholder = "Search..."; ObjectID = "grH-Ka-PEx"; */
+"grH-Ka-PEx.placeholder" = "Search...";
+
+/* Class = "UIButton"; normalTitle = "Search"; ObjectID = "oVL-gF-wAb"; */
+"oVL-gF-wAb.normalTitle" = "Search";

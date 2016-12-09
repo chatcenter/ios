@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="9MZ-1A-463" customClass="CCYesNoCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SeY-Jr-aK4" userLabel="Avatar container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="R3t-RZ-yWY" userLabel="Avatar Image View">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="664-9t-euN"/>
+                            <constraint firstItem="R3t-RZ-yWY" firstAttribute="leading" secondItem="SeY-Jr-aK4" secondAttribute="leading" id="9RY-kM-wb5"/>
+                            <constraint firstAttribute="bottom" secondItem="R3t-RZ-yWY" secondAttribute="bottom" id="CmJ-5X-GEN"/>
+                            <constraint firstAttribute="trailing" secondItem="R3t-RZ-yWY" secondAttribute="trailing" id="SqS-SY-Lrg"/>
+                            <constraint firstAttribute="height" constant="24" id="X4T-KM-0p1"/>
+                            <constraint firstItem="R3t-RZ-yWY" firstAttribute="top" secondItem="SeY-Jr-aK4" secondAttribute="top" id="qAk-Mu-auI"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pmj-8a-VSc" userLabel="Sticker container">
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Jtk-UJ-C3D" userLabel="Choice container">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="YE4-qu-73Z"/>
+                                </constraints>
+                            </view>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tzM-S5-xIC" userLabel="Discription">
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Xt-BK-tmG" userLabel="Title">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="HdF-H1-Zrt"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                <color key="textColor" red="0.0" green="0.50196081399917603" blue="0.25098040699958801" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="tzM-S5-xIC" secondAttribute="bottom" constant="32" id="1vu-OC-nNo"/>
+                            <constraint firstItem="tzM-S5-xIC" firstAttribute="top" secondItem="7Xt-BK-tmG" secondAttribute="bottom" id="F7W-bm-0oD"/>
+                            <constraint firstAttribute="bottom" secondItem="Jtk-UJ-C3D" secondAttribute="bottom" id="WhH-b4-pAj"/>
+                            <constraint firstItem="Jtk-UJ-C3D" firstAttribute="top" secondItem="Pmj-8a-VSc" secondAttribute="top" id="ZBn-Y1-6wj"/>
+                            <constraint firstItem="7Xt-BK-tmG" firstAttribute="leading" secondItem="Pmj-8a-VSc" secondAttribute="leading" id="dLI-Ir-puW"/>
+                            <constraint firstAttribute="trailing" secondItem="tzM-S5-xIC" secondAttribute="trailing" id="eWW-Nl-vnu"/>
+                            <constraint firstAttribute="width" constant="200" id="gXQ-lW-UX1"/>
+                            <constraint firstItem="Jtk-UJ-C3D" firstAttribute="leading" secondItem="Pmj-8a-VSc" secondAttribute="leading" id="h6q-AR-Fde"/>
+                            <constraint firstAttribute="trailing" secondItem="Jtk-UJ-C3D" secondAttribute="trailing" id="ibL-J1-E3h"/>
+                            <constraint firstAttribute="trailing" secondItem="7Xt-BK-tmG" secondAttribute="trailing" id="ltR-q5-2M4"/>
+                            <constraint firstItem="tzM-S5-xIC" firstAttribute="leading" secondItem="Pmj-8a-VSc" secondAttribute="leading" id="mNq-s5-s9i"/>
+                            <constraint firstItem="7Xt-BK-tmG" firstAttribute="top" secondItem="Pmj-8a-VSc" secondAttribute="top" id="tkv-CQ-Jds"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="ZBn-Y1-6wj"/>
+                            </mask>
+                        </variation>
+                    </view>
+                </subviews>
+            </view>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="SeY-Jr-aK4" secondAttribute="trailing" constant="15" id="T1i-9G-qPZ"/>
+                <constraint firstAttribute="bottom" secondItem="Pmj-8a-VSc" secondAttribute="bottom" id="Tje-xB-vrC"/>
+                <constraint firstItem="Pmj-8a-VSc" firstAttribute="top" secondItem="9MZ-1A-463" secondAttribute="top" id="Uef-p2-SOZ"/>
+                <constraint firstItem="SeY-Jr-aK4" firstAttribute="leading" secondItem="Pmj-8a-VSc" secondAttribute="trailing" constant="3" id="cRH-lb-Ldb"/>
+                <constraint firstItem="SeY-Jr-aK4" firstAttribute="top" secondItem="9MZ-1A-463" secondAttribute="top" id="l8n-MS-2Ly"/>
+            </constraints>
+            <size key="customSize" width="143" height="89"/>
+            <connections>
+                <outlet property="avatarImage" destination="R3t-RZ-yWY" id="Hzm-nt-yY5"/>
+                <outlet property="choiceContainer" destination="Jtk-UJ-C3D" id="C7u-4E-kJr"/>
+                <outlet property="discriptionView" destination="tzM-S5-xIC" id="MmH-sZ-LaQ"/>
+                <outlet property="stickerContainer" destination="Pmj-8a-VSc" id="FOe-tJ-v2j"/>
+                <outlet property="titleLabel" destination="7Xt-BK-tmG" id="rG9-Ho-ARt"/>
+            </connections>
+            <point key="canvasLocation" x="460" y="240"/>
+        </collectionViewCell>
+    </objects>
+</document>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CCHistoryNavigationTitleView">
+            <connections>
+                <outlet property="_contentView" destination="iN0-l3-epB" id="bwF-Wv-baZ"/>
+                <outlet property="_searchLabel" destination="4FK-k9-0Ki" id="EXV-kn-ff5"/>
+                <outlet property="_titleButton" destination="ZDb-eH-ndI" id="uul-Vv-lDc"/>
+                <outlet property="_underImageView" destination="v4G-go-s56" id="xaT-qr-aAr"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="All" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4FK-k9-0Ki">
+                    <rect key="frame" x="153" y="30" width="15" height="12"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="12" id="0Vg-GN-IMx"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                    <color key="textColor" red="0.16078431372549018" green="0.23137254901960785" blue="0.32941176470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="CCPointerDown.png" translatesAutoresizingMaskIntoConstraints="NO" id="v4G-go-s56">
+                    <rect key="frame" x="170" y="35" width="8" height="4"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="4" id="4uO-wM-OEj"/>
+                        <constraint firstAttribute="width" constant="8" id="XsE-xp-6dD"/>
+                    </constraints>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZDb-eH-ndI">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
+                    <state key="normal" title="Button">
+                        <color key="titleColor" red="0.16078431372549018" green="0.23137254901960785" blue="0.32941176470588235" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="pressTitleButton:" destination="-1" eventType="touchUpInside" id="7gi-dO-PQ2"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="ZDb-eH-ndI" secondAttribute="trailing" id="0po-aq-dNn"/>
+                <constraint firstAttribute="bottom" secondItem="4FK-k9-0Ki" secondAttribute="bottom" constant="2" id="2o9-dF-gSv"/>
+                <constraint firstItem="v4G-go-s56" firstAttribute="leading" secondItem="4FK-k9-0Ki" secondAttribute="trailing" constant="2.5" id="4C8-Jl-TLt"/>
+                <constraint firstItem="4FK-k9-0Ki" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="9dk-wK-mS4"/>
+                <constraint firstItem="ZDb-eH-ndI" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="WkD-LC-yQg"/>
+                <constraint firstAttribute="bottom" secondItem="v4G-go-s56" secondAttribute="bottom" constant="5" id="ZmE-cJ-1UK"/>
+                <constraint firstItem="ZDb-eH-ndI" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="jj1-fH-Vkw"/>
+                <constraint firstAttribute="bottom" secondItem="ZDb-eH-ndI" secondAttribute="bottom" id="nFo-82-VhX"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="CCPointerDown.png" width="12" height="6"/>
+    </resources>
+</document>

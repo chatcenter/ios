@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="qMG-VK-ATQ" userLabel="Photo Collection View Cell Incoming" customClass="CCPhotoCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jqK-En-RWA" userLabel="Sticker container">
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qi1-q3-MEJ" userLabel="Choice container">
+                                <color key="backgroundColor" red="0.96538686752319336" green="0.96423375606536865" blue="0.99988090991973877" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.96538686752319336" green="0.96423375606536865" blue="0.99988090991973877" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="qi1-q3-MEJ" firstAttribute="top" secondItem="jqK-En-RWA" secondAttribute="top" constant="5" id="A33-gO-atE"/>
+                            <constraint firstAttribute="bottom" secondItem="qi1-q3-MEJ" secondAttribute="bottom" constant="5" id="CgS-hX-NM0"/>
+                            <constraint firstAttribute="width" constant="200" id="HBz-jW-Azw"/>
+                            <constraint firstItem="qi1-q3-MEJ" firstAttribute="leading" secondItem="jqK-En-RWA" secondAttribute="leading" constant="20" id="ef5-au-0SL"/>
+                            <constraint firstAttribute="trailing" secondItem="qi1-q3-MEJ" secondAttribute="trailing" constant="20" id="nrz-Wd-z4k"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QzV-Pl-097" userLabel="Avatar container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="91H-Ff-LTe" userLabel="Avatar Image View">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="24" id="Ty7-qe-Mns"/>
+                            <constraint firstAttribute="bottom" secondItem="91H-Ff-LTe" secondAttribute="bottom" id="bDk-bA-vSz"/>
+                            <constraint firstAttribute="height" constant="24" id="hgn-Pq-632"/>
+                            <constraint firstItem="91H-Ff-LTe" firstAttribute="leading" secondItem="QzV-Pl-097" secondAttribute="leading" id="m6b-P1-7u8"/>
+                            <constraint firstItem="91H-Ff-LTe" firstAttribute="top" secondItem="QzV-Pl-097" secondAttribute="top" id="qVi-15-YlS"/>
+                            <constraint firstAttribute="trailing" secondItem="91H-Ff-LTe" secondAttribute="trailing" id="yC2-VS-TDc"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="jqK-En-RWA" secondAttribute="bottom" id="6I5-XZ-mvw"/>
+                <constraint firstItem="jqK-En-RWA" firstAttribute="leading" secondItem="QzV-Pl-097" secondAttribute="trailing" constant="3" id="BOk-nh-s6Q"/>
+                <constraint firstItem="QzV-Pl-097" firstAttribute="leading" secondItem="qMG-VK-ATQ" secondAttribute="leading" constant="14" id="LSt-Cd-8SH"/>
+                <constraint firstItem="QzV-Pl-097" firstAttribute="top" secondItem="qMG-VK-ATQ" secondAttribute="top" id="cBt-3k-d1n"/>
+                <constraint firstItem="jqK-En-RWA" firstAttribute="top" secondItem="qMG-VK-ATQ" secondAttribute="top" id="fc0-4C-3g1"/>
+            </constraints>
+            <size key="customSize" width="143" height="89"/>
+            <connections>
+                <outlet property="avatarImage" destination="91H-Ff-LTe" id="XCo-sy-3oN"/>
+                <outlet property="choiceContainer" destination="qi1-q3-MEJ" id="66q-Dx-Nip"/>
+                <outlet property="stickerContainer" destination="jqK-En-RWA" id="aDT-vf-9tw"/>
+            </connections>
+            <point key="canvasLocation" x="460" y="240"/>
+        </collectionViewCell>
+    </objects>
+</document>

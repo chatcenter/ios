@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="8195" systemVersion="14F27" minimumToolsVersion="Xcode 4.3">
+    <entity name="CCChannel" representedClassName="CCChannel" syncable="YES">
+        <attribute name="channel_informations" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="direct_message" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="icon_url" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="latest_message" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="latest_message_created" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="org_name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="org_uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="read" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="unread_messages" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="users" optional="YES" attributeType="Binary" syncable="YES"/>
+    </entity>
+    <entity name="CCMessage" representedClassName="CCMessage" syncable="YES">
+        <attribute name="answer" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="channel_uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="content" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="meta" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="question" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="user" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="users_read_message" optional="YES" attributeType="Binary" syncable="YES"/>
+    </entity>
+    <entity name="CCOrg" representedClassName="CCOrg" syncable="YES">
+        <attribute name="ancestry" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+    </entity>
+    <entity name="CCUser" representedClassName="CCUser" syncable="YES">
+        <attribute name="authentication_token" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="authentication_ttl" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="current_sign_in_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="current_sign_in_ip" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="email" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="encrypted_password" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="last_sign_in_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="last_sign_in_ip" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="remember_created_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="reset_password_sent_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="reset_password_token" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sign_in_count" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="CCChannel" positionX="-290" positionY="-171" width="128" height="300"/>
+        <element name="CCMessage" positionX="-434" positionY="-169" width="128" height="225"/>
+        <element name="CCOrg" positionX="-585" positionY="-169" width="128" height="133"/>
+        <element name="CCUser" positionX="-738" positionY="-171" width="128" height="283"/>
+    </elements>
+</model>

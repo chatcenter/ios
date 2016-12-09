@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="O15-b3-pzd" userLabel="Photo Collection View Cell Outgoing" customClass="CCPhotoCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5x5-t5-ixg" userLabel="Avatar container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="koJ-qF-oFQ" userLabel="Avatar Image View">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="koJ-qF-oFQ" firstAttribute="leading" secondItem="5x5-t5-ixg" secondAttribute="leading" id="Arq-Ek-Rn2"/>
+                            <constraint firstAttribute="width" constant="24" id="LyK-gS-ut7"/>
+                            <constraint firstItem="koJ-qF-oFQ" firstAttribute="top" secondItem="5x5-t5-ixg" secondAttribute="top" id="WIj-gh-3Pu"/>
+                            <constraint firstAttribute="height" constant="24" id="XnI-OC-9bp"/>
+                            <constraint firstAttribute="bottom" secondItem="koJ-qF-oFQ" secondAttribute="bottom" id="fa5-k4-TUM"/>
+                            <constraint firstAttribute="trailing" secondItem="koJ-qF-oFQ" secondAttribute="trailing" id="vC2-z5-l5r"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DpN-vS-ZaM" userLabel="Sticker container">
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="V8J-cX-ba5" userLabel="Choice container">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="V8J-cX-ba5" firstAttribute="leading" secondItem="DpN-vS-ZaM" secondAttribute="leading" id="Ltf-yf-teM"/>
+                            <constraint firstAttribute="bottom" secondItem="V8J-cX-ba5" secondAttribute="bottom" constant="5" id="hQ8-sX-RTW"/>
+                            <constraint firstItem="V8J-cX-ba5" firstAttribute="top" secondItem="DpN-vS-ZaM" secondAttribute="top" constant="5" id="j1O-l7-lIt"/>
+                            <constraint firstAttribute="trailing" secondItem="V8J-cX-ba5" secondAttribute="trailing" id="tc7-OB-hHC"/>
+                            <constraint firstAttribute="width" constant="200" id="zw6-qi-tua"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="DpN-vS-ZaM" secondAttribute="bottom" id="G9A-ib-LQW"/>
+                <constraint firstItem="5x5-t5-ixg" firstAttribute="leading" secondItem="DpN-vS-ZaM" secondAttribute="trailing" constant="3" id="MaS-MJ-eRS"/>
+                <constraint firstItem="5x5-t5-ixg" firstAttribute="top" secondItem="O15-b3-pzd" secondAttribute="top" id="YiG-Pa-b8W"/>
+                <constraint firstAttribute="trailing" secondItem="5x5-t5-ixg" secondAttribute="trailing" constant="15" id="mGd-Hg-PYV"/>
+                <constraint firstItem="DpN-vS-ZaM" firstAttribute="top" secondItem="O15-b3-pzd" secondAttribute="top" id="oVb-lf-JKz"/>
+            </constraints>
+            <size key="customSize" width="143" height="89"/>
+            <connections>
+                <outlet property="avatarImage" destination="koJ-qF-oFQ" id="oQc-Tt-tX3"/>
+                <outlet property="choiceContainer" destination="V8J-cX-ba5" id="heG-2b-690"/>
+                <outlet property="stickerContainer" destination="DpN-vS-ZaM" id="3Uj-za-mAa"/>
+            </connections>
+            <point key="canvasLocation" x="460" y="240"/>
+        </collectionViewCell>
+    </objects>
+</document>

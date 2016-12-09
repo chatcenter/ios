@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CCLinearScaleQuestionComponent">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="125"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Fh-Rr-IZZ">
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="Cv2-e2-8QX"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tu4-3X-Dvo">
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="G7T-hw-cnR"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="ncH-jT-GXm">
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="48" id="SWD-0B-8Lw"/>
+                    </constraints>
+                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="KBu-b9-c4e">
+                        <size key="itemSize" width="36" height="48"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <connections>
+                        <outlet property="dataSource" destination="iN0-l3-epB" id="EvY-RE-mRJ"/>
+                        <outlet property="delegate" destination="iN0-l3-epB" id="1P3-Uk-HST"/>
+                    </connections>
+                </collectionView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="tu4-3X-Dvo" secondAttribute="trailing" constant="12" id="5i5-N1-OCl"/>
+                <constraint firstItem="ncH-jT-GXm" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="23" id="BWf-xU-vHE"/>
+                <constraint firstItem="5Fh-Rr-IZZ" firstAttribute="top" secondItem="ncH-jT-GXm" secondAttribute="bottom" constant="8" id="G71-7p-WXP"/>
+                <constraint firstItem="tu4-3X-Dvo" firstAttribute="top" secondItem="ncH-jT-GXm" secondAttribute="bottom" constant="8" id="STR-yg-AK2"/>
+                <constraint firstItem="5Fh-Rr-IZZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="12" id="g6d-qT-b3q"/>
+                <constraint firstAttribute="trailing" secondItem="ncH-jT-GXm" secondAttribute="trailing" id="irJ-8F-HQa"/>
+                <constraint firstItem="ncH-jT-GXm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="owe-cd-3FY"/>
+                <constraint firstItem="tu4-3X-Dvo" firstAttribute="leading" secondItem="5Fh-Rr-IZZ" secondAttribute="trailing" id="sti-kn-Nnr"/>
+                <constraint firstItem="tu4-3X-Dvo" firstAttribute="width" secondItem="5Fh-Rr-IZZ" secondAttribute="width" id="ut9-2q-BGI"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="collectionView" destination="ncH-jT-GXm" id="Xu1-Pd-OiR"/>
+                <outlet property="maxLabel" destination="tu4-3X-Dvo" id="wE9-V3-TPz"/>
+                <outlet property="minLabel" destination="5Fh-Rr-IZZ" id="nbo-td-7hw"/>
+            </connections>
+            <point key="canvasLocation" x="25" y="51.5"/>
+        </view>
+    </objects>
+</document>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="cbd-x1-vZY" customClass="CCInformationCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="148"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="148"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="uLC-VY-cg3">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="148"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="top of cell" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CJi-ag-Zn3">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="20"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="Z0J-y5-jMc"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" red="0.7019608021" green="0.7019608021" blue="0.7019608021" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="sticker top" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IVF-4r-Igq">
+                                <rect key="frame" x="0.0" y="20" width="320" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="20" id="CBh-dJ-j7Q"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <color key="textColor" red="0.7019608021" green="0.7019608021" blue="0.7019608021" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="redraw" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg_bubble_sticker_information.png" translatesAutoresizingMaskIntoConstraints="NO" id="sWh-22-dHi">
+                                <rect key="frame" x="0.0" y="40" width="320" height="108"/>
+                            </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="0qn-XS-g4b">
+                                <rect key="frame" x="0.0" y="40" width="320" height="108"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in</string>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="IVF-4r-Igq" firstAttribute="top" secondItem="CJi-ag-Zn3" secondAttribute="bottom" id="2f6-ZO-PUF"/>
+                            <constraint firstItem="sWh-22-dHi" firstAttribute="leading" secondItem="0qn-XS-g4b" secondAttribute="leading" id="71w-Ex-qEO"/>
+                            <constraint firstItem="0qn-XS-g4b" firstAttribute="top" secondItem="IVF-4r-Igq" secondAttribute="bottom" id="BHb-42-pkE"/>
+                            <constraint firstItem="sWh-22-dHi" firstAttribute="bottom" secondItem="0qn-XS-g4b" secondAttribute="bottom" id="BHk-Pr-aJM"/>
+                            <constraint firstItem="IVF-4r-Igq" firstAttribute="leading" secondItem="uLC-VY-cg3" secondAttribute="leading" id="FR4-6e-0P8"/>
+                            <constraint firstItem="CJi-ag-Zn3" firstAttribute="top" secondItem="uLC-VY-cg3" secondAttribute="top" id="JvY-7j-zL8"/>
+                            <constraint firstItem="sWh-22-dHi" firstAttribute="trailing" secondItem="0qn-XS-g4b" secondAttribute="trailing" id="PVq-w9-dNF"/>
+                            <constraint firstAttribute="bottom" secondItem="0qn-XS-g4b" secondAttribute="bottom" id="TxG-Nr-EzQ"/>
+                            <constraint firstAttribute="trailing" secondItem="CJi-ag-Zn3" secondAttribute="trailing" id="YVf-5E-6lL"/>
+                            <constraint firstAttribute="trailing" secondItem="IVF-4r-Igq" secondAttribute="trailing" id="ZBu-gb-FZe"/>
+                            <constraint firstAttribute="trailing" secondItem="0qn-XS-g4b" secondAttribute="trailing" id="eTH-eO-eQl"/>
+                            <constraint firstItem="sWh-22-dHi" firstAttribute="top" secondItem="0qn-XS-g4b" secondAttribute="top" id="oX6-QG-lLI"/>
+                            <constraint firstItem="CJi-ag-Zn3" firstAttribute="leading" secondItem="uLC-VY-cg3" secondAttribute="leading" id="stV-4n-EMU"/>
+                            <constraint firstItem="0qn-XS-g4b" firstAttribute="leading" secondItem="uLC-VY-cg3" secondAttribute="leading" id="xlM-kv-aNU"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </view>
+            <constraints>
+                <constraint firstItem="uLC-VY-cg3" firstAttribute="leading" secondItem="cbd-x1-vZY" secondAttribute="leading" id="OW0-By-bZe"/>
+                <constraint firstAttribute="trailing" secondItem="uLC-VY-cg3" secondAttribute="trailing" id="VGd-lC-2fF"/>
+                <constraint firstAttribute="bottom" secondItem="uLC-VY-cg3" secondAttribute="bottom" id="VtF-ZN-fJP"/>
+                <constraint firstItem="uLC-VY-cg3" firstAttribute="top" secondItem="cbd-x1-vZY" secondAttribute="top" id="yVR-ay-6Wt"/>
+            </constraints>
+            <size key="customSize" width="418" height="266"/>
+            <connections>
+                <outlet property="cellTopLabel" destination="CJi-ag-Zn3" id="3uT-gm-abG"/>
+                <outlet property="cellTopLabelHeight" destination="Z0J-y5-jMc" id="ZSQ-az-STP"/>
+                <outlet property="inforDescriptionView" destination="0qn-XS-g4b" id="TS9-Vc-tit"/>
+                <outlet property="stickerContainer" destination="uLC-VY-cg3" id="OuR-dd-hxZ"/>
+                <outlet property="stickerTopLabel" destination="IVF-4r-Igq" id="65Q-h1-1rj"/>
+            </connections>
+            <point key="canvasLocation" x="200" y="216"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="bg_bubble_sticker_information.png" width="355" height="81"/>
+    </resources>
+</document>

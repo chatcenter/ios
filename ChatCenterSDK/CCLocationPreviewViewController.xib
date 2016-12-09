@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CCLocationPreviewViewController">
+            <connections>
+                <outlet property="mapView" destination="tPx-xt-K5h" id="ggQ-p6-3tK"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tPx-xt-K5h">
+                    <frame key="frameInset" width="600" height="600"/>
+                </mapView>
+                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lk8-N1-EnJ">
+                    <frame key="frameInset" minX="539" minY="535" width="46" height="46"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="46" id="QRc-9b-qUr"/>
+                        <constraint firstAttribute="height" constant="46" id="ssc-PR-995"/>
+                    </constraints>
+                    <state key="normal" title="2"/>
+                    <connections>
+                        <action selector="showTargetLocation:" destination="-1" eventType="touchUpInside" id="2S8-Q9-wE7"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kpk-SQ-izJ">
+                    <frame key="frameInset" minX="477" minY="535" width="46" height="46"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="46" id="PB0-sB-fB6"/>
+                        <constraint firstAttribute="width" constant="46" id="ba4-nS-qw9"/>
+                    </constraints>
+                    <state key="normal" title="1"/>
+                    <connections>
+                        <action selector="showLocalLocation:" destination="-1" eventType="touchUpInside" id="jpd-0B-v8P"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="Lk8-N1-EnJ" firstAttribute="leading" secondItem="tPx-xt-K5h" secondAttribute="trailing" constant="-61" id="J1H-uX-OW3"/>
+                <constraint firstItem="tPx-xt-K5h" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="Rfj-z2-unI"/>
+                <constraint firstItem="tPx-xt-K5h" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="WG8-iH-yDK"/>
+                <constraint firstItem="Lk8-N1-EnJ" firstAttribute="top" secondItem="tPx-xt-K5h" secondAttribute="bottom" constant="-65" id="cvI-sZ-8m3"/>
+                <constraint firstItem="kpk-SQ-izJ" firstAttribute="bottom" secondItem="Lk8-N1-EnJ" secondAttribute="bottom" id="hl5-eI-cIi"/>
+                <constraint firstAttribute="trailing" secondItem="tPx-xt-K5h" secondAttribute="trailing" id="oAO-nf-2hM"/>
+                <constraint firstAttribute="bottom" secondItem="tPx-xt-K5h" secondAttribute="bottom" id="rQC-B2-OVF"/>
+                <constraint firstItem="Lk8-N1-EnJ" firstAttribute="leading" secondItem="kpk-SQ-izJ" secondAttribute="trailing" constant="16" id="s2a-yo-dBc"/>
+            </constraints>
+        </view>
+    </objects>
+</document>

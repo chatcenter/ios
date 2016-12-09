@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="6BQ-jc-bme" customClass="CCCalendarCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3MF-bt-tyI" userLabel="Sticker container">
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VRa-Ol-twG" userLabel="Avatar container">
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="c2q-mc-z3f" userLabel="Avatar Image View">
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="15"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="c2q-mc-z3f" firstAttribute="leading" secondItem="VRa-Ol-twG" secondAttribute="leading" id="BeA-Z7-qpi"/>
+                                    <constraint firstAttribute="trailing" secondItem="c2q-mc-z3f" secondAttribute="trailing" id="IjH-aK-coN"/>
+                                    <constraint firstAttribute="bottom" secondItem="c2q-mc-z3f" secondAttribute="bottom" id="YCX-Hm-MfI"/>
+                                    <constraint firstAttribute="width" constant="30" id="a61-Bj-2kx"/>
+                                    <constraint firstItem="c2q-mc-z3f" firstAttribute="top" secondItem="VRa-Ol-twG" secondAttribute="top" id="kdy-A5-0sw"/>
+                                    <constraint firstAttribute="height" constant="30" id="tNE-Lv-Q8M"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="cgR-op-ecD" colorLabel="IBBuiltInLabel-Red">
+                                <string key="text">Here are some times that 
+works for me.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Choose a slot tap to reply" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FxI-2G-HUi">
+                                <frame key="frameInset" minX="15" minY="47" width="167" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" red="0.60000002379999995" green="0.60000002379999995" blue="0.60000002379999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eAj-s0-3ah" userLabel="Choice container">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="cgR-op-ecD" firstAttribute="top" secondItem="3MF-bt-tyI" secondAttribute="top" constant="8" id="0GP-CL-6oX"/>
+                            <constraint firstItem="VRa-Ol-twG" firstAttribute="top" secondItem="cgR-op-ecD" secondAttribute="top" id="1iA-6R-YvY"/>
+                            <constraint firstItem="FxI-2G-HUi" firstAttribute="top" secondItem="cgR-op-ecD" secondAttribute="bottom" constant="3" id="A6u-RX-Hd0"/>
+                            <constraint firstAttribute="trailing" secondItem="eAj-s0-3ah" secondAttribute="trailing" constant="70" id="HOw-ot-aLc"/>
+                            <constraint firstItem="FxI-2G-HUi" firstAttribute="leading" secondItem="cgR-op-ecD" secondAttribute="leading" id="ICS-Io-8AN"/>
+                            <constraint firstItem="eAj-s0-3ah" firstAttribute="top" secondItem="FxI-2G-HUi" secondAttribute="bottom" constant="8" id="VJS-ka-4ba"/>
+                            <constraint firstItem="eAj-s0-3ah" firstAttribute="leading" secondItem="3MF-bt-tyI" secondAttribute="leading" constant="70" id="Zgy-NR-PFQ"/>
+                            <constraint firstAttribute="trailing" secondItem="VRa-Ol-twG" secondAttribute="trailing" constant="15" id="d86-f1-oK0"/>
+                            <constraint firstItem="cgR-op-ecD" firstAttribute="leading" secondItem="3MF-bt-tyI" secondAttribute="leading" constant="15" id="jPO-QF-IOq"/>
+                            <constraint firstAttribute="bottom" secondItem="eAj-s0-3ah" secondAttribute="bottom" id="mnC-G5-GuB"/>
+                            <constraint firstItem="FxI-2G-HUi" firstAttribute="leading" secondItem="cgR-op-ecD" secondAttribute="leading" id="zfe-Wg-YA9"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstItem="3MF-bt-tyI" firstAttribute="leading" secondItem="6BQ-jc-bme" secondAttribute="leading" id="IeX-H0-iQw"/>
+                <constraint firstAttribute="trailing" secondItem="3MF-bt-tyI" secondAttribute="trailing" id="iEW-mh-sHj"/>
+                <constraint firstAttribute="bottom" secondItem="3MF-bt-tyI" secondAttribute="bottom" id="qWm-p0-X6P"/>
+                <constraint firstItem="3MF-bt-tyI" firstAttribute="top" secondItem="6BQ-jc-bme" secondAttribute="top" id="yFW-bA-qsX"/>
+            </constraints>
+            <size key="customSize" width="143" height="89"/>
+            <connections>
+                <outlet property="avatarImage" destination="c2q-mc-z3f" id="52U-DC-jjr"/>
+                <outlet property="choiceContainer" destination="eAj-s0-3ah" id="29J-0Y-AXa"/>
+                <outlet property="stickerContainer" destination="3MF-bt-tyI" id="X3m-Di-XcW"/>
+            </connections>
+            <point key="canvasLocation" x="460" y="240"/>
+        </collectionViewCell>
+    </objects>
+</document>

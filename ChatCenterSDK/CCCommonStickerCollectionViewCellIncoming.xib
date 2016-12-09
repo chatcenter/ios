@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="Lpr-wS-1jZ" userLabel="Common Sticker Collection View Cell Incoming" customClass="CCCommonStickerCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="154"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="cell top label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wqF-qR-lSR" userLabel="Cell top label">
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="3Ou-ek-XcF"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sticker top label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X7P-qT-hvd" userLabel="Sticker top label">
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="yQL-Qy-7IO"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
+                        <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dt1-hy-e5S" userLabel="Avatar container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="NVB-Jh-AU3" userLabel="Avatar Image View">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="30" id="0Gg-Yv-SV1"/>
+                            <constraint firstAttribute="bottom" secondItem="NVB-Jh-AU3" secondAttribute="bottom" id="3ut-0B-XbK"/>
+                            <constraint firstItem="NVB-Jh-AU3" firstAttribute="top" secondItem="dt1-hy-e5S" secondAttribute="top" id="QK3-BZ-aYe"/>
+                            <constraint firstAttribute="height" constant="30" id="YFn-vH-rfe"/>
+                            <constraint firstItem="NVB-Jh-AU3" firstAttribute="leading" secondItem="dt1-hy-e5S" secondAttribute="leading" id="dZT-3w-8em"/>
+                            <constraint firstAttribute="trailing" secondItem="NVB-Jh-AU3" secondAttribute="trailing" id="gCz-Dm-RHJ"/>
+                        </constraints>
+                    </view>
+                    <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-1j-0Ml" userLabel="Sticker container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="r2r-Wc-Yf0">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="38" id="Dvb-G8-QhE"/>
+                                    <constraint firstAttribute="width" constant="30" id="KaN-i4-4rt"/>
+                                </constraints>
+                            </imageView>
+                            <textView multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cVh-vt-RW4">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="5Wr-66-Xk8"/>
+                                </constraints>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R5s-2k-zs1">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="ecH-v0-13X"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nx5-5g-vBt">
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="14" id="dQK-fh-xEd"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="Nx5-5g-vBt" firstAttribute="top" secondItem="R5s-2k-zs1" secondAttribute="bottom" id="33M-K9-Mac"/>
+                            <constraint firstItem="Nx5-5g-vBt" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="4UT-zU-ddT"/>
+                            <constraint firstItem="cVh-vt-RW4" firstAttribute="leading" secondItem="r2r-Wc-Yf0" secondAttribute="trailing" id="8c1-z6-NZi"/>
+                            <constraint firstAttribute="trailing" secondItem="Nx5-5g-vBt" secondAttribute="trailing" id="95e-h9-kbb"/>
+                            <constraint firstItem="cVh-vt-RW4" firstAttribute="top" secondItem="GVY-1j-0Ml" secondAttribute="top" id="TOZ-H4-Ua3"/>
+                            <constraint firstItem="r2r-Wc-Yf0" firstAttribute="top" secondItem="GVY-1j-0Ml" secondAttribute="top" id="W7B-ol-k0E"/>
+                            <constraint firstItem="R5s-2k-zs1" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="nWV-Bv-FUt"/>
+                            <constraint firstItem="r2r-Wc-Yf0" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="pHb-dM-LEk"/>
+                            <constraint firstAttribute="trailing" secondItem="R5s-2k-zs1" secondAttribute="trailing" id="rdw-R1-nRN"/>
+                            <constraint firstAttribute="width" constant="275" id="tIE-wI-PxJ"/>
+                            <constraint firstAttribute="bottom" secondItem="Nx5-5g-vBt" secondAttribute="bottom" id="u1J-4s-w4e"/>
+                            <constraint firstItem="R5s-2k-zs1" firstAttribute="top" secondItem="cVh-vt-RW4" secondAttribute="bottom" id="unQ-aR-FcN"/>
+                            <constraint firstAttribute="trailing" secondItem="cVh-vt-RW4" secondAttribute="trailing" id="yB9-8r-i50"/>
+                        </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.borderWidth">
+                                <real key="value" value="0.80000000000000004"/>
+                            </userDefinedRuntimeAttribute>
+                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                <integer key="value" value="14"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                    </view>
+                </subviews>
+            </view>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="dt1-hy-e5S" firstAttribute="bottom" secondItem="Lpr-wS-1jZ" secondAttribute="bottom" id="65j-Ao-4ZW"/>
+                <constraint firstItem="X7P-qT-hvd" firstAttribute="top" secondItem="wqF-qR-lSR" secondAttribute="bottom" id="794-VA-jT6"/>
+                <constraint firstAttribute="trailing" secondItem="X7P-qT-hvd" secondAttribute="trailing" id="99J-Ow-Ij3"/>
+                <constraint firstItem="GVY-1j-0Ml" firstAttribute="top" secondItem="X7P-qT-hvd" secondAttribute="bottom" id="PJX-FE-QB1"/>
+                <constraint firstAttribute="bottom" secondItem="GVY-1j-0Ml" secondAttribute="bottom" id="Phw-V1-W6a"/>
+                <constraint firstItem="dt1-hy-e5S" firstAttribute="leading" secondItem="Lpr-wS-1jZ" secondAttribute="leading" constant="2" id="R0X-34-tob"/>
+                <constraint firstItem="wqF-qR-lSR" firstAttribute="top" secondItem="Lpr-wS-1jZ" secondAttribute="top" id="TCC-Hp-u17"/>
+                <constraint firstAttribute="trailing" secondItem="wqF-qR-lSR" secondAttribute="trailing" id="cQu-XE-ZOa"/>
+                <constraint firstItem="GVY-1j-0Ml" firstAttribute="leading" secondItem="dt1-hy-e5S" secondAttribute="trailing" constant="5" id="i3S-Go-U1p"/>
+                <constraint firstItem="wqF-qR-lSR" firstAttribute="leading" secondItem="Lpr-wS-1jZ" secondAttribute="leading" id="tRD-cR-uMf"/>
+                <constraint firstItem="GVY-1j-0Ml" firstAttribute="leading" secondItem="X7P-qT-hvd" secondAttribute="leading" id="wTm-Hc-hq1"/>
+            </constraints>
+            <size key="customSize" width="143" height="89"/>
+            <connections>
+                <outlet property="avatarImage" destination="NVB-Jh-AU3" id="IJa-RL-QqL"/>
+                <outlet property="cellTopLabel" destination="wqF-qR-lSR" id="rKN-F5-dsR"/>
+                <outlet property="cellTopLabelHeight" destination="3Ou-ek-XcF" id="qv5-V7-8UJ"/>
+                <outlet property="discriptionView" destination="cVh-vt-RW4" id="IFC-YE-ibe"/>
+                <outlet property="discriptionViewHeight" destination="5Wr-66-Xk8" id="vvQ-Dm-NSV"/>
+                <outlet property="headerImageView" destination="r2r-Wc-Yf0" id="CBe-PY-6UD"/>
+                <outlet property="headerImageViewWidthConstraint" destination="KaN-i4-4rt" id="V6F-bs-C14"/>
+                <outlet property="stickerActionsContainer" destination="Nx5-5g-vBt" id="GEs-ZO-KQP"/>
+                <outlet property="stickerActionsContainerHeight" destination="dQK-fh-xEd" id="7xw-zc-fCk"/>
+                <outlet property="stickerContainer" destination="GVY-1j-0Ml" id="OUi-Sx-7UR"/>
+                <outlet property="stickerContainerWidth" destination="tIE-wI-PxJ" id="Vux-Vr-ZD3"/>
+                <outlet property="stickerObjectContainer" destination="R5s-2k-zs1" id="xjv-qD-7Um"/>
+                <outlet property="stickerObjectContainerHeight" destination="ecH-v0-13X" id="VmO-0x-DmY"/>
+                <outlet property="stickerTopLabel" destination="X7P-qT-hvd" id="cF9-uX-ei4"/>
+                <outlet property="stickerTopLabelHeight" destination="yQL-Qy-7IO" id="n90-n0-Omv"/>
+            </connections>
+            <point key="canvasLocation" x="191" y="259"/>
+        </collectionViewCell>
+    </objects>
+</document>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CCYesNoQuestionComponent">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="42"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g4f-3a-fdB">
+                    <color key="backgroundColor" red="0.60392156860000001" green="0.60392156860000001" blue="0.60392156860000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="1" id="Ygg-dP-8dr"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" tag="100" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mBL-gO-XcZ">
+                    <state key="normal" title="Yes"/>
+                    <connections>
+                        <action selector="buttonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="QNH-Qh-ncv"/>
+                    </connections>
+                </button>
+                <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d6a-jH-piV">
+                    <state key="normal" title="No"/>
+                    <connections>
+                        <action selector="buttonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="t1N-Jc-fsb"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="mBL-gO-XcZ" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="BYu-OA-SPB"/>
+                <constraint firstAttribute="bottom" secondItem="g4f-3a-fdB" secondAttribute="bottom" id="CM3-VY-NOX"/>
+                <constraint firstItem="d6a-jH-piV" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="LMX-p7-e21"/>
+                <constraint firstItem="d6a-jH-piV" firstAttribute="leading" secondItem="mBL-gO-XcZ" secondAttribute="trailing" id="O16-Sn-Erm"/>
+                <constraint firstItem="g4f-3a-fdB" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="ObC-ub-TWL"/>
+                <constraint firstAttribute="bottom" secondItem="d6a-jH-piV" secondAttribute="bottom" id="XTO-kf-OM9"/>
+                <constraint firstItem="g4f-3a-fdB" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="XWx-pg-CBc"/>
+                <constraint firstAttribute="trailing" secondItem="d6a-jH-piV" secondAttribute="trailing" id="g6G-uW-fUB"/>
+                <constraint firstAttribute="bottom" secondItem="mBL-gO-XcZ" secondAttribute="bottom" id="pMn-vy-3A3"/>
+                <constraint firstItem="mBL-gO-XcZ" firstAttribute="width" secondItem="iN0-l3-epB" secondAttribute="width" multiplier="0.5" id="tGa-eC-fqI"/>
+                <constraint firstItem="mBL-gO-XcZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="vUb-xD-dL2"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="button1" destination="mBL-gO-XcZ" id="r2A-sE-yBI"/>
+                <outlet property="button2" destination="d6a-jH-piV" id="aFi-8D-d1c"/>
+                <outlet property="divideView" destination="g4f-3a-fdB" id="7nv-PG-Xmj"/>
+            </connections>
+        </view>
+    </objects>
+</document>

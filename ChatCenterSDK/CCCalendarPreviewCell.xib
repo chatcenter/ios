@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CCCalendarPreviewCell">
+            <connections>
+                <outlet property="choiceContainer" destination="Cr0-qR-x9l" id="Nem-Td-6R5"/>
+                <outlet property="contentView" destination="iN0-l3-epB" id="6bC-6R-xlU"/>
+                <outlet property="discription" destination="qdD-Vj-xWv" id="jWS-C3-1Fq"/>
+                <outlet property="title" destination="ATU-Fk-2eD" id="9Dg-1x-QML"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="154"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Here are some times that works for me." lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="187" translatesAutoresizingMaskIntoConstraints="NO" id="ATU-Fk-2eD">
+                    <rect key="frame" x="8" y="7" width="187" height="34"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="34" id="hIo-OS-gsm"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose a slot and tap to reply." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qdD-Vj-xWv">
+                    <rect key="frame" x="8" y="43" width="187" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="uqS-DK-qg1"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cr0-qR-x9l" userLabel="ChoiceContainer">
+                    <rect key="frame" x="0.0" y="71" width="200" height="83"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="ATU-Fk-2eD" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="7" id="4Xn-Zg-2Xb"/>
+                <constraint firstAttribute="trailing" secondItem="ATU-Fk-2eD" secondAttribute="trailing" constant="5" id="4fh-1M-ZEM"/>
+                <constraint firstItem="Cr0-qR-x9l" firstAttribute="top" secondItem="qdD-Vj-xWv" secondAttribute="bottom" constant="7" id="Fp1-hr-f6Z"/>
+                <constraint firstItem="ATU-Fk-2eD" firstAttribute="leading" secondItem="qdD-Vj-xWv" secondAttribute="leading" id="NuP-uK-sxx"/>
+                <constraint firstItem="ATU-Fk-2eD" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="T8j-hr-A02"/>
+                <constraint firstAttribute="bottom" secondItem="Cr0-qR-x9l" secondAttribute="bottom" id="fEp-Lb-yx2"/>
+                <constraint firstAttribute="trailing" secondItem="Cr0-qR-x9l" secondAttribute="trailing" id="ulB-zH-h80"/>
+                <constraint firstItem="Cr0-qR-x9l" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="v1p-hi-hc5"/>
+                <constraint firstAttribute="trailing" secondItem="qdD-Vj-xWv" secondAttribute="trailing" constant="5" id="zXM-4u-djX"/>
+                <constraint firstItem="qdD-Vj-xWv" firstAttribute="top" secondItem="ATU-Fk-2eD" secondAttribute="bottom" constant="2" id="zeq-ja-1FI"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                    <integer key="value" value="18"/>
+                </userDefinedRuntimeAttribute>
+            </userDefinedRuntimeAttributes>
+        </view>
+    </objects>
+</document>

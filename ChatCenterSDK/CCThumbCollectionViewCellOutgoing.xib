@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="IEp-te-cj1" customClass="CCThumbCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="321" height="40"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="321" height="40"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xpl-Gv-eVR" userLabel="Avatar container">
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UJo-F7-nKK" userLabel="Avatar Image View">
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksToBounds" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="12"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </imageView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="UJo-F7-nKK" secondAttribute="bottom" id="LNz-ow-V5x"/>
+                            <constraint firstAttribute="width" constant="24" id="WeW-Yb-tph"/>
+                            <constraint firstAttribute="trailing" secondItem="UJo-F7-nKK" secondAttribute="trailing" id="pwz-Jo-OIq"/>
+                            <constraint firstAttribute="height" constant="24" id="wgp-vt-Gw0"/>
+                            <constraint firstItem="UJo-F7-nKK" firstAttribute="leading" secondItem="xpl-Gv-eVR" secondAttribute="leading" id="yJB-XR-D0j"/>
+                            <constraint firstItem="UJo-F7-nKK" firstAttribute="top" secondItem="xpl-Gv-eVR" secondAttribute="top" id="ydW-e8-7hu"/>
+                        </constraints>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d7S-Nb-4cQ" userLabel="Sticker container">
+                        <subviews>
+                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="743-Ys-W0C" userLabel="Choice container">
+                                <subviews>
+                                    <button opaque="NO" tag="10" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TQb-md-H2C">
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="NJb-JA-Sb9"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.60000002384185791" green="0.60000002384185791" blue="0.60000002384185791" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <inset key="imageEdgeInsets" minX="34" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <state key="normal" title="Yes" image="CCmenu_icon_thumb.png">
+                                            <color key="titleColor" red="1" green="0.40000000596046448" blue="0.40000000596046448" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                    </button>
+                                    <button opaque="NO" tag="20" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="epv-IS-ah4">
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="3Ms-VE-h3f"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.5296475887298584" green="0.52963173389434814" blue="0.52964073419570923" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <inset key="imageEdgeInsets" minX="24" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <state key="normal" title="No" image="CCmenu_icon_thumbNo.png">
+                                            <color key="titleColor" red="0.60000002384185791" green="0.60000002384185791" blue="0.60000002384185791" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="0.96538686752319336" green="0.96423375606536865" blue="0.99988090991973877" alpha="0.80000000000000004" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="TQb-md-H2C" firstAttribute="top" secondItem="743-Ys-W0C" secondAttribute="top" id="5Ls-fO-IYb"/>
+                                    <constraint firstItem="epv-IS-ah4" firstAttribute="leading" secondItem="TQb-md-H2C" secondAttribute="trailing" id="GJm-7C-Kgf"/>
+                                    <constraint firstItem="epv-IS-ah4" firstAttribute="top" secondItem="743-Ys-W0C" secondAttribute="top" id="Ixt-9W-dul"/>
+                                    <constraint firstAttribute="bottom" secondItem="epv-IS-ah4" secondAttribute="bottom" id="MWP-2i-h1o"/>
+                                    <constraint firstAttribute="height" constant="40" id="OkT-Os-NIX"/>
+                                    <constraint firstItem="TQb-md-H2C" firstAttribute="leading" secondItem="743-Ys-W0C" secondAttribute="leading" id="PXh-qy-Agc"/>
+                                    <constraint firstAttribute="bottom" secondItem="TQb-md-H2C" secondAttribute="bottom" id="fRe-RG-Pxy"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="0.99997437000274658" blue="0.99999129772186279" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="743-Ys-W0C" secondAttribute="trailing" id="n86-pz-L4f"/>
+                            <constraint firstAttribute="bottom" secondItem="743-Ys-W0C" secondAttribute="bottom" id="puV-FL-d0N"/>
+                            <constraint firstItem="743-Ys-W0C" firstAttribute="leading" secondItem="d7S-Nb-4cQ" secondAttribute="leading" id="yNV-vw-s8l"/>
+                            <constraint firstAttribute="width" constant="200" id="zKC-vR-bub"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="xpl-Gv-eVR" firstAttribute="top" secondItem="IEp-te-cj1" secondAttribute="top" id="OAh-OW-QR2"/>
+                <constraint firstAttribute="bottom" secondItem="d7S-Nb-4cQ" secondAttribute="bottom" id="eSl-WL-bhq"/>
+                <constraint firstItem="d7S-Nb-4cQ" firstAttribute="top" secondItem="IEp-te-cj1" secondAttribute="top" id="xDF-ZP-Krt"/>
+                <constraint firstAttribute="trailing" secondItem="xpl-Gv-eVR" secondAttribute="trailing" constant="15" id="yZK-sY-kq0"/>
+                <constraint firstItem="xpl-Gv-eVR" firstAttribute="leading" secondItem="d7S-Nb-4cQ" secondAttribute="trailing" constant="3" id="zJP-hb-qTc"/>
+            </constraints>
+            <size key="customSize" width="144" height="-21"/>
+            <connections>
+                <outlet property="avatarImage" destination="UJo-F7-nKK" id="dDP-4u-c3B"/>
+                <outlet property="choiceContainer" destination="743-Ys-W0C" id="TLW-UX-pCt"/>
+                <outlet property="stickerContainer" destination="d7S-Nb-4cQ" id="avy-1c-gic"/>
+            </connections>
+            <point key="canvasLocation" x="458.5" y="183"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="CCmenu_icon_thumb.png" width="24" height="24"/>
+        <image name="CCmenu_icon_thumbNo.png" width="24" height="24"/>
+    </resources>
+</document>

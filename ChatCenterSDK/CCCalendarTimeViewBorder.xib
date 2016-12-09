@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7706"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CCCalendarTimeViewBorder">
+            <connections>
+                <outlet property="contentView" destination="iN0-l3-epB" id="wCq-t7-Joq"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view userInteractionEnabled="NO" contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="6"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OnS-Td-7BH" userLabel="line">
+                    <rect key="frame" x="35" y="2.5" width="565" height="1"/>
+                    <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="0.70000000000000007" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="1" id="bEY-b9-rFf"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="94K-ax-eDU" userLabel="circle">
+                    <rect key="frame" x="32" y="0.0" width="6" height="6"/>
+                    <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="6" id="Gv9-J4-vif"/>
+                        <constraint firstAttribute="width" constant="6" id="j9M-Wf-EnA"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="3"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="0.0" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="OnS-Td-7BH" secondAttribute="trailing" id="f77-tx-1Yq"/>
+                <constraint firstItem="94K-ax-eDU" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="32" id="hE2-fJ-vM9"/>
+                <constraint firstItem="OnS-Td-7BH" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="35" id="jiC-ES-qLP"/>
+                <constraint firstItem="94K-ax-eDU" firstAttribute="centerY" secondItem="OnS-Td-7BH" secondAttribute="centerY" id="mBs-IS-bsl"/>
+                <constraint firstItem="94K-ax-eDU" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="wcS-G7-3OX"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+        </view>
+    </objects>
+</document>
