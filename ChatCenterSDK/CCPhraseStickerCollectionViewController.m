@@ -56,7 +56,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     self.collectionView.backgroundColor = [UIColor whiteColor];
     
     // register nib for CCCommonStickerViewCell
-    UINib *nib = [UINib nibWithNibName:kCCCommonStickerPreviewCollectionViewCell bundle:nil];
+    UINib *nib = [UINib nibWithNibName:kCCCommonStickerPreviewCollectionViewCell bundle:SDK_BUNDLE];
     [self.collectionView registerNib:nib forCellWithReuseIdentifier:kCCCommonStickerPreviewCollectionViewCell];
 
     ((UICollectionViewFlowLayout*)self.collectionView.collectionViewLayout).minimumInteritemSpacing = 10.0;
