@@ -123,7 +123,9 @@
         for (int i = self.fromValue; i <= self.toValue; i++) {
             [actionData addObject:@{
                                     @"label": [NSString stringWithFormat:@"%d", i],
-                                    @"value": @(i)
+                                    @"value": @{
+                                            @"answer": @(i)
+                                            }
                                     }];
         }
     }

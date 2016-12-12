@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11201" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,6 +19,7 @@
                 <outlet property="otherVideoDisabledLabel" destination="Y8d-OU-UGT" id="kYV-s8-rvD"/>
                 <outlet property="otherVideoInfoContainer" destination="Cjk-xB-PZi" id="yWu-gx-cr1"/>
                 <outlet property="remoteView" destination="C6b-cI-mRk" id="YVG-p3-3Rs"/>
+                <outlet property="switchCameraButton" destination="q8F-3J-GQd" id="KsE-N8-X6S"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -25,22 +29,27 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C6b-cI-mRk" userLabel="Remote View">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                     <subviews>
                         <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="other_mic_off" translatesAutoresizingMaskIntoConstraints="NO" id="7XM-eD-OnM">
+                            <rect key="frame" x="20" y="40" width="32" height="32"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="32" id="UHM-9m-iJa"/>
                                 <constraint firstAttribute="height" constant="32" id="mGE-ME-Grt"/>
                             </constraints>
                         </imageView>
                         <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Cjk-xB-PZi">
+                            <rect key="frame" x="20" y="293.5" width="335" height="80"/>
                             <subviews>
                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="other_video_off" translatesAutoresizingMaskIntoConstraints="NO" id="Kdp-BV-J6x">
+                                    <rect key="frame" x="151.5" y="0.0" width="32" height="32"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="32" id="XgI-1w-UYv"/>
                                         <constraint firstAttribute="height" constant="32" id="Ydk-Kz-UcS"/>
                                     </constraints>
                                 </imageView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Video is disabled" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y8d-OU-UGT">
+                                    <rect key="frame" x="0.0" y="37" width="335" height="20.5"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <nil key="highlightedColor"/>
@@ -56,17 +65,31 @@
                                 <constraint firstItem="Y8d-OU-UGT" firstAttribute="leading" secondItem="Cjk-xB-PZi" secondAttribute="leading" id="xOL-1n-EVg"/>
                             </constraints>
                         </view>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="q8F-3J-GQd">
+                            <rect key="frame" x="313" y="40" width="42" height="42"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="42" id="I0R-wr-vUV"/>
+                                <constraint firstAttribute="width" constant="42" id="UcH-Vj-jxH"/>
+                            </constraints>
+                            <state key="normal" image="switch_camera"/>
+                            <connections>
+                                <action selector="switchCamera:" destination="-1" eventType="touchUpInside" id="Tzy-6a-CKW"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" red="0.28627450980392155" green="0.28627450980392155" blue="0.28627450980392155" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
+                        <constraint firstAttribute="trailing" secondItem="q8F-3J-GQd" secondAttribute="trailing" constant="20" id="5zV-SB-gRv"/>
                         <constraint firstItem="7XM-eD-OnM" firstAttribute="leading" secondItem="C6b-cI-mRk" secondAttribute="leading" constant="20" id="6Z9-7c-LPS"/>
                         <constraint firstAttribute="trailing" secondItem="Cjk-xB-PZi" secondAttribute="trailing" constant="20" id="85y-d8-S2e"/>
-                        <constraint firstItem="7XM-eD-OnM" firstAttribute="top" secondItem="C6b-cI-mRk" secondAttribute="top" constant="20" id="Gpy-Hl-CnO"/>
+                        <constraint firstItem="q8F-3J-GQd" firstAttribute="top" secondItem="C6b-cI-mRk" secondAttribute="top" constant="40" id="DUr-J2-yLE"/>
+                        <constraint firstItem="7XM-eD-OnM" firstAttribute="top" secondItem="C6b-cI-mRk" secondAttribute="top" constant="40" id="Gpy-Hl-CnO"/>
                         <constraint firstItem="Cjk-xB-PZi" firstAttribute="leading" secondItem="C6b-cI-mRk" secondAttribute="leading" constant="20" id="LcL-Le-T6Q"/>
                         <constraint firstItem="Cjk-xB-PZi" firstAttribute="centerY" secondItem="C6b-cI-mRk" secondAttribute="centerY" id="jOB-u0-MiN"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="72Z-qu-ooV" userLabel="Local View">
+                    <rect key="frame" x="247" y="433" width="128" height="128"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
@@ -80,6 +103,7 @@
                     </userDefinedRuntimeAttributes>
                 </view>
                 <button opaque="NO" tag="12" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I2P-04-wBR">
+                    <rect key="frame" x="155.5" y="578" width="64" height="64"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="64" id="2rf-Zk-23m"/>
@@ -93,6 +117,7 @@
                     </connections>
                 </button>
                 <button opaque="NO" tag="13" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CZa-ex-fOm">
+                    <rect key="frame" x="248.5" y="578" width="64" height="64"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="695-rW-lke"/>
@@ -105,6 +130,7 @@
                     </connections>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" tag="4" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Calling..." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qps-df-75s">
+                    <rect key="frame" x="132.5" y="323" width="110" height="21"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="110" id="bPC-T4-Uoy"/>
                         <constraint firstAttribute="height" constant="21" id="ws7-xA-6tr"/>
@@ -114,6 +140,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <button opaque="NO" tag="11" contentMode="redraw" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mLo-Qd-yv1">
+                    <rect key="frame" x="62.5" y="578" width="64" height="64"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="64" id="Ugu-pa-s0T"/>
@@ -152,5 +179,6 @@
         <image name="micOn_btn" width="60" height="60"/>
         <image name="other_mic_off" width="36" height="36"/>
         <image name="other_video_off" width="19" height="19"/>
+        <image name="switch_camera" width="42" height="42"/>
     </resources>
 </document>

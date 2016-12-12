@@ -38,4 +38,6 @@
 
 - (NSAttributedString*)createMessageString:(CCJSQMessage*)msg;
 
+- (void)resetSelection;
+
 @end

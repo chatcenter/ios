@@ -96,6 +96,7 @@ static bool subscribeToSelf = NO;
     
     if ([self.videoAction isEqualToString:CC_ACTIONTYPE_VOICECALL]) {
         self.cameraButton.hidden = YES;
+        self.switchCameraButton.hidden = YES;
     }
 }
 
@@ -380,6 +381,14 @@ static bool subscribeToSelf = NO;
 }
 
 #pragma mark - UI actions
+- (IBAction)switchCamera:(id)sender {
+    if (_publisher.cameraPosition == AVCaptureDevicePositionBack) {
+        [_publisher setCameraPosition:AVCaptureDevicePositionFront];
+    } else {
+        [_publisher setCameraPosition:AVCaptureDevicePositionBack];
+    }
+}
+
 - (IBAction)onMicrophoneClicked:(id)sender {
     _publisher.publishAudio = !_publisher.publishAudio;
     if(!_publisher.publishAudio) {
@@ -414,15 +423,18 @@ static bool subscribeToSelf = NO;
     if(!_publisher.publishVideo) {
         [_cameraButton setImage:cameraOffImage forState:UIControlStateNormal];
         _publisher.view.hidden = YES;
+        _switchCameraButton.hidden = YES;
     } else {
         [_cameraButton setImage:cameraOnImage forState:UIControlStateNormal];
         _publisher.view.hidden = NO;
+        _switchCameraButton.hidden = NO;
     }
 }
 
 - (void) doHangup {
     NSLog(@"doHangup channelid = %@", self.channelUid);
     [[CCConnectionHelper sharedClient] hangupCall:self.channelUid messageId:self.messageId user:@{@"user_id": _publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }];
 }
 

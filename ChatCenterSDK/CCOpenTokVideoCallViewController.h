@@ -17,6 +17,7 @@
 
 @property (strong, nonatomic) IBOutlet UIImageView *otherMicrophoneInfo;
 
+@property (strong, nonatomic) IBOutlet UIButton *switchCameraButton;
 
 @property (strong, nonatomic) IBOutlet UILabel *callingLabel;
 

@@ -1752,7 +1752,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 //                 )
                 //     }
                 // )
-                NSArray *wrapped = @[ @{ @"action":actionResponseData } ];
+                NSArray *wrapped = @[ @{ @"actions":actionResponseData } ];
                 
                 [stickerAction setValue:wrapped forKey:@"action-response-data"];
                 [newContent setValue:stickerAction forKey:@"sticker-action"];
@@ -2597,6 +2597,24 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                     navigationTitleView.title.text = CCLocalizedString(@"Guest");
                 }else{
                     ///Display names of chat members
+                    float screenWidth = [UIScreen mainScreen].bounds.size.width;
+                    // Estimate navigation title width
+                    CGSize maximumLabelSize = CGSizeMake(screenWidth, MAXFLOAT);
+                    NSStringDrawingOptions options = NSStringDrawingTruncatesLastVisibleLine |
+                    NSStringDrawingUsesLineFragmentOrigin;
+                    
+                    NSDictionary *attr = @{NSFontAttributeName: navigationTitleView.title.font};
+                    CGRect labelBounds = [names boundingRectWithSize:maximumLabelSize
+                                                              options:options
+                                                           attributes:attr
+                                                              context:nil];
+                    float padding = navigationTitleView.rightArrow.frame.size.width + 16;
+                    if (labelBounds.size.width > navigationTitleView.frame.size.width - padding) {
+                        navigationTitleView.titleWidthConstraint.constant = navigationTitleView.frame.size.width - padding;
+                    } else {
+                        navigationTitleView.titleWidthConstraint.constant = labelBounds.size.width + 5; //5 for content inset
+                    }
+                    
                     navigationTitleView.title.text = names;
                 }
             }
@@ -2607,6 +2625,23 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 self.navigationItem.rightBarButtonItems = @[rightSpacer, videoCallButton, voiceCallButton];
             } else {
                 self.navigationItem.rightBarButtonItems = nil;
+            }
+            float screenWidth = [UIScreen mainScreen].bounds.size.width;
+            // Estimate navigation title width
+            CGSize maximumLabelSize = CGSizeMake(screenWidth, MAXFLOAT);
+            NSStringDrawingOptions options = NSStringDrawingTruncatesLastVisibleLine |
+            NSStringDrawingUsesLineFragmentOrigin;
+            
+            NSDictionary *attr = @{NSFontAttributeName: navigationTitleView.title.font};
+            CGRect labelBounds = [self.orgName boundingRectWithSize:maximumLabelSize
+                                                     options:options
+                                                  attributes:attr
+                                                     context:nil];
+            float padding = navigationTitleView.rightArrow.frame.size.width;
+            if (labelBounds.size.width > navigationTitleView.frame.size.width - padding) {
+                navigationTitleView.titleWidthConstraint.constant = navigationTitleView.frame.size.width - padding;
+            } else {
+                navigationTitleView.titleWidthConstraint.constant = labelBounds.size.width + 5;//5 for content inset
             }
             navigationTitleView.title.text = self.orgName;
         }
@@ -4130,6 +4165,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 //
 - (void)onUserReactionToSticker:(NSNotification *)notification {
     NSDictionary *data = notification.userInfo;
+    CCCommonStickerCollectionViewCell *cell = (CCCommonStickerCollectionViewCell*)[notification object];
+    
     if (data != nil) {
         NSNumber *msgId = [data objectForKey:@"msgId"];
         NSString *actionType = [data objectForKey:@"action-type"];
@@ -4161,6 +4198,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             // Build dialog
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:CCLocalizedString(@"Cancelled selections")];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                [cell resetSelection];
                 [_answeringStickers removeObject:data];
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
@@ -4231,6 +4269,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             // Build dialog
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:message];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                [cell resetSelection];
                 [_answeringStickers removeObject:data];
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
@@ -4271,6 +4310,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stickerAction[@"label"]];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                [cell resetSelection];
                 [_answeringStickers removeObject:data];
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
@@ -4294,6 +4334,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             if (stickerAction[@"value"] != nil) {
                 CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stickerAction[@"label"]];
                 [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                    [cell resetSelection];
                     [_answeringStickers removeObject:data];
                 }];
                 [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {

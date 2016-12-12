@@ -26,6 +26,7 @@
 @property (nonatomic, weak) id<CCChatViewNavigationTitleDelegate> delegate;
 
 @property (weak, nonatomic) IBOutlet UILabel *title;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *titleWidthConstraint;
 @property (weak, nonatomic) IBOutlet UIImageView *rightArrow;
 @property (strong, nonatomic) IBOutlet UIView *contentView;
 

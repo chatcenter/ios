@@ -342,11 +342,24 @@
     //
     // Part E: Action
     //
+    [self setupQuestionComponentWithMessage:msg];
+    
+    
+    //------------------------------
+    //
+    // Part F: Status
+    //
+    [self setMessageStatusLabel:msg delegate:delegate];
 
+    return YES;
+}
+
+
+- (void)setupQuestionComponentWithMessage:(CCJSQMessage*)msg {
     //
     // Extract sticker actions
     //
-//    NSString *stickerActionType = [msg getStringAtPath:@"sticker-action/action-type"];
+    //    NSString *stickerActionType = [msg getStringAtPath:@"sticker-action/action-type"];
     NSArray *actionData = [msg getArrayAtPath:@"sticker-action/action-data"];
     NSArray *stickerActionsResponses_wrapped = [msg getArrayAtPath:@"sticker-action/action-response-data"];
     
@@ -398,12 +411,17 @@
     //                   )
     //     }
     // )
-
     NSArray <NSDictionary*> *stickerActionsResponses;
+    
     if (stickerActionsResponses_wrapped) {
         if (stickerActionsResponses_wrapped.count>0) {
             if ([stickerActionsResponses_wrapped[0] isKindOfClass:[NSDictionary class]]) {
-                id obj = [stickerActionsResponses_wrapped[0] objectForKey:@"action"];
+                id obj;
+                if ([stickerActionsResponses_wrapped[0] objectForKey:@"actions"] != nil) {
+                    obj = [stickerActionsResponses_wrapped[0] objectForKey:@"actions"];
+                }else{
+                    obj = [stickerActionsResponses_wrapped[0] objectForKey:@"action"];
+                }
                 
                 if ([obj isKindOfClass:[NSArray class]]) {
                     stickerActionsResponses = obj;
@@ -419,7 +437,7 @@
         //
         // Create question component
         //
-    
+        
         NSDictionary *action =  msg.content[@"sticker-action"];
         // If the stickerActionType is "confirm" convert it to YesNo Question Widget
         action = [[self class] convertStickerActionToMoonStyleIfNeeded:action];
@@ -438,7 +456,7 @@
         NSArray *constraints2 = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[view]|" options:0 metrics:nil views:@{@"view":v}];
         [stickerActionsContainer addConstraints:constraints1];
         [stickerActionsContainer addConstraints:constraints2];
-
+        
         stickerActionsContainerHeight.constant = height;
         
         // Set selection state
@@ -448,16 +466,7 @@
     } else {
         stickerActionsContainerHeight.constant = 0;
     }
-
     
-    
-    //------------------------------
-    //
-    // Part F: Status
-    //
-    [self setMessageStatusLabel:msg delegate:delegate];
-
-    return YES;
 }
 
 - (void)setMessageStatusLabel:(CCJSQMessage*)msg delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate{
@@ -638,7 +647,7 @@
                                     @"stickerActions" : items,
                                     @"sticker_type": _msg.type ,
                                     @"reacted" : isReacted};
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:nil userInfo:data];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
 
     
     
@@ -893,8 +902,15 @@
     for (UIView *v in [stickerActionsContainer subviews]) {
         [v removeFromSuperview];
     }
+}
 
-   
+- (void)resetSelection {
+    // Reset sticker action container
+    for (UIView *v in [stickerActionsContainer subviews]) {
+        [v removeFromSuperview];
+    }
+    
+    [self setupQuestionComponentWithMessage:_msg];
 }
 
 @end
