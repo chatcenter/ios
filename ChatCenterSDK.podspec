@@ -2,8 +2,8 @@ Pod::Spec.new do |s|
   s.name         = "ChatCenterSDK"
   s.authors      = "AppSocially Inc."
   s.homepage     = "http://chatcenter.io"
-  s.version      = "1.0.18"  
-  s.ios.deployment_target  = '9.0'
+  s.version      = "1.0.20"  
+  s.ios.deployment_target  = '8.1'
   s.summary      = "ChatCenterSDK: SDK for ChatCenter iO"
   s.description  = "ChatCenter iO helps your business"
   # We can delete the entry "OpenTok" and the followings once Cocoapods allow the dependency to OpenTok
