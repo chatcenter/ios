@@ -133,7 +133,6 @@ completionHandler:(void (^)(void))completionHandler;
    completionHandler:(void (^)(void))completionHandler;
 // Present viewController
 - (void)presentHistoryView:(UIViewController *)viewController
-               channelType:(CCChannelType)channelType
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
        providerTokenSecret:(NSString *)providerTokenSecret
@@ -149,7 +148,6 @@ completionHandler:(void (^)(void))completionHandler;
       completionHandler:(void (^)(void))completionHandler;
 // Present viewController
 - (void)presentHistoryView:(UIViewController *)viewController
-               channelType:(CCChannelType)channelType
          completionHandler:(void (^)(void))completionHandler;
 
 
@@ -183,9 +181,6 @@ completionHandler:(void (^)(void))completionHandler;
 - (NSUInteger)unreadMessageCount;
 - (NSUInteger)unreadChannelCount;
 - (BOOL)isUnreadMessageCount;
-- (BOOL)hasChatUser;
-- (BOOL)hasChannel:(NSString *)orgUid;
-- (BOOL)isDebug;
 - (void)isOrgOnline:orgUid completeHandler:(void (^)(BOOL isOnline))completionHandler;
 
 

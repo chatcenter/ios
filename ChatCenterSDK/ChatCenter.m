@@ -383,7 +383,6 @@ completionHandler:(void (^)(void))completionHandler
 
 
 - (void)presentHistoryView:(UIViewController *)viewController
-               channelType:(CCChannelType)channelType
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
        providerTokenSecret:(NSString *)providerTokenSecret
@@ -391,7 +390,7 @@ completionHandler:(void (^)(void))completionHandler
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler{
     [CCConstants sharedInstance].isModal = YES;
-    CCHistoryViewController *historyView = [[CCHistoryViewController alloc] initWithUserdata:channelType
+    CCHistoryViewController *historyView = [[CCHistoryViewController alloc] initWithUserdata:CCAllChannel
                                                                                     provider:provider
                                                                                providerToken:providerToken
                                                                          providerTokenSecret:providerTokenSecret
@@ -523,10 +522,9 @@ completionHandler:(void (^)(void))completionHandler
 }
 
 - (void)presentHistoryView:(UIViewController *)viewController
-               channelType:(CCChannelType)channelType
          completionHandler:(void (^)(void))completionHandler{
     [CCConstants sharedInstance].isModal = YES;
-    CCHistoryViewController *historyView = [[CCHistoryViewController alloc] initWithUserdata:channelType
+    CCHistoryViewController *historyView = [[CCHistoryViewController alloc] initWithUserdata:CCAllChannel
                                                                                     provider:nil
                                                                                providerToken:nil
                                                                          providerTokenSecret:nil

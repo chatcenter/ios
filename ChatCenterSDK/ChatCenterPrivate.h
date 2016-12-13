@@ -63,5 +63,8 @@
 + (void)setAppIconName:(NSString *)setAppIconName;
 + (void)setSendButtonColor:(UIColor *)sendButtonColor;
 + (void)setLeftMenuViewSelectColor:(UIColor *)leftMenuViewSelectColor;
+- (BOOL)hasChatUser;
+- (BOOL)hasChannel:(NSString *)orgUid;
+- (BOOL)isDebug;
 
 @end
