@@ -13,19 +13,18 @@
 #define CC_SDK_VERSION                    @"1.0.8"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
+#define CC_VIDEO 1
 
 #ifdef API_BASE_URL
     #define CC_API_BASE_URL             API_BASE_URL
 #else
-//    #define CC_API_BASE_URL             @"https://api.chatcenter.io/"
-#define CC_API_BASE_URL             @"https://api.staging.chatcenter.io/"
+    #define CC_API_BASE_URL             @"https://api.chatcenter.io/"
 #endif
 
 #ifdef WEBSOCKET_BASE_URL
     #define CC_WEBSOCKET_BASE_URL       WEBSOCKET_BASE_URL
 #else
-//    #define CC_WEBSOCKET_BASE_URL       @"wss://api.chatcenter.io/"
-#define CC_WEBSOCKET_BASE_URL       @"wss://api.staging.chatcenter.io/"
+    #define CC_WEBSOCKET_BASE_URL       @"wss://api.chatcenter.io/"
 #endif
 
 #ifdef WEB_DASHBOARD_URL

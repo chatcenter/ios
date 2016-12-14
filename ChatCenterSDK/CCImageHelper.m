@@ -2,7 +2,7 @@
 //  CCImageHelper.m
 //  ChatCenterDemo
 //
-//  Created by VietHD on 9/23/16.
+//  Created by AppSocially Inc. on 9/23/16.
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 

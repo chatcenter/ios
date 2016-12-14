@@ -2,7 +2,7 @@
 //  UIImage+fixOrientation.m
 //  ChatCenterDemo
 //
-//  Created by VietHD on 10/6/16.
+//  Created by AppSocially Inc. on 10/6/16.
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 

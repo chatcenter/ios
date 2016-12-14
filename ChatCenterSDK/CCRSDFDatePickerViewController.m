@@ -33,9 +33,6 @@
     [self.view addSubview:self.datePickerView];
     
     
-    /*
-     * added by shingo
-     */
     UIBarButtonItem *button = [[UIBarButtonItem alloc]
                                initWithTitle:@"Done"
                                style:UIBarButtonItemStyleBordered

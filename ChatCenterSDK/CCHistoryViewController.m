@@ -621,6 +621,9 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     }else{
         self.navigationController.navigationBar.barTintColor = [[CCConstants sharedInstance] historyHeaderBackgroundColor];
     }
+    if ([CCConstants sharedInstance].headerItemColor != nil) {
+        self.navigationController.navigationBar.tintColor = [[CCConstants sharedInstance] headerItemColor];
+    }
     [self addNavigationBottomBorder];
 }
 

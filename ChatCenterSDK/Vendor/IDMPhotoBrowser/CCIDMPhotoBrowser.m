@@ -1289,7 +1289,7 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
 				}];
 			}
 			
-            // Fixed to prevent crash with tapping share icon in iPad by shingo
+            // Fixed to prevent crash with tapping share icon in iPad by AppSocially
             // https://github.com/ideaismobile/IDMPhotoBrowser/issues/169
             if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
                 [self presentViewController:self.activityViewController animated:YES completion:nil];

@@ -2,7 +2,7 @@
 //  CCChatViewNavigationTitle.h
 //  ChatCenterDemo
 //
-//  Created by Shingo Hagiwara on 2016/11/22.
+//  Created by AppSocially Inc. on 2016/11/22.
 //  Copyright © 2016年 AppSocially Inc. All rights reserved.
 //
 

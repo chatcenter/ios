@@ -72,7 +72,7 @@
         button.frame = CGRectMake(0.0, currButtonStartY, CC_STICKER_BUBBLE_WIDTH, buttonHeight);
         currButtonStartY += buttonHeight;
         stickerActionsContainerHeight.constant = currButtonStartY;
-        // 20160624 VietHD hide "call again" of call message (temporary)
+        // 20160624 AppSocially Inc. hide "call again" of call message (temporary)
         stickerActionsContainerHeight.constant = 0;
         // add button to container
         //        [stickerActionsContainer addSubview:button];

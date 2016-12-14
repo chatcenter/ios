@@ -567,6 +567,14 @@ int kCloseStickerMenuButtonTag  = 997;
                                              disableImageName:[CCConstants sharedInstance].backBtnDisable
                                                        target:self
                                                      selector:@selector(pressBack:)];
+                
+                //--------------------------------------------------------------------
+                // Without this UIBarButtonItem was not changed
+                //--------------------------------------------------------------------
+                if ([CCConstants sharedInstance].headerItemColor == nil) {
+                    leftButton.tintColor = [UIColor colorWithRed:41/255.0 green:59/255.0 blue:84/255.0 alpha:1.0];
+                }
+                
                 leftBarButton = [[UIBarButtonItem alloc] initWithCustomView:leftButton];
             }
         }
@@ -804,9 +812,9 @@ int kCloseStickerMenuButtonTag  = 997;
 //    locationManager.delegate = self;
 //    if ([CLLocationManager locationServicesEnabled] == NO) {
 //        NSLog(@"Location is denied");
-//        NSLog(@"VIETHD___LOcation    1");
+//        NSLog(@"AppSocially Inc.___LOcation    1");
 //    }else{
-//        NSLog(@"VIETHD___LOcation    2");
+//        NSLog(@"AppSocially Inc.___LOcation    2");
 //        if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) { //requestWhenInUseAuthorization can be used in iOS8
 //            switch ([CLLocationManager authorizationStatus]) {
 //                case kCLAuthorizationStatusNotDetermined:
@@ -4112,7 +4120,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSLog(@"canShowStatus: %d - canShowDate: %d", [self canShowStatusForMessage:msg], [self checkShowDateForMessageAtIndexPath:indexPath]);
         
         // button "Call again" height
-        // 20160624 VietHD hide "call again" of call message (temporary)
+        // 20160624 AppSocially Inc. hide "call again" of call message (temporary)
 //         height += 30;
         
         

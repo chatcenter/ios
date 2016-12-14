@@ -2,7 +2,7 @@
 //  OTDefaultAudioDevice.h
 //  ChatCenterDemo
 //
-//  Created by VietHD on 11/15/16.
+//  Created by AppSocially Inc. on 11/15/16.
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 #ifdef CC_VIDEO
