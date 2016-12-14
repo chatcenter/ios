@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.resource_bundle = {
   	'ChatCenter' => ['ChatCenterSDK/*.{storyboard,xib,png,bundle,xcdatamodeld,xcassets,plist}', '*.lproj', "ChatCenterSDK/Vendor/**/*.{xib,png,bundle}"]
   }
-  s.prefix_header_contents = "ChatCenterSDK/ChatCenter.pch"
+  s.prefix_header_file = "ChatCenterSDK/ChatCenter.pch"
   # So far Cocoapods doesn't allow setting the dependency to OpenTok because it includes a static library.
   #  s.dependency 'OpenTok'
 end
