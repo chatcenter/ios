@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/chatcenter/ios.git" }
   s.source_files = "ChatCenterSDK/*.{h,m}", "ChatCenterSDK/Vendor/**/*.{h,m}"
   s.public_header_files = "ChatCenterSDK/*.h"
-  s.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"/Users/yoke/pocketsupernova/chatCenter/chat-center-for-iOS/ChatCenterSDK"/**', 'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}"/OpenTok', 'GCC_PREPROCESSOR_DEFINITIONS' => 'CC_VIDEO=1 API_BASE_URL=\@\"https:\/\/api.staging.chatcenter.io/\" WEBSOCKET_BASE_URL=\@\"wss:\/\/api.staging.chatcenter.io/\"' }
+  s.xcconfig = { 'USER_HEADER_SEARCH_PATHS' => '"/Users/yoke/pocketsupernova/chatCenter/chat-center-for-iOS/ChatCenterSDK"/**', 'FRAMEWORK_SEARCH_PATHS' => '"${PODS_ROOT}"/OpenTok', 'GCC_PREPROCESSOR_DEFINITIONS' => 'CC_VIDEO=1' }
   s.resources = ['ChatCenterSDK/*.{storyboard,xib,png,bundle,xcdatamodeld,xcassets,plist}', '*.lproj', 'TwitterCore.framework', 'TwitterKit.framework', "ChatCenterSDK/Vendor/**/*.{xib,png,bundle}"]
   s.resource_bundle = {
   	'ChatCenter' => ['ChatCenterSDK/*.{storyboard,xib,png,bundle,xcdatamodeld,xcassets,plist}', '*.lproj', "ChatCenterSDK/Vendor/**/*.{xib,png,bundle}"]
