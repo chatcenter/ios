@@ -20,5 +20,6 @@
 @property (strong, nonatomic) IBOutlet UIButton *sendButton;
 - (void) setDelegate: (id<CCCommonWidgetEditorDelegate>)newDelegate;
 - (void) setMessage: (CCJSQMessage *) msg;
+- (void) cancelButtonPressed:(id)sender;
 
 @end

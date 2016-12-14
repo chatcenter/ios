@@ -4429,6 +4429,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                         CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
                         [vc setMessage:msg];
                         [vc setDelegate:self];
+                        vc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Cancel")
+                                                                                                  style:UIBarButtonItemStylePlain target:vc action:@selector(cancelButtonPressed:)];
 
                         UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:vc];
                         [self presentViewController:rootNC animated:YES completion:^{
