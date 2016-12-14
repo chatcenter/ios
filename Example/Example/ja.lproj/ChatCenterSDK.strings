@@ -1,0 +1,232 @@
+/*
+ ChatCenterSDK.strings Version 1.0.7
+ 
+ Created by AppSocially Inc.on 2015/03/21.
+ Copyright (c) 2015年 AppSocially Inc. All rights reserved.
+ */
+
+/* View Titles, Button Titles, etc... */
+"Compose your message"  = "メッセージを入力";
+"Send"                  = "送信";
+"Guest"                 = "ゲスト";
+"OK"                    = "OK";
+"Done"                  = "決定";
+"cancel"                = "cancel";
+"yyyy/MM/dd"            = "yyyy/MM/dd";
+"HH:mm"                 = "HH:mm";
+"MM/dd"                 = "MM/dd";
+"Inbox"                 = "Inbox";
+"read"                  = "read";
+"Sign out"              = "ログアウト";
+"Email"                 = "Email";
+"Password"              = "パスワード";
+"Organization"          = "Organization";
+"Sign In"               = "Sign In";
+"Archive"               = "アーカイブ";
+"Delete"                = "削除";
+"Call to"               = "へ問い合わせ";
+"Launch Phone app?"     = "電話アプリを起動しますか？";
+"Cancel"                = "キャンセル";
+"Phone number is not registered" = "電話番号が登録されておりません";
+"Edit"                  = "編集";
+"Sent an image."        = "画像を送信しました。";
+"Sent a PDF."           = "PDFを送信しました。";
+"Sent a location."      = "位置情報を送信しました。";
+"Sent a sticker."       = "ステッカーを送信しました。";
+"Sent a question sticker." = "質問ステッカーを送信しました。";
+"Tap dates and time you are available" = "日付と時刻をタップして選択してください";
+"Availability" = "候補日時";
+"Monday" = "月曜日";
+"Tuesday" = "火曜日";
+"Wednesday" = "水曜日";
+"Thursday" = "木曜日";
+"Friday" = "金曜日";
+"Saturday" = "土曜日";
+"Sunday" = "日曜日";
+"Monday-Middle" = "月曜日";
+"Tuesday-Middle" = "火曜日";
+"Wednesday-Middle" = "水曜日";
+"Thursday-Middle" = "木曜日";
+"Friday-Middle" = "金曜日";
+"Saturday-Middle" = "土曜日";
+"Sunday-Middle" = "日曜日";
+"Monday-Min" = "月";
+"Tuesday-Min" = "火";
+"Wednesday-Min" = "水";
+"Thursday-Min" = "木";
+"Friday-Min" = "金";
+"Saturday-Min" = "土";
+"Sunday-Min" = "日";
+
+/* HUD Messages */
+"No Message yet"                    = "メッセージなし";
+"Email or Password is not correct"  = "EmailもしくはPasswordが間違っています。";
+"Authentication is failed"          = "認証に失敗しました。";
+"Lacking of authentication information" = "認証情報が不足しています。";
+"You are logout, please login"      = "ログアウトされました。再度ログインを行ってください。";
+"Loading Organizations..."          = "ロード中です...";
+"Load Organization Failed"          = "ロードに失敗しました";
+"Loading..."                        = "ロード中です...";
+"Loading Failed"                    = "ロードに失敗しました";
+"Loading Messages..."               = "ロード中です...";
+"Success!"                          = "完了しました";
+"Load Message Failed"               = "ロードに失敗しました";
+"Loading Profile..."                = "プロフィールを読み込み中...";
+"Data Loading..."                   = "データロード中です...";
+"Answered!"                         = "回答しました！";
+"Uploading..."                      = "アップロード中です...";
+"Loading Users..."                  = "ロード中です...";
+"Saving..."                         = "保存中です...";
+"Saved image"                       = "写真を保存しました。";
+
+/* Error Messages */
+"Failed sending message"     = "メッセージが送信できませんでした。";
+"Failed archiving chat"      = "アーカイブ出来ませんでした。";
+"Failed deleting chat"       = "削除出来ませんでした。";
+"Failed loading data"        = "データがロードできませんでした。";
+"Failed calling"             = "問い合わせに失敗しました。";
+"Incorrect phone number"    = "電話番号が不正です。";
+"Please make sure internet"  = "通信状況を確認して下さい。";
+"Please try after a while"   = "しばらくしてからお試しください。";
+"Can not load data"          = "データロードに失敗しました。";
+"Can not make connection"    = "オフラインです";
+"Come online"                = "オンラインになりました";
+"Finished data load"         = "データロードが完了しました。";
+"Please select chat"         = "チャットを選択してください。";
+"Connection Failed"          = "サーバと通信が行えませんでした。\n通信状況を確認して下さい。";
+"Inquired information"       = "問い合わせ情報";
+"Inquired property"          = "問い合せ物件";
+"Failed uploading"           = "アップロードに失敗しました。";
+"Please select the time"     = "日時を選択してください";
+"Invalid URL"                = "URLは無効です。";
+
+"Load Earlier Messages" = "以前のメッセージをロードする";
+"Your current version can't display the message. Please download the latest version in App Store." = "現在お使いのバージョンで非対応のメッセージです。App Storeより最新バージョンをダウンロードしてください";
+"No chat" = "チャットがありません";
+"dateFormat" = "yyyy年MM月dd日";
+"timeChoiceDateFormat" = "a hh:mm";
+"Here are some times that works for me." = "以下から都合の良い日時を選択してください。";
+"Choose a slot and tap to reply." = "タップして回答できます。";
+"Preview" = "プレビュー";
+"works!" = "でお願いします。";
+"Time Availability" = "日程調整";
+"Send a Sticker" = "ステッカーを送信する";
+"Close" = "閉じる";
+"Create a chat" = "チャットを作成する";
+"Direct Message" = "ダイレクトメッセージ";
+"Group" = "グループ";
+"To:" = "宛先:";
+"Create" = "作成";
+"Please select one contact" = "1名のみ選択してください";
+"Switch app" = "アプリ切り替え";
+"New message" = "新しいメッセージ！";
+
+"Menu" = "メニュー";
+"Setting" = "設定";
+"About this app" = "このアプリについて";
+"About ChatCenter IO" = "ChatCenter iOについて";
+"Terms of service" = "利用規約";
+"Privacy policy" = "プライバシーポリシー";
+"Service Level Agreement" = "サービスレベル契約";
+"Copyright" = "著作権情報";
+"Back to Top" = "トップへ戻る";
+
+"Name" = "氏名";
+"Name kana" = "氏名かな";
+"Birthday" = "誕生日";
+"Phone Number" = "電話番号";
+"Email" = "Eメールアドレス";
+"Gender" = "性別";
+
+"Sent an inquiry." = "問い合わせ情報を送信しました。";
+
+"Fixed Phrases Controller Title" = "定型文";
+"App's Recommendation" = "アプリ推奨";
+"Team's Recommendation" = "チーム推奨";
+"Mine" = "自分専用";
+
+"New" = "新規作成";
+"Edit" = "編集";
+"Do you want to delete this phrase?" = "定型文を削除しますか?";
+"Please input phrase." = "定型文を入力してください";
+"OK" = "OK";
+
+"Location" = "位置情報";
+"Yes/No" = "Yes/No";
+"Image" = "写真";
+"Camera" = "カメラ";
+"Phrase" = "定型文";
+"Videochat" = "ビデオチャット";
+"You have not any app's recommendation fixed phrases." = "アプリ推奨定型文がありません";
+"You have not any org's recommendation fixed phrases." = "チーム推奨定型文がありません";
+"You have not created any fixed phrases." = "自分専用定型文を作っていません";
+"Tap to select" = "タップして選択してください";
+"Please input question" = "質問を入力してください";
+"Tap here" = "この位置を送信";
+"Location services" = "位置情報サービス";
+"Location services are not enabled on this device. Please enable location services in settings." = "お使いの端末では位置情報サービスの使用が許可されておりません。端末のプライバシー設定をご確認ください。";
+"Dismiss" = "閉じる";
+"Could not find places" = "見つかりませんでした。";
+"Cannot open Google Maps" = "Googleマップアプリを開けませんでした。";
+"Address" = "アドレス";
+
+// calendar sticker
+//"calendar_sticker_time_format" = "M月d日(EEE) H:mm"; // 1月8日(金) 23:00
+"calendar_sticker_time_format_from" = "M月d日(EEE) H:mm"; // 1月8日(金) 23:00
+"calendar_sticker_time_format_to" = "H:mm"; // 23:00
+"Please select your available time." = "以下から都合の良い日時を選択してください。";
+"From %@ to %@ %@" = "%@ - %@"; // 1月8日(金) 23:00 - 1:30
+"Propose other slots" = "他の日時を選択する";
+"Property code" = "物件コード";
+
+"Delivering" = "送信中";
+"Delivered" = "送信済み";
+"Send failed" = "送信失敗";
+"Read" = "既読";
+
+"Please size of the file is in the 20MB or less." = "ファイルのサイズは20MB以下にしてください。";
+
+"You" = "あなた";
+"Other" = "さん";
+
+"Ringing..." = "呼び出し中です...";
+"Call again" = "かけ直す";
+"Call notification" = "%@ からビデオ通話を着信中...";
+"Reject" = "拒否する";
+"Accept" = "受信する";
+"Please select user to call" = "ユーザーを選択してください";
+"Called" = "電話しました。";
+"Hangup" = "終了";
+"Call message" = "%@ が %@ にビデオ通話しました。\n%@";
+"You are about to send following message." = "以下のメッセージを送ります。";
+"All" = "全て";
+"Unassigned" = "未対応";
+"Assigned to me" = "担当中";
+"Closed" = "対応済";
+"Missed call" = "応答がありませんでした。";
+
+"Channel detail" = "チャネル詳細";
+"Assignee/Viewers" = "担当者/閲覧者";
+"Information" = "インフォメーション";
+"Assignee" = "担当者";
+"Followers" = "閲覧者";
+"No assignee" = "担当者なし";
+"No followers" = "閲覧者なし";
+
+"Online" = "オンライン";
+"Online at %d %@ ago" = "%d%@前にオンライン";
+// Time unit
+"years" = "年";
+"year" = "年";
+"months" = "ヶ月";
+"month" = "ヶ月";
+"days" = "日";
+"day" = "日";
+"hours" = "時間";
+"hour" = "時間";
+"minutes" = "分";
+"minute" = "分";
+"This message is invisible to the customer." = "このメッセージは、お客様からは閲覧できません。";
+"Log out" = "ログアウト";
+"Change apps" = "アプリを変更する";
+"Please input 2000 characters or less." = "2000文字以内で入力してください。";

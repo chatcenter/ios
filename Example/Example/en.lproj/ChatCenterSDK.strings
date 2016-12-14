@@ -1,0 +1,236 @@
+/*
+ ChatCenterSDK.strings Version 1.0.7
+ 
+ Created by AppSocially Inc.on 2015/03/21.
+ Copyright (c) 2015年 AppSocially Inc. All rights reserved.
+ */
+
+/* View Titles, Button Titles, etc... */
+"Compose your message"  = "Compose your message";
+"Send"                  = "Send";
+"Guest"                 = "Guest";
+"OK"                    = "OK";
+"Done"                  = "Done";
+"cancel"                = "cancel";
+"yyyy/MM/dd"            = "yyyy/MM/dd";
+"HH:mm"                 = "HH:mm";
+"MM/dd"                 = "MM/dd";
+"Inbox"                 = "Inbox";
+"read"                  = "read";
+"Sign out"              = "Sign out";
+"Email"                 = "Email";
+"Password"              = "Password";
+"Organization"          = "Organization";
+"Sign In"               = "Sign In";
+"Archive"               = "Archive";
+"Delete"                = "Delete";
+"Call to"               = " ";
+"Launch Phone app?"     = "Launch Phone app?";
+"Cancel"                = "Cancel";
+"Phone number is not registered" = "Phone number is not registered";
+"Edit"                  = "Edit";
+"Sent an image."        = "Sent an image.";
+"Sent a PDF."           = "Sent a PDF.";
+"Sent an availability." = "Sent an availability.";
+"Sent a location."      = "Sent a location.";
+"Sent a sticker."       = "Sent a sticker.";
+"Sent a question sticker."       = "Sent a question sticker.";
+"Tap dates and time you are available" = "Tap dates and time you are available";
+"Availability" = "Availability";
+"Monday" = "Monday";
+"Tuesday" = "Tuesday";
+"Wednesday" = "Wednesday";
+"Thursday" = "Thursday";
+"Friday" = "Friday";
+"Saturday" = "Saturday";
+"Sunday" = "Sunday";
+"Monday-Middle" = "Mon.";
+"Tuesday-Middle" = "Tue.";
+"Wednesday-Middle" = "Wed.";
+"Thursday-Middle" = "Thur.";
+"Friday-Middle" = "Fri.";
+"Saturday-Middle" = "Sat.";
+"Sunday-Middle" = "Sun.";
+"Monday-Min" = "M";
+"Tuesday-Min" = "T";
+"Wednesday-Min" = "W";
+"Thursday-Min" = "T";
+"Friday-Min" = "F";
+"Saturday-Min" = "S";
+"Sunday-Min" = "S";
+
+/* HUD Messages */
+"No Message yet"                        = "No Message yet";
+"Email or Password is not correct"      = "Email or Password is not correct";
+"Authentication is failed"              = "Authentication is failed";
+"Lacking of authentication information" = "Lacking of authentication information";
+"You are logout, please login"          = "You are logout, please login";
+"Loading Organizations..."              = "Loading Organizations...";
+"Load Organization Failed"              = "Load Organization Failed";
+"Loading..."                            = "Loading...";
+"Loading Failed"                        = "Loading Failed";
+"Loading Messages..."                   = "Loading Messages...";
+"Success!"                              = "Success!";
+"Load Message Failed"                   = "Load Message Failed";
+"Loading Profile..."                    = "Loading Profile...";
+"Data Loading..."                       = "Data Loading...";
+"Answered!"                             = "Answered!";
+"Uploading..."                          = "Uploading...";
+"Loading Users..."                      = "Loading Users...";
+"Saving..."                             = "Saving...";
+"Saved image"                           = "Saved image";
+/* Error Messages */
+"Failed sending message"     = "Failed sending message";
+"Failed archiving chat"      = "Failed archiving chat";
+"Failed deleting chat"       = "Failed deleting chat";
+"Failed loading data"        = "Failed loading data";
+"Failed calling"             = "Failed calling";
+"Incorrect phone number"    = "Incorrenct phone number";
+"Please make sure internet"  = "Please make sure internet";
+"Please try after a while"   = "Please try after a while";
+"Can not make connection"    = "Can not make connection";
+"Can not load data"          = "Can not load data";
+"Come online"                = "Come online";
+"Finished data load"         = "Finished data load";
+"Please select chat"         = "Please select chat";
+"Connection Failed"          = "Connection Failed. Please make sure internet.";
+"Inquired information"       = "Inquired information";
+"Inquired property"          = "Inquired property";
+"Failed uploading"           = "Failed uploading";
+"Please select the time"     = "Please select the time";
+"Invalid URL"                = "Invalid URL";
+"Load Earlier Messages" = "Load Earlier Messages";
+
+"Your current version can't display the message. Please download the latest version in App Store." = "Your current version can't display the message. Please download the latest version in App Store.";
+"No chat" = "No chat";
+"dateFormat" = "MMMM d, yyyy";
+"timeChoiceDateFormat" = "hh:mm a";
+"Here are some times that works for me." = "Here are some times that works for me.";
+"Choose a slot and tap to reply." = "Choose a slot and tap to reply.";
+"Preview" = "Preview";
+"works!" = "works!";
+"Time Availability" = "Time Availability";
+"Send a Sticker" = "Send a Sticker";
+"Close" = "Close";
+"Create a chat" = "Create a chat";
+"Direct Message" = "Direct Message";
+"Group" = "Group";
+"To:" = "To:";
+"Create" = "Create";
+"Please select one contact" = "Please select one contact";
+"Switch app" = "Switch app";
+"New message" = "New message";
+
+"Menu" = "Menu";
+"Setting" = "Setting";
+"About this app" = "About";
+"About ChatCenter IO" = "About ChatCenter iO";
+"Terms of service" = "Terms of service";
+"Privacy policy" = "Privacy policy";
+"Service Level Agreement" = "Service Level Agreement";
+"Copyright" = "Copyright";
+"Back to Top" = "Back to Top";
+
+"Name" = "Name";
+"Name kana" = "Name kana";
+"Birthday" = "Birthday";
+"Phone Number" = "Phone Number";
+"Email" = "Email";
+"Gender" = "Gender";
+
+"Sent an inquiry." = "Sent an inquiry.";
+
+"Fixed Phrases Controller Title" = "Fixed phrases";
+"App's Recommendation" = "App's Recommendation";
+"Team's Recommendation" = "Team's Recommendation";
+"Mine" = "Mine";
+
+"New" = "New";
+"Edit" = "Edit";
+"Do you want to delete this phrase?" = "Do you want to delete this phrase?";
+"Please input phrase." = "Please input phrase.";
+"OK" = "OK";
+
+"Location" = "Location";
+"Yes/No" = "Yes/No";
+"Image" = "Image";
+"Camera" = "Camera";
+"Phrase" = "Phrase";
+"Videochat" = "Video Chat";
+"You have not any app's recommendation fixed phrases." = "You have not any app's recommendation fixed phrases.";
+"You have not any org's recommendation fixed phrases." = "You have not any org's recommendation fixed phrases.";
+"You have not created any fixed phrases." = "You have not created any fixed phrases.";
+"Tap to select" = "Tap to select";
+"Please input question" = "Please input question";
+"Tap here" = "Tap here";
+"Location services" = "Location services";
+"Location services are not enabled on this device. Please enable location services in settings." = "Location services are not enabled on this device. Please enable location services in settings.";
+"Dismiss" = "Dismiss";
+"Could not find places" = "Could not find places";
+"Cannot open Google Maps" = "Cannot open Google Maps";
+"Address" = "Address";
+
+// calendar sticker
+//"calendar_sticker_time_format" = "h:mm a, EEE MMM d"; // 11:00 PM, Fri Jan 8
+"calendar_sticker_time_format_from" = "h:mm a"; // 11:00 PM
+"calendar_sticker_time_format_to" = "h:mm a, EEE MMM d"; // 11:00 PM, Fri Jan 8
+"Please select your available time." = "Please select your available time.";
+"From %@ to %@ %@" = "%@ - %@ (%@)"; // 11:00 PM - 1:30 PM, Sat Jan 9 (PST)
+"Propose other slots" = "Propose other slots";
+
+"Property code" = "Property code";
+
+"Delivering" = "Delivering";
+"Delivered" = "Delivered";
+"Send failed" = "Send failed";
+"Read" = "Read";
+
+"Please size of the file is in the 20MB or less." = "Please size of the file is in the 20MB or less.";
+
+"You" = "You";
+"Other" = " ";
+
+
+"Ringing..." = "Ringing...";
+"Call again" = "Call again";
+"Call notification" = "%@ is calling you...";
+"Reject" = "Reject";
+"Accept" = "Accept";
+"Please select user to call" = "Please select user to call";
+"Called" = "called.";
+"Hangup" = "Hangup";
+"Call message" = "%@ call %@ through this channel. \n%@";
+
+"You are about to send following message." = "You are about to send following message.";
+
+"All" = "All";
+"Unassigned" = "Unassigned";
+"Assigned to me" = "Assigned to me";
+"Closed" = "Closed";
+"Missed call" = "Missed call";
+
+"Channel detail" = "Channel Detail";
+"Assignee/Viewers" = "Assignee/Followers";
+"Information" = "Information";
+"Assignee" = "Assignee";
+"Followers" = "Followers";
+"No assignee" = "No assignee";
+"No followers" = "No followers";
+
+"Online" = "Online";
+"Online at %d %@ ago" = "Online at %d %@ ago";
+// Time unit
+"years" = "years";
+"year" = "year";
+"months" = "months";
+"month" = "month";
+"days" = "days";
+"day" = "day";
+"hours" = "hours";
+"hour" = "hour";
+"minutes" = "minutes";
+"minute" = "minute";
+"This message is invisible to the customer." = "This message is invisible to the customer.";
+"Log out" = "Log out";
+"Change apps" = "Change apps";
+"Please input 2000 characters or less." = "Please input 2000 characters or less.";
