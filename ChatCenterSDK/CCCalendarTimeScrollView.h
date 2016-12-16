@@ -25,5 +25,6 @@
 @property (nonatomic) NSMutableArray *hourTimes;
 
 - (void)updateSelections:(NSMutableArray *)selectedHourTimes;
+- (void)displayCurrentLine;
 
 @end

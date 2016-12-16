@@ -72,6 +72,15 @@ const int VIEW_COUNT = 3;
     }
 }
 
+- (void)viewDidAppear:(BOOL)animated{
+    //---------------------------------------------------------------------------------------------------
+    //
+    // After autolayout(viewDidAppear), caluculate the position of current line in calendarTimeScrollView
+    //
+    //---------------------------------------------------------------------------------------------------
+    [self displayTimeCurrentLine];
+}
+
 - (void)deviceOrientationDidChange:(NSNotification *)notification {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     isRotating = YES;
@@ -738,6 +747,10 @@ const int VIEW_COUNT = 3;
     [self.calendarTimeScrollView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 }
 
+- (void)displayTimeCurrentLine{
+    [self.calendarTimeScrollView displayCurrentLine];
+}
+
 - (void)moveForward{
     NSLog(@"moveForward");
     [self updateSelectedDateTimes]; ///Store selected hours
@@ -936,8 +949,13 @@ const int VIEW_COUNT = 3;
             NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), from, to, [[NSTimeZone defaultTimeZone] abbreviation]];
             
             // set data
-            [actionsDatas addObject:@{@"label":label}];
-            
+            NSDate *startDate = times[j][@"from"];
+            NSDate *endDate = times[j][@"to"];
+            double start = [startDate timeIntervalSince1970];
+            double end = [endDate timeIntervalSince1970];
+            [actionsDatas addObject:@{@"label":label,
+                                      @"value":@{@"start":[NSNumber numberWithDouble:start],
+                                                 @"end":[NSNumber numberWithDouble:end]}}];
         }
     }
     [actionsDatas addObject:@{@"label":CCLocalizedString(@"Propose other slots"), @"action":@[@"open:sticker/calender"]}];

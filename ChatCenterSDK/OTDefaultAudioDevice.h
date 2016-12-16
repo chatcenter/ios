@@ -5,6 +5,8 @@
 //  Created by AppSocially Inc. on 11/15/16.
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
+#import "CCConstants.h"
+
 #ifdef CC_VIDEO
 
 #import <Foundation/Foundation.h>

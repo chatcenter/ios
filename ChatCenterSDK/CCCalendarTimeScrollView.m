@@ -146,7 +146,20 @@ const int SWIPE_MOVEMENT = 60;
         [self addSubview:calendarTimeView];
         [self.hourTimes addObject:calendarTimeView];
     }
-    ///Display current line
+}
+
+/*
+// Only override drawRect: if you perform custom drawing.
+// An empty implementation adversely affects performance during animation.
+- (void)drawRect:(CGRect)rect {
+    // Drawing code
+}
+ */
+
+- (void)displayCurrentLine{
+    CGRect rect = [UIScreen mainScreen].bounds; ///calendarWeekScrollView.frame.size.width will be as same as screen width
+    int width = rect.size.width;
+    int columnHeight = COLUMN_HEIGHT*2;
     int borderLineHeight = 6;
     NSDate *crtDate = [NSDate date];
     NSUInteger flags;
@@ -168,21 +181,24 @@ const int SWIPE_MOVEMENT = 60;
     CGRect frame = self.frame;
     float offsetY;
     float contentSizeHeight = self.contentSize.height;
-    if(height < (self.contentSize.height-(float)frame.size.height/2)){
-        offsetY = height - (float)frame.size.height/2 + SCROLL_VIEW_OFFSET;
+    float frameSizeHeight = (float)frame.size.height;
+    if(height < (contentSizeHeight-frameSizeHeight/2)){
+        offsetY = height - frameSizeHeight/2 + SCROLL_VIEW_OFFSET;
     }else{
         offsetY = frame.origin.y + contentSizeHeight;
     }
+    
+    //-------------------------
+    // 
+    //-------------------------
+    if(offsetY<0){
+        offsetY = 0;
+    }else if(contentSizeHeight - frameSizeHeight < offsetY){
+        offsetY = contentSizeHeight - frameSizeHeight + SCROLL_VIEW_OFFSET;
+    }
+    
     [self setContentOffset:CGPointMake(0, offsetY) animated:NO];
 }
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
- */
 
 - (void)updateSelections:(NSMutableArray *)selectedHourTimes{
     self.selectedHourTimes = selectedHourTimes;

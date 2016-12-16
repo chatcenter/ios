@@ -6,6 +6,8 @@
 //  Copyright (c) 2014年 AppSocially Inc. All rights reserved.
 //
 // Import all the things
+
+#import "CCConstants.h"
 #import "CCJSQMessage.h"
 #import "CCJSQMessages.h"
 #import "CCConectionHelperDelegate.h"

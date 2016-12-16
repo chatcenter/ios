@@ -1891,7 +1891,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             NSInteger imageSize = 12.0f;
             NSUInteger MAX_WITH_MESSAGE = 165.0f;
             NSString *buttonTitle;
-            if([newMsg.type isEqualToString:CC_RESPONSETYPEMESSAGE]){
+            if([messageType isEqualToString:CC_RESPONSETYPEMESSAGE]){
                 buttonTitle = newMsg.text;
             }
             else if ([messageType isEqualToString:CC_RESPONSETYPESTICKER]){
@@ -1900,42 +1900,44 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             else if([messageType isEqualToString:CC_RESPONSETYPECALL]){
                 buttonTitle = [NSString stringWithFormat:@"%@:%@", newMsg.senderDisplayName, CCLocalizedString(@"Missed call")];
             }
-            NSDictionary *messageStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0f]};
-            NSMutableAttributedString *messageAttributedString = [[NSMutableAttributedString alloc] initWithString:buttonTitle attributes:messageStringAttributes];
-            NSUInteger messageWidth = messageAttributedString.size.width;
-            messageWidth = MIN(messageWidth, MAX_WITH_MESSAGE);
-            newMessageView = [[UIView alloc] initWithFrame: CGRectMake ( 0, 0,paddingMessageLabel + messageWidth + paddingMessageImage * 2 + imageSize, imageSize + paddingMessageImage * 2)];
-            newMessageView.backgroundColor = [UIColor colorWithRed:132.0f/255.0f
-                                                             green:132.0f/255.0f
-                                                              blue:132.0f/255.0f
-                                                             alpha:1.0f];
-            // Create border (top-left and top-right)
-            UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:newMessageView.bounds byRoundingCorners:(UIRectCornerTopLeft | UIRectCornerTopRight) cornerRadii:CGSizeMake(5.0, 5.0)];
-            CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
-            maskLayer.frame = newMessageView.bounds;
-            maskLayer.path  = maskPath.CGPath;
-            // Create button title label
-            UILabel *buttonTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(paddingMessageLabel, 0, paddingMessageLabel + messageWidth, imageSize + paddingMessageImage * 2)];
-            buttonTitleLabel.text = buttonTitle;
-            buttonTitleLabel.font= [UIFont systemFontOfSize:12.0f];
-            buttonTitleLabel.textColor=[UIColor whiteColor];
-            buttonTitleLabel.backgroundColor=[UIColor clearColor];
-            [newMessageView addSubview:buttonTitleLabel];
-            // Create icon button
-            UIButton *checkmarkButton =[UIButton buttonWithType:UIButtonTypeRoundedRect];
-            [checkmarkButton setImage:[UIImage SDKImageNamed:@"CCarrow-down"] forState:UIControlStateNormal];
-            checkmarkButton.tintColor = [UIColor whiteColor];
-            UIImageView *imageNewMessageView = [[UIImageView alloc] init];
-            checkmarkButton.frame = CGRectMake(paddingMessageLabel + messageWidth + paddingMessageImage, paddingMessageImage, imageSize, imageSize);
-            checkmarkButton.layer.cornerRadius = checkmarkButton.frame.size.height/2;
-            [imageNewMessageView addSubview:checkmarkButton];
-            [newMessageView addSubview:imageNewMessageView];
-            // Add new message view to super view
-            newMessageView.center = CGPointMake(self.view.bounds.size.width / 2, self.view.bounds.size.height - self.inputToolbar.bounds.size.height - newMessageView.bounds.size.height/2);
-            UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickNewMessageButton:)];
-            [newMessageView addGestureRecognizer:tapGesture];
-            [self.view addSubview:newMessageView];
-            [self.view bringSubviewToFront:newMessageView];
+            if(buttonTitle != nil) {
+                NSDictionary *messageStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0f]};
+                NSMutableAttributedString *messageAttributedString = [[NSMutableAttributedString alloc] initWithString:buttonTitle attributes:messageStringAttributes];
+                NSUInteger messageWidth = messageAttributedString.size.width;
+                messageWidth = MIN(messageWidth, MAX_WITH_MESSAGE);
+                newMessageView = [[UIView alloc] initWithFrame: CGRectMake ( 0, 0,paddingMessageLabel + messageWidth + paddingMessageImage * 2 + imageSize, imageSize + paddingMessageImage * 2)];
+                newMessageView.backgroundColor = [UIColor colorWithRed:132.0f/255.0f
+                                                                 green:132.0f/255.0f
+                                                                  blue:132.0f/255.0f
+                                                                 alpha:1.0f];
+                // Create border (top-left and top-right)
+                UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:newMessageView.bounds byRoundingCorners:(UIRectCornerTopLeft | UIRectCornerTopRight) cornerRadii:CGSizeMake(5.0, 5.0)];
+                CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+                maskLayer.frame = newMessageView.bounds;
+                maskLayer.path  = maskPath.CGPath;
+                // Create button title label
+                UILabel *buttonTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(paddingMessageLabel, 0, paddingMessageLabel + messageWidth, imageSize + paddingMessageImage * 2)];
+                buttonTitleLabel.text = buttonTitle;
+                buttonTitleLabel.font= [UIFont systemFontOfSize:12.0f];
+                buttonTitleLabel.textColor=[UIColor whiteColor];
+                buttonTitleLabel.backgroundColor=[UIColor clearColor];
+                [newMessageView addSubview:buttonTitleLabel];
+                // Create icon button
+                UIButton *checkmarkButton =[UIButton buttonWithType:UIButtonTypeRoundedRect];
+                [checkmarkButton setImage:[UIImage SDKImageNamed:@"CCarrow-down"] forState:UIControlStateNormal];
+                checkmarkButton.tintColor = [UIColor whiteColor];
+                UIImageView *imageNewMessageView = [[UIImageView alloc] init];
+                checkmarkButton.frame = CGRectMake(paddingMessageLabel + messageWidth + paddingMessageImage, paddingMessageImage, imageSize, imageSize);
+                checkmarkButton.layer.cornerRadius = checkmarkButton.frame.size.height/2;
+                [imageNewMessageView addSubview:checkmarkButton];
+                [newMessageView addSubview:imageNewMessageView];
+                // Add new message view to super view
+                newMessageView.center = CGPointMake(self.view.bounds.size.width / 2, self.view.bounds.size.height - self.inputToolbar.bounds.size.height - newMessageView.bounds.size.height/2);
+                UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickNewMessageButton:)];
+                [newMessageView addGestureRecognizer:tapGesture];
+                [self.view addSubview:newMessageView];
+                [self.view bringSubviewToFront:newMessageView];
+            }
         }
         else{
             [self scrollToBottomAnimated:YES];

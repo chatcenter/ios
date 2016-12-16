@@ -7,6 +7,7 @@
 //  Copyright (c) 2014年 AppSocially Inc. All rights reserved.
 //
 
+#import "CCConstants.h"
 #import "CCHistoryViewController.h"
 #import "CCConnectionHelper.h"
 #import "CCConstants.h"
