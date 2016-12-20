@@ -26,11 +26,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [ChatCenter setAppToken:"アプリトークンを入力ください" completionHandler:^{
+    //アプリトークンを入力ください
+    [ChatCenter setAppToken:"Please set App token" completionHandler:^{
+        ///Please set design custmization
         ///セット完了のコールバックです
         ///SDKのデザインカスタマイズはここに記述してください
-        [ChatCenter setHistoryViewTitle:@"メッセージ"];
-        [ChatCenter setHistoryViewVoidMessage:@"チャットがありません。"];
+        [ChatCenter setHistoryViewTitle:@"Message"];
+        [ChatCenter setHistoryViewVoidMessage:@"No chat"];
     }];
     
     UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(closeSoftKeyboard)];
@@ -51,7 +53,7 @@
 - (IBAction)didTapChat:(id)sender {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSString *deviceToken = [ud stringForKey:@"deviceToken"];
-    NSString *orgId = "Org Uidを入力ください";
+    NSString *orgId = "Please set Team ID";
     
     [[ChatCenter sharedInstance] presentChatView:self
                                           orgUid:orgId
