@@ -4,7 +4,7 @@
 * [Getting Started](#GettingStarted)
 	* [1. サンプルプロジェクトをダウンロード](#DLSample)
 	* [2. Pod install](#PodInstall)
-	* [3. アプリトークンとOrg Uidを設定](#SetAppOrg)
+	* [3. アプリトークンとチームIDを設定](#SetAppOrg)
 	* [4. アプリケーションを起動](#LaunchApp)
 * [SDKをアプリに組み込む](#InstallYourApp)
 	* [1. Xcodeでの設定](#SettingOfXcode)
@@ -31,10 +31,10 @@ Exampleプロジェクトが含まれています。
 Exampleフォルダにてpod installを実行してください
 
 <a id="SetAppOrg"></a>
-#### 3. アプリトークンとOrg Uidを設定
+#### 3. アプリトークンとチームIDを設定
 <p align="center"><img src="InstallationImages/sample1.png"></p>
-サンプルプロジェクトを開き、ViewController.m内のアプリトークンとOrg Uidを設定してください。
-アプリトークンとOrg Uidはダッシュボードから確認できます。
+サンプルプロジェクトを開き、ViewController.m内のアプリトークンとチームIDを設定してください。
+アプリトークンとチームIDはダッシュボードから確認できます。
 
 <a id="LaunchApp"></a>
 #### 4. アプリケーションを起動
@@ -209,7 +209,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 	</tr>
 	<tr>
 		<td>orgUid(NSString)</td>
-		<td colspan="2"><b>Chatに紐づく、Organization uidを指定してください</b></td>
+		<td colspan="2"><b>Chatに紐づく、チームIDを指定してください</b></td>
 	</tr>
 	<tr>
 		<td>firstName(NSString)</td>
@@ -328,7 +328,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 	</tr>
 	<tr>
 		<td>orgUid(NSString)</td>
-		<td><b>Chatに紐づく、Organization uidを指定してください ※Organization Uid(法人/店舗ID)Iについて</b></td>
+		<td><b>Chatに紐づく、チームIDを指定してください</b></td>
 	</tr>
 	<tr>
 		<td>firstName(NSString)</td>
@@ -630,7 +630,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHand
 
 * app_name -> アプリ名
 * unread_count -> 未読のチャネル数
-* org_uid -> Organization Uid(法人/店舗ID)
+* org_uid -> チームID(法人/店舗ID)
 * channel_uid -> チャネルUID
 ***
 
@@ -858,7 +858,7 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
 </tr>
 <tr>
 <td><b>orgUid:(NSString *)</b></td>
-<td><b>オンライン/オフラインを取得したいOrganization uidを指定してください</b></td>
+<td><b>オンライン/オフラインを取得したいチームIDを指定してください</b></td>
 </tr>
 <tr>
 <td>completeHandler</td>
