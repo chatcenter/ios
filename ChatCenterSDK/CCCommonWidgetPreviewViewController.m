@@ -14,7 +14,7 @@
 #import "CCConstants.h"
 
 @interface CCCommonWidgetPreviewViewController ()
-@property (weak, nonatomic) IBOutlet UIView *widgetContainer;
+@property (weak, nonatomic) IBOutlet UIScrollView *widgetContainer;
 
 @end
 
@@ -53,54 +53,26 @@
 }
 
 - (UIView *)createPreviewView {
-    float width = _widgetContainer.frame.size.width;
-    float height = _widgetContainer.frame.size.height;
-    /*
-    UIScrollView *view = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 64, width, height - 144)]; // 80 for send button height and 64 for navigation bar
-    [view setBackgroundColor:[UIColor whiteColor]];
-    */
-    // create preview cell
+    UIScreen *screen = [UIScreen mainScreen];
+    float width = screen.bounds.size.width;
+    float height = screen.bounds.size.height;
+
     CGSize previewCellSize = [CCCommonStickerPreviewCollectionViewCell estimateSizeForMessage:message atIndexPath:nil hasPreviousMessage:nil options:0 withListUser:nil];
     CCCommonStickerPreviewCollectionViewCell *previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
     CCStickerCollectionViewCellOptions options = 0;
     options |= CCStickerCollectionViewCellOptionShowAsWidget;
     
-    previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, (height - 144)/ 2 - previewCellSize.height / 2, previewCellSize.width, previewCellSize.height);
-    //    [previewCell setMessage:msg atIndexPath:nil withListUser:nil];
+    float previewFrameY = height / 2 - previewCellSize.height / 2 - 64> 0 ? height / 2 - previewCellSize.height / 2 - 64: 0; // 64 for navigation
+    
+    previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, previewFrameY, previewCellSize.width, previewCellSize.height);
+    
     [previewCell setupWithIndex:nil message:message avatar:nil delegate:nil options:options];
     previewCell.userInteractionEnabled = NO;
     
-    previewCell.translatesAutoresizingMaskIntoConstraints = NO;
-
-    
     [_widgetContainer addSubview:previewCell];
-
-    NSLayoutConstraint *xCenterConstraint = [NSLayoutConstraint constraintWithItem:previewCell attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_widgetContainer attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
-    [_widgetContainer addConstraint:xCenterConstraint];
-    NSLayoutConstraint *yCenterConstraint = [NSLayoutConstraint constraintWithItem:previewCell attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:_widgetContainer attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0];
-    [_widgetContainer addConstraint:yCenterConstraint];
     
-    NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:previewCell
-                                                                        attribute:NSLayoutAttributeHeight
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:nil
-                                                                        attribute:NSLayoutAttributeNotAnAttribute
-                                                                       multiplier:1.0
-                                                                         constant:previewCellSize.height];
-    NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:previewCell
-                                                                        attribute:NSLayoutAttributeWidth
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:nil
-                                                                        attribute:NSLayoutAttributeNotAnAttribute
-                                                                       multiplier:1.0
-                                                                         constant:previewCellSize.width];
-    
-    [previewCell addConstraint:heightConstraint];
-    [previewCell addConstraint:widthConstraint];
-    
-    
-//    _widgetContainer.contentSize = CGSizeMake(previewCellSize.width, previewCellSize.height + 20);
-    
+    _widgetContainer.contentSize = CGSizeMake(previewCellSize.width, previewCellSize.height);
+    _widgetContainer.contentInset = UIEdgeInsetsZero;
     return _widgetContainer;
 }
 
