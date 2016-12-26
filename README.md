@@ -1,76 +1,77 @@
-# ChatCenteriO iOS SDKインストールガイド Ver. 1.0.8
+# ChatCenteriO iOS SDK Installation guide Ver. 1.0.8
 
-## 目次
+## Table of contents
 * [Getting Started](#GettingStarted)
-	* [1. サンプルプロジェクトをダウンロード](#DLSample)
+	* [1. Download sample project](#DLSample)
 	* [2. Pod install](#PodInstall)
-	* [3. アプリトークンとチームIDを設定](#SetAppOrg)
-	* [4. アプリケーションを起動](#LaunchApp)
-* [SDKをアプリに組み込む](#InstallYourApp)
-	* [1. Xcodeでの設定](#SettingOfXcode)
-	* [2. App Tokenのセット](#SetAppToken)
-    * [3. チャットビューの呼び出し](#DispalyChatView)
-    * [4. ヒストリービューの呼び出し](#DispalyHistoryView)
-    * [5. ユーザーのログアウト](#LogoutUser)
-* [オプション](#Opptions)
-    * [1. プッシュ通知](#Pushnotification)
-    * [2. デザインのカスタマイズ](#DesignCustom)
-    * [3. 未読メッセージ数の取得](#ConfirmMessage)
-    * [4. Orgのオンライン/オフラインの取得](#GetOnline/Offline)
+	* [3. Set app org](#SetAppOrg)
+	* [4. Launch app](#LaunchApp)
+* [Install SDK in to your app](#InstallYourApp)
+	* [1. Setting of Xcode](#SettingOfXcode)
+	* [2. Set App Token](#SetAppToken)
+    * [3. Display chat view](#DispalyChatView)
+    * [4. Display history view](#DispalyHistoryView)
+    * [5. Log out user](#LogoutUser)
+* [Options](#Options)
+    * [1. Push notification](#Pushnotification)
+    * [2. Custom design](#DesignCustom)
+    * [3. Confirm message](#ConfirmMessage)
+    * [4. Get online / offline](#GetOnline/Offline)
 
 <a id="GettingStarted"></a>
 ## Getting Started
 
 <a id="DLSample"></a>
-#### 1. サンプルプロジェクトをダウンロード
-[こちら](https://github.com/chatcenter/ios/releases)よりChatCenterSDKをダウンロードします。
-Exampleプロジェクトが含まれています。
+#### 1. Download sample project
+You can download ChatCenter SDK from [here](https://github.com/chatcenter/ios/releases)
+Example project is included.
 
 <a id="PodInstall"></a>
 #### 2. Pod install
-Exampleフォルダにてpod installを実行してください
+Please execute pod install in the Example folder
 
 <a id="SetAppOrg"></a>
-#### 3. アプリトークンとチームIDを設定
+#### 3. Set app org
 <p align="center"><img src="InstallationImages/sample1.png"></p>
-サンプルプロジェクトを開き、ViewController.m内のアプリトークンとチームIDを設定してください。
-アプリトークンとチームIDはダッシュボードから確認できます。
+Open the sample project and set app org in ViewController.m.
+You can check the application token and team ID from the dashboard.
 
 <a id="LaunchApp"></a>
-#### 4. アプリケーションを起動
+#### 4. Launch app
 <p align="center"><img src="InstallationImages/sample2.png" width="320"></p>
 
 <a id="InstallYourApp"></a>
-## SDKをアプリに組み込む
+## Install SDK into your app
 
 <a id="SettingOfXcode"></a>
-### 1. Xcodeでの設定
+### 1. Setting of Xcode
 
 <a id="1InstallSDK"></a>
-#### 1-1. SDKのインストール
-以下の(a)、(b)いづれかの方法をお選びください。
-#### (a)Cocoa Podよりインストール
-ご使用のPodfileに以下を追加してください(OpenTokはChatCenterSDK内で使用しているボイス/ビデオチャットのライブラリです)。
+#### 1-1. Installing SDK
+Please choose one of the following methods (a) or (b).
+#### (a)Install from Cocoa Pod
+Please add the following to your Podfile (OpenTok is the library of voice / video chat used in ChatCenterSDK).
 ```
-例)
+Ex)
 target 'TargetName' do
 pod 'ChatCenterSDK', :git => "https://github.com/chatcenter/ios.git"
 pod 'OpenTok'
 end
 ```
 
-該当のフォルダにてpod installを実施してください。
+Please do pod install in the corresponding folder.
 ```
-例)
+Ex)
 pod install
 ```
-#### (b)ソースからインストール
-**ソースのダウンロード**  
-[こちら](https://github.com/chatcenter/ios/releases)よりChatCenterSDKをダウンロードします。  
-ChatCenterSDKフォルダを任意のフォルダへドラッグアンドドロップしてください。  
+#### (b)Install from source
+**Download source**  
+You can download ChatCenter SDK from [here](https://github.com/chatcenter/ios/releases)
+  
+Drag and drop the ChatCenterSDK folder to any folder.
 
-**ライブラリの追加**  
-下記ライブラリを”Build Phases” > ”Link Binary With Libraries”より追加してください。  
+**Add library**  
+Please add the following library from "Build Phases"> "Link Binary With Libraries".
 
 * UIKit.framework
 * CoreGraphics.framework
@@ -82,87 +83,89 @@ ChatCenterSDKフォルダを任意のフォルダへドラッグアンドドロ�
 * CoreData.framework
 * SystemConfiguration.framework
 * MobileCoreServices.framework
-* libicucore.A.tbdもしくはlibicucore.dylib
+* libicucore.A.tbd or libicucore.dylib
 * MapKit.framework
 * AssetsLibrary.framework
 * SafariServices.framework(Optional)  
 
-**PCHファイルへのパス追加**  
-ChatCenterSDK内にPCHファイルがありますのでパスを通してください。
-下図のように、プロジェクト > Build Settings > Apple LLVM 7.0 - Language > Prefix Headerに”(プロジェクト以下のパス)/ChatCenterSDK/ChatCenter.pch”と指定してください。
+**Add path to PCH file**  
+Since there is a PCH file in ChatCenterSDK please go through the path.
+As shown below, specify "Project (path below project) / ChatCenterSDK / ChatCenter.pch" in Project> Build Settings> Apple LLVM 7.0 - Language> Prefix Header.
 <p align="center"><img src="InstallationImages/pch.png" width="640"></p>
 
-**OpenTokライブラリの追加**  
-OpenTokはChatCenterSDK内で使用しているボイス/ビデオチャットのライブラリです。  
-ご使用のPodfileに以下を追加してください。  
+**Add OpenTok library**  
+OpenTok is a library of voice / video chats used within ChatCenterSDK.
+Please add the following to your Podfile.
 
 ```
-例)
+Ex)
 target 'TargetName' do
 pod 'OpenTok'
 end
 ```
 
-該当のフォルダにてpod installを実施してください。
+Please do pod install in the corresponding folder.
+
 ```
-例)
+Ex)
 pod install
 ```
 
 ***
 
 <a id="4EditPlist"></a>
-#### 1-2. Plistの編集
-ChatCenter SDKでは各ウィジェットの送信時に、ユーザーの情報を使用する場合があります。そのためplistに許諾の設定をお願いします。
-許諾の必要があるものは以下です。
+#### 1-2. Edit Plist
+In some cases, ChatCenter SDK will use the user's information when sending each widget. Therefore, please change the setting to give plist permission to use the information.
+Permission necessary are mentioned below.
 
-| 許諾項目|使用するウィジェット| 
+| Permission necessary|Widgets that use the information| 
 |:-----------|:------------|
-| NSLocationWhenInUseUsageDescription|位置情報|
-| NSPhotoLibraryUsageDescription|画像添付|
-| NSCameraUsageDescription|画像添付/ビデオチャット|
-| NSMicrophoneUsageDescription|ビデオチャット/ボイスチャット|
+| NSLocationWhenInUseUsageDescription|location information|
+| NSPhotoLibraryUsageDescription|Image attachment|
+| NSCameraUsageDescription|Image attachment/Video chat|
+| NSMicrophoneUsageDescription|video chat/voice chat|
 
 <p align="center"><img src="InstallationImages/plist.png"></p>
-ソースでは以下のようになります。
+In the source, it will be shown as below.
 
 ```
-例)
+Ex)
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>位置情報を送信時に使用します。</string>
+<string>Uses location information when sending</string>
 <key>NSPhotoLibraryUsageDescription</key>
-<string>画像を保存するためにアクセスします</string>
+<string>Accesses to save image</string>
 <key>NSCameraUsageDescription</key>
-<string>ビデオチャットにて使用するためにアクセスします</string>
+<string>Accesses to use for video chat</string>
 <key>NSMicrophoneUsageDescription</key>
-<string>ビデオチャットにて使用するためにアクセスします</string>
+<string>Accesses to use for video chat</string>
 ```
 ***
 
 <a id="5Localize"></a>
-#### 1-3. 言語のローカライズ
-各言語のstringファイルを用意しておりますので、各lprojフォルダにstringファイルをコピーしてください。もしlprojフォルダが存在しない場合は、lprojフォルダごとコピーしてください。
+#### 1-3. Localization of languages
+Please copy the string file to each lproj folder from the string file of each language we prepared. If the lproj folder does not exist, please copy the entire lproj folder.
 
 ```
-例)
+Ex)
 ja.lproj/ChatCenterSDK.strings
 en.lproj/ChatCenterSDK.strings
 ```
 
 <a id="SetAppToken"></a>
-## 2. App Tokenのセット
-以下のメソッドを初回起動時のviewControllerのviewDidLoad等に箇所に挿入ください。  
+## 2. Set App Token
+Please insert the following method into the viewDidLoad etc of the viewController at the first activate the app.  
 ```+ (void)setAppToken:(NSString *)appToken completionHandler:(void (^)(void))completionHandler;```
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 - (void)viewDidLoad
 {
-    [ChatCenter setAppToken:@”appsociallyより発行いたします” completionHandler:^{
-       ///セット完了のコールバックです
-       ///SDKのデザインカスタマイズはここに記述してください
+    [ChatCenter setAppToken:@”Issued by appsocially” completionHandler:^{
+       ///call back for set completion
+
+       ///Insert the SDK design customization here
     }];
   …
   …    
@@ -171,12 +174,12 @@ en.lproj/ChatCenterSDK.strings
 ***
 
 <a id="DispalyChatView"></a>
-## 3. チャットビューの呼び出し
-チャットを表示するチャットビューを呼び出します。
-<p align="center"><img src="InstallationImages/chatview.png" width="375" height="667"></p>
+## 3. Display chat view
+Call chat view to display chat.
+<p align="center"><img src="InstallationImages/chatview_en.PNG" width="375" height="667"></p>
 
-### 3-1. 認証ありの場合
-以下のコードを任意の場所に挿入してください。
+### 3-1. When requiring authentication
+Please insert the following code in a convenient place.
 
 ```
 - (void)presentChatView:(UIViewController *)viewController
@@ -193,76 +196,77 @@ en.lproj/ChatCenterSDK.strings
             deviceToken:(NSString *)deviceToken
       completionHandler:(void (^)(void))completionHandler;
 ```
-NavigationControlloer付きのチャットビューをpresentViewControllerします。
-既存のNavigationControlloerへ追加する場合は、チャットビュー単体をreturnするgetChatViewをご利用ください。
+PresentViewController a chat view with NavigationControlloer.
+To add to existing NavigationControlloer, please use getChatView which returns standalone chat view.
 
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 	<tr>
-		<th>パラメータ名</th>
+		<th>Parameter name</th>
 		<th>Facebook</th>
 		<th>Twitter</th>
 	</tr>
 	<tr>
 		<td>viewController(UIViewController)</td>
-		<td colspan="2"><b>presentViewControllerする元のViewControllerをご指定ください</b></td>
+		<td colspan="2"><b>Please specify the original ViewController to presentViewController</b></td>
 	</tr>
 	<tr>
 		<td>orgUid(NSString)</td>
-		<td colspan="2"><b>Chatに紐づく、チームIDを指定してください</b></td>
+		<td colspan="2"><b>Please specify team ID based on Chat</b></td>
 	</tr>
 	<tr>
 		<td>firstName(NSString)</td>
-		<td colspan="2">生成するユーザーのファミリーネームを指定してください。nilを指定した場合はFacebook/Twitterに登録されているユーザーのファミリーネームが使用されます。</td>
+		<td colspan="2">Please specify the family name of the user to be generated. If nil is specified, the family name of the user registered on Facebook / Twitter will be used.</td>
 	</tr>
 	<tr>
 		<td>familyName(NSString)</td>
-		<td colspan="2">生成するユーザーのファミリーネームを指定してください。nilを指定した場合はFacebook/Twitterに登録されているユーザーのファミリーネームが使用されます。</td>
+		<td colspan="2">Please specify the last name of the user to be generated. If nil is specified, the family name of the user registered on Facebook / Twitter will be used.</td>
 	</tr>
 	<tr>
 		<td>email(NSString)</td>
-		<td colspan="2">生成するユーザーのEmailアドレスを指定してください。nilを指定した場合はFacebook/Twitterに登録されているEmailアドレスが使用されます(Facebook認証時にパーミッションを要求している必要があります)。</td>
+		<td colspan="2">Please specify the Email address of the user to be generated. If nil is specified, the Email address of the user registered on Facebook / Twitter will be used. (Need to request permission at Facebook authentication)。</td>
 	</tr>
 	<tr>
 		<td>provider(NSString)</td>
-		<td><b>@"facebook"を指定してください</b></td>
-		<td><b>@"twitter"を指定してください</b></td>
+		<td><b>@Please specify "facebook"</b></td>
+		<td><b>@Please specify "twitter"</b></td>
 	</tr>
 	<tr>
 		<td>providerToken(NSString)</td>
-		<td colspan="2"><b>認証結果のtokenを指定してください</b></td>
+		<td colspan="2"><b>Please specify token of authentication result</b></td>
 	</tr>
 	<tr>
 		<td>providerTokenSecret(NSString)</td>
-		<td>nilを指定してください</td>
-		<td><b>Access token secretを指定してください</b></td>
+		<td>Please specify nil</td>
+		<td><b>Please specify Access token secret</b></td>
 	</tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
-		<td colspan="2">nilを指定してください</td>
+		<td colspan="2">Please specify nil</td>
 	</tr>
 	<tr>
 		<td>providerExpiresAt(NSDate)</td>
-		<td><b>認証結果のtokenの失効日(expirationDate)を指定してください</b></td>
-		<td>nilを指定してください</td>
+		<td><b>Please specify the expiration date(expirationDate) of authentication</b></td>
+		<td>Please specify nil</td>
 	</tr>
 	<tr>
 		<td>deviceToken(NSString)</td>
-		<td colspan="2">プッシュ通知で使用するAppleから取得したdeviceTokenを指定してください</td>
+		<td colspan="2">Please specify the deviceToken obtained from Apple for using Push notification</td>
 	</tr>
 	<tr>
 		<td>channelInformations(NSDictionary)</td>
-		<td colspan="2">生成するchannelに紐づくurlを以下のように指定してください``例) @{@"url":@"https://app.asana.com"}``</td>
+		<td colspan="2">Please specify url related to creating channel as below
+``Ex) @{@"url":@"https://app.asana.com"}``</td>
 	</tr>
 	<tr>
 		<td>completionHandler</td>
-		<td colspan="2">チャットビューを閉じる際に呼ぶコールバック処理を指定してください</td>
+		<td colspan="2">Please specify which callback processing to call when closing chat view</td>
 	</tr>
 </table>
 
 
 ```
-例)Facebook
+Ex)Facebook
 #import "ChatCenter.h"
 
 …
@@ -282,7 +286,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 ```
 
 ```
-例)Twitter
+Ex)Twitter
 #import "ChatCenter.h"
 
 …
@@ -300,9 +304,9 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 …
 ```
 
-### 3-2. 認証なしの場合(Anonymousログイン)
-**注意: 認証なしの場合は、ログインから30日後に自動ログアウトされます。また、後から認証処理を紐付けることは現在対応しておりません**  
-以下のコードを任意の場所に挿入してください。  
+### 3-2. When authentication is not required (Anonymous login)
+**Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
+Please insert the following code in a convenient place.
 
 ```
 - (void)presentChatView:(UIViewController *)viewController
@@ -315,45 +319,45 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
       completionHandler:(void (^)(void))completionHandler;
 ```
 
-#### パラメータ
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+#### Parameter
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 	<tr>
-		<th>パラメータ名</th>
-		<th>値</th>
+		<th>Name of parameter</th>
+		<th>value</th>
 	</tr>
 	<tr>
 		<td>viewController(UIViewController)</td>
-		<td><b>presentViewControllerする元のViewControllerをご指定ください</b></td>
+		<td><b>Please specify the original ViewController to presentViewController</b></td>
 	</tr>
 	<tr>
 		<td>orgUid(NSString)</td>
-		<td><b>Chatに紐づく、チームIDを指定してください</b></td>
+		<td><b>Please specify team ID based on Chat</b></td>
 	</tr>
 	<tr>
 		<td>firstName(NSString)</td>
-		<td>生成するユーザーのファーストネームを指定してください</td>
+		<td>Please specify the first name of the user to be generated</td>
 	</tr>
 	<tr>
 		<td>familyName(NSString)</td>
-		<td>生成するユーザーのファミリーネームを指定してください</td>
+		<td>Please specify the last name of the user to be generated</td>
 	</tr>
 	<tr>
 		<td>email(NSString)</td>
-		<td>生成するユーザーのEmailアドレスを指定してください</td>
+		<td>Please specify the Email address of the user to be generated</td>
 	</tr>
 	<tr>
 		<td>channelInformations(NSDictionary)</td>
-		<td>生成するchannelに紐づくurを以下のように指定してください  ``例) @{@"url":@"https://app.asana.com"}``</td>
+		<td>Please specify url related to creating channel as below)@{@"url":@"https://app.asana.com"}``</td>
 	</tr>
 	<tr>
 		<td>completionHandler</td>
-		<td>チャットビューを閉じる際に呼ぶコールバック処理を指定してください</td>
+		<td>Please specify which callback processing to call when closing chat view</td>
 	</tr>
 </table>
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 …
@@ -370,12 +374,12 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 ***
 
 <a id="DispalyHistoryView"></a>
-## 4. ヒストリービューの呼び出し
-チャットの履歴一覧を表示するヒストリービューを呼び出します。  
-<p align="center"><img src="InstallationImages/historyview.png" width="375" height="667"></p>
+## 4. Display history view
+Call history view to display chat history list.  
+<p align="center"><img src="InstallationImages/historyview_en.PNG" width="375" height="667"></p>
 
-### 4-1. 認証ありの場合
-以下のコードを任意の場所に挿入してください。
+### 4-1. When requiring authentication
+Please insert the following code in a convenient place.
 
 ```
 - (void)presentHistoryView:(UIViewController *)viewController
@@ -386,51 +390,51 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler;
 ```
-NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
-既存のNavigationControlloerへ追加する場合は、チャットビュー単体をreturnするgetChatViewをご利用ください。
+PresentViewController a Histroy View with NavigationControlloer.
+To add to existing NavigationControlloer, please use getChatView which returns standalone chat view.
 
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 	<tr>
-		<th>パラメータ名</th>
+		<th>Name of parameter</th>
 		<th>Facebook</th>
 		<th>Twitter</th>
 	</tr>
 	<tr>
 		<td>viewController(UIViewController)</td>
-		<td colspan="2"><b>presentViewControllerする元のViewControllerをご指定ください</b></td>
+		<td colspan="2"><b>Please specify the original ViewController to presentViewController</b></td>
 	</tr>
 	<tr>
 		<td>provider(NSString)</td>
-		<td><b>@"facebook"を指定してください</b></td>
-		<td><b>@"twitter"を指定してください</b></td>
+		<td><b>Please specify @"facebook"</b></td>
+		<td><b>Please specify @"twitter"</b></td>
 	</tr>
 	<tr>
 		<td>providerToken(NSString)</td>
-		<td colspan="2"><b>認証結果のtokenを指定してください</b></td>
+		<td colspan="2"><b>Please specify token of authentication result</b></td>
 	</tr>
 	<tr>
 		<td>providerTokenSecret(NSString)</td>
-		<td>nilを指定してください</td>
-		<td><b>Access token secretを指定してください</b></td>
+		<td>Please specify nil</td>
+		<td><b>Please specify Access token secret</b></td>
 	</tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
-		<td colspan="2">nilを指定してください</td>
+		<td colspan="2">Please specify nil</td>
 	</tr>
 	<tr>
 		<td>providerExpiresAt(NSDate)</td>
-		<td><b>認証結果のtokenの失効日(expirationDate)を指定してください</b></td>
-		<td>nilを指定してください</td>
+		<td><b>Please specify the expiration date(expirationDate) of authentication</b></td>
+		<td>Please specify nil</td>
 	</tr>
 	<tr>
 		<td>completionHandler</td>
-		<td colspan="2">ヒストリービューを閉じる際に呼ぶコールバック処理を指定してください</td>
+		<td colspan="2">Please specify which callback processing to call when closing chat view</td>
 	</tr>
 </table>
 
 ```
-例)Facebook
+Ex)Facebook
 #import "ChatCenter.h"
 
 …
@@ -445,7 +449,7 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 ```
 
 ```
-例)Twitter
+Ex)Twitter
 #import "ChatCenter.h"
 
 …
@@ -459,34 +463,35 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 …
 ```
 
-### 4-2. 認証なしの場合(Anonymousログイン)
-**注意: 認証なしの場合は、ログインから30日後に自動ログアウトされます。また、後から認証処理を紐付けることは現在対応しておりません**    
-以下のコードを任意の場所に挿入してください。  
+### 4-2. When authentication is not required (Anonymous login)
+**Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
+Please insert the following code in a convenient place.
+
 
 ```
 - (void)presentHistoryView:(UIViewController *)viewController
          completionHandler:(void (^)(void))completionHandler;
 ```
 
-#### パラメータ
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+#### Parameter
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 	<tr>
-		<th>パラメータ名</th>
-		<th>値</th>
+		<th>Name of parameter</th>
+		<th>Value</th>
 	</tr>
 	<tr>
 		<td>viewController(UIViewController)</td>
-		<td><b>presentViewControllerする元のViewControllerをご指定ください</b></td>
+		<td><b>Please specify the original ViewController to presentViewController</b></td>
 	</tr>
 	<tr>
 		<td>completionHandler</td>
-		<td>ヒストリービューを閉じる際に呼ぶコールバック処理を指定してください</td>
+		<td>Please specify which callback processing to call when closing chat view</td>
 	</tr>
 </table>
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 …
@@ -497,25 +502,25 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 ***
 
 <a id="LogoutUser"></a>
-## 5. ユーザーのログアウト
-ChatCenter iOS SDKではチャットデータをローカルDB(Coredata)へ保存しており、ユーザーのログアウト時には以下をコールしてデータのリセットをお願いします。  
+## 5. Log out user
+In ChatCenter iOS SDK, chat data is saved in the local DB (Coredata), please reset the data by calling the following when logging out user.  
 ``- (BOOL)signOut;``
 ***
 
 
-<a id="Opptions"></a>
-## オプション
+<a id="Options"></a>
+## Options
 <a id="Pushnotification"></a>
-### 1. プッシュ通知
-**※ プッシュ通知を実施される場合は、p12ファイル及びパスワードを弊社の担当者へ送付ください。**
+### 1. Push notification
+**※ When using Push notification, please send the file and password on page 12 to our person in charge.**
 
-#### 1-1. プッシュ通知のオン
+#### 1-1. Turning on Push notification
 
-#### (a)チャットビューを表示時に行う
-チャットビューの呼び出しの際に、Appleより取得したデバイストークンをdeviceTokenに設定してください。登録の時点でプッシュ通知は有効になります。
+#### (a)Set device token when displaying chat view
+When calling chat view, set the device token acquired from Apple to deviceToken. Push notification is enabled at the time of registration.
 
-#### (b)任意のタイミングで行う
-サインイン等、プッシュ通知を有効にしたいタイミングで以下をコールしてください。ChatCenterのビューを呼び出す前にプッシュ通知をオンにしたい場合に使用してください。
+#### (b)Set device token manually
+Please call the following at the timing when you want to enable Push notification, such as sign in. Use it when you want to turn on Push notification before calling ChatCenter view.
 
 ```
 - (void)signInDeviceToken:(NSString*)email
@@ -529,91 +534,91 @@ deviceToken:(NSString *)deviceToken
 completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 ```
 
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 <tr>
-<th>パラメータ名</th>
+<th>Name of parameter</th>
 <th>Facebook</th>
 <th>Twitter</th>
 </tr>
 <tr>
 <td>password(NSString)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>email(NSString)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>provider(NSString)</td>
-<td><b>@"facebook"を指定してください</b></td>
-<td><b>@"twitter"を指定してください</b></td>
+<td><b>Please specify @"facebook"</b></td>
+<td><b>Please specify @"twitter"</b></td>
 </tr>
 <tr>
 <td>providerToken(NSString)</td>
-<td colspan="2"><b>認証結果のtokenを指定してください</b></td>
+<td colspan="2"><b>Please specify token of authentication result</b></td>
 </tr>
 <tr>
 <td>providerTokenSecret(NSString)</td>
-<td>nilを指定してください</td>
-<td><b>Access token secretを指定してください</b></td>
+<td>Please specify nil</td>
+<td><b>Please specify Access token secret</b></td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>providerExpiresAt(NSDate)</td>
-<td><b>認証結果のtokenの失効日(expirationDate)を指定してください</b></td>
-<td>nilを指定してください</td>
+<td><b>Please specify the expiration date(expirationDate) of authentication</b></td>
+<td>Please specify nil</td>
 </tr>
 <tr>
 <td>deviceToken(NSString)</td>
-<td colspan="2"><b>プッシュ通知で使用するAppleから取得したdeviceTokenを指定してください</b></td>
+<td colspan="2"><b>Please specify the deviceToken obtained from Apple for using Push notification</b></td>
 </tr>
 <tr>
 <td>channelInformations(NSDictionary)</td>
-<td colspan="2">生成するchannelに紐づくurlを以下のように指定してください``例) @{@"url":@"https://app.asana.com"}``</td>
+<td colspan="2">Please specify url related to creating channel as below ``Ex @{@"url":@"https://app.asana.com"}``</td>
 </tr>
 <tr>
 <td>completionHandler</td>
-<td colspan="2">通信後のコールバック処理を指定してください。通信結果が含まれます</td>
+<td colspan="2">Please specify call back processing after communication. Communication result is included</td>
 </tr>
 </table>
 
-#### 1-2. プッシュ通知のオフ
-サインアウト等、プッシュ通知を無効にしたいタイミングで以下をコールしてください。
+#### 1-2. Turning off Push notification
+Please call the following at the timing when you want to invalidate Push notification, such as sign-out.
 
 ```
 - (void)signOutDeviceToken:(NSString *)deviceToken
 completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 ```
 
-**パラメータ**
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+**Parameter**
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 <tr>
-<th>パラメータ名</th>
-<th>値</th>
+<th>Name of parameter</th>
+<th>Value</th>
 </tr>
 <tr>
 <td>deviceToken(NSString)</td>
-<td><b>プッシュ通知で使用するAppleから取得したdeviceTokenを指定してください</b></td>
+<td><b>Please specify the deviceToken obtained from Apple for using Push notification</b></td>
 </tr>
 <tr>
 <td>completionHandler</td>
-<td>通信後のコールバック処理を指定してください。通信結果が含まれます</td>
+<td>Please specify call back processing after communication. Communication result is included</td>
 </tr>
 </table>
 
-#### 1-3. プッシュ通知の受信
-受信時のペイロードからorg_uidを取り出し、チャットビューの呼び出しを行ってください。
-以下のようなペイロードが送信されます。
+#### 1-3. Receiving Push notification
+Please retrieve org_uid from the payload at reception and perform Display chat view.
+The following payload will be sent.
 
 ```
 {
 "aps": {
-"alert": "app_name チャットセンターでメッセージを受信しました。",
+"alert": "app_name You have a message from ChatCenter",
 "badge": unread_count,
 "sound": "default",
 "category": "chat message",
@@ -626,69 +631,69 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHand
 }
 ```
 
-**変数**
+**Variable**
 
-* app_name -> アプリ名
-* unread_count -> 未読のチャネル数
-* org_uid -> チームID(法人/店舗ID)
-* channel_uid -> チャネルUID
+* app_name -> App name
+* unread_count -> Number of unread channel
+* org_uid -> Team ID(Company/Store ID)
+* channel_uid -> Channel UID
 ***
 
 <a id="DesignCustom"></a>
-### 2. デザインのカスタマイズ
-setAppTokenのcompletionHandler内でセットをしてください
+### 2. Custom design
+Please set within setHandler of setAppToken
 
 #### 2-1. Base color  
 ``+ (void)setBaseColor:(UIColor *)baseColor;``  
-デザインのベースとなるカラーを設定できます。主に以下に適応されます
+You can set the base color of the design. Mainly applied to;
 
-* (チャットビュー) 自分が送信したチャットバブルの背景色
-* (チャットビュー) ウィジェットメニューアイコンの色
-* (チャットビュー) ウィジェットメニューの色
+* (Chat View) Background color of chat bubble sent by you
+* (Chat View) Widget Menu Icon Colors
+* (Chat View) Widget menu color
 
 
 #### 2-2. headerBarStyle
 ``+ (void)setHeaderBarStyle:(UIBarStyle)headerBarStyle;``  
-チャット/ヒストリービュー内のBarStyleを設定します。デフォルトでは、UIBarStyleDefaultが設定されています。
+Set the BarStyle in the Chat / History view. By default UIBarStyleDefault is set.
 
 #### 2-3. headerTranslucent
 ``+ (void)setHeaderTranslucent:(BOOL)headerTranslucent;``  
-チャット/ヒストリービュー内のTranslucentを設定します。デフォルトでは、YESが設定されています。
+Set Translucent in the Chat / History view. By default, YES is set.
 
 #### 2-4. headerItemColor
 ``+ (void)setHeaderItemColor:(UIColor *)headerItemColor;``  
-ナビゲーションアイテム(タイトル、ボイス/ビデオチャットアイコン、戻る/閉じるボタン)のTintColorを設定します。
+Set TintColor for navigation items (title, voice / video chat icon, back / close button).
 
 #### 2-5. headerBackgroundColor
 ``+ (void)setHeaderBackgroundColor:(UIColor *)headerBackgroundColor;``  
-ナビゲーションの背景色を設定します。
+Sets the background color of the navigation.
 
 #### 2-6. Close button image
 ``+ (void)setCloseBtnImage:(NSString *)normal hilighted:(NSString *)hilighted disable:(NSString *)disable;``  
-チャット/ヒストリービュー内のの閉じるボタンを設定します。
+Set the close button in the chat / history view.
 
 #### 2-7. Back button image
 ``+ (void)setBackBtnImage:(NSString *)normal hilighted:(NSString *)hilighted disable:(NSString *)disable;``  
-チャット/ヒストリービュー内のの戻るボタンを設定します。
+Set the back button in the chat / history view.
 
 #### 2-8. Voice chat button image
 ``+ (void)setVoiceCallBtnImage:(NSString *)normal hilighted:(NSString *)hilighted disable:(NSString *)disable;``  
-チャットビュー内のボイスチャットボタンを設定します。
+Sets the voice chat button in the chat view.
 
 #### 2-9. Video chat button image
 ``+ (void)setVideoCallBtnImage:(NSString *)normal hilighted:(NSString *)hilighted disable:(NSString *)disable;``  
-チャットビュー内のビデオチャットボタンを設定します。
+Sets the video chat button in the chat view.
 
 #### 2-10. historyViewTitle
 ``+ (void)setHistoryViewTitle:(NSString *)historyViewTitle;``  
-ヒストリービューのタイトルの文言を設定します
+Set the wording of the title in the history view.
 
 #### 2-11. historyViewVoidMessage
 ``+ (void)setHistoryViewVoidMessage:(NSString *)historyViewVoidMessage;``  
-ヒストリービューでチャットが0件の場合に表示する文言を設定します
+Set the wording to display when the chat is 0 in the history view.
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 …
@@ -705,8 +710,8 @@ setAppTokenのcompletionHandler内でセットをしてください
         [ChatCenter setBackBtnImage:@"back.png" hilighted:@"back_pressed.png" disable:@"back_disable.png"];
         [ChatCenter setVoiceCallBtnImage:@"voice.png" hilighted:@"voice_pressed.png" disable:@"voice_disable.png"];
         [ChatCenter setVideoCallBtnImage:@"video.png" hilighted:@"video_pressed.png" disable:@"video_disable.png"];
-        [ChatCenter setHistoryViewTitle:@"メッセージ"];
-        [ChatCenter setHistoryViewVoidMessage:@"チャットがありません。"];
+        [ChatCenter setHistoryViewTitle:@"Message"];
+        [ChatCenter setHistoryViewVoidMessage:@"No chat."];
     }];
 
 …
@@ -714,49 +719,50 @@ setAppTokenのcompletionHandler内でセットをしてください
 ***
 
 <a id="ConfirmMessage"></a>
-### 3. 未読メッセージ数の取得
-未読件数の表示には以下の3種類のAPIを用意しています。
+### 3. Confirm message
+The following three types of API are prepared for displaying the number of unread counts.
 
 <table>
 <tr>
 <th>API</th>
-<th>返り値</th>
-<th>内容</th>
+<th>Return Value</th>
+<th>Details</th>
 </tr>
 <td>isUnreadMessageCount</td>
 <td>BOOL</td>
-<td>未読メッセージの有無を返却します</td>
+<td>Returns the existence of unread messages</td>
 </tr>
 <tr>
 <td>unreadMessageCount</td>
 <td>NSUInteger</td>
-<td>未読メッセージ数を返却します</td>
+<td>Return number of unread messages</td>
 </tr>
 <td>unreadChannelCount</td>
 <td>NSUInteger</td>
-<td>未読チャットルーム数を返却します</td>
+<td>Return the number of unread chat rooms</td>
 </tr>
 </table>
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 …
 
 if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
-   ///未読メッセージあり
+   ///Unread message
 }else{
-   ///未読メッセージなし
+   ///No unread message
 }
 
 …
 ```
 
-#### 事前に未読件数をロードしたい場合
-通常、ChatCenterとの通信はチャットビューもしくはヒストリービューを開いたタイミングで発生しますが、  
-事前に未読件数をロードしたい場合は、以下のコードをsetAppTokenが完了後(completionHandler内)に挿入してください。
-#### (a)認証ありの場合
+#### When you want to load unread counts in advance
+Normally, communication with ChatCenter occurs at the timing when chat view or history view is opened. 
+If you want to load unread counts in advance, insert the following code after setAppToken is completed (within completionHandler).
+
+#### (a)When requiring authentication
 ```
 - (void)signInDeviceToken:(NSString*)email
                  password:(NSString*)password
@@ -769,63 +775,63 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
         completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 ```
 
-以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
 <table>
 <tr>
-<th>パラメータ名</th>
+<th>Name of parameter</th>
 <th>Facebook</th>
 <th>Twitter</th>
 </tr>
 <tr>
 <td>password(NSString)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>email(NSString)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>provider(NSString)</td>
-<td><b>@"facebook"を指定してください</b></td>
-<td><b>@"twitter"を指定してください</b></td>
+<td><b>Please specify @"facebook"</b></td>
+<td><b>Please specify @"twitter"</b></td>
 </tr>
 <tr>
 <td>providerToken(NSString)</td>
-<td colspan="2"><b>認証結果のtokenを指定してください</b></td>
+<td colspan="2"><b>Please specify token of authentication result</b></td>
 </tr>
 <tr>
 <td>providerTokenSecret(NSString)</td>
-<td>nilを指定してください</td>
-<td><b>Access token secretを指定してください</b></td>
+<td>Please specify nil</td>
+<td><b>Please specify Access token secret</b></td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>
-<td colspan="2">nilを指定してください</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>providerExpiresAt(NSDate)</td>
-<td><b>認証結果のtokenの失効日(expirationDate)を指定してください</b></td>
-<td>nilを指定してください</td>
+<td><b>Please specify the expiration date(expirationDate) of authentication</b></td>
+<td>Please specify nil</td>
 </tr>
 <tr>
 <td>deviceToken(NSString)</td>
-<td colspan="2"><b>プッシュ通知で使用するAppleから取得したdeviceTokenを指定してください</b></td>
+<td colspan="2"><b>Please specify the deviceToken obtained from Apple for using Push notification</b></td>
 </tr>
 <tr>
 <td>channelInformations(NSDictionary)</td>
-<td colspan="2">生成するchannelに紐づくurlを以下のように指定してください``例) @{@"url":@"https://app.asana.com"}``</td>
+<td colspan="2">Please specify url related to creating channel as below ``Ex @{@"url":@"https://app.asana.com"}``</td>
 </tr>
 <tr>
 <td>completionHandler</td>
-<td colspan="2">通信後のコールバック処理を指定してください。通信結果が含まれます</td>
+<td colspan="2">Please specify call back processing after communication. Communication result is included</td>
 </tr>
 </table>
 
-#### (b)認証なしの場合
+#### (b)When authentication is not required
 ``- (void)signInWithAnonymous;``  
-パラメータはありません。
+There’s no parameter.Parameter
 
-```例
+```Ex
 #import "ChatCenter.h"
 
 …
@@ -845,31 +851,31 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
 ***
 
 <a id="GetOnline/Offline"></a>
-### 4. Orgのオンライン/オフラインの取得
-以下のコードを任意の場所に挿入してください。
+### 4. Get online / offline
+Please insert the following code in a convenient place.
 
 ``- (void)isOrgOnline:orgUid completeHandler:(void (^)(BOOL isOnline))completionHandler;``
 
-太字が必須のパラメータになります。他のパラメータで不要な場合はnilをご指定ください。
+Boldface is a required parameter. If other parameters are not required, please specify nil.
 <table>
 <tr>
-<th>パラメータ名</th>
-<th>内容</th>
+<th>Name of parameter</th>
+<th>Details</th>
 </tr>
 <tr>
 <td><b>orgUid:(NSString *)</b></td>
-<td><b>オンライン/オフラインを取得したいチームIDを指定してください</b></td>
+<td><b>Please specify team ID you want to get online / offline</b></td>
 </tr>
 <tr>
 <td>completeHandler</td>
-<td>通信後のコールバック処理を指定してください。通信結果が含まれます。</td>
+<td>Please specify call back processing after communication. Communication result is included.</td>
 </tr>
 </table>
 
-※該当Orgに所属するエージェントが1名以上オンラインだった場合にcompletionHandlerのisOnlineにYESが返却されます。それ以外はNOが返却されます。
+※If one or more agents belonging to the corresponding Org are online, YES is returned to isOnline of completionHandler.Otherwise NO will be returned.
 
 ```
-例)
+Ex)
 #import "ChatCenter.h"
 
 …
