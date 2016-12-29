@@ -26,6 +26,7 @@
 #import "CCCommonStickerCollectionViewCell.h"
 #import "ChatCenterClient.h"
 #import "CCLocationPreviewViewController.h"
+#import "CCLiveLocationStickerViewController.h"
 #import "CCConstants.h"
 #import "CCYesNoQuestionCreatorViewController.h"
 #import "CCImagePickerViewController.h"
@@ -45,8 +46,9 @@
 #import "CCIncomingCallViewController.h"
 #import "CCSuggestionInputView.h"
 #import "CCCommonWidgetPreviewViewController.h"
-
+#import "CCLiveLocationWebviewController.h"
 #import "UIImage+CCSDKImage.h"
+#import "CCLiveLocationTask.h"
 
 NSString *kCCCommonStickerCollectionViewCell_Incoming = @"CCCommonStickerCollectionViewCellIncoming";
 NSString *kCCCommonStickerCollectionViewCell_Outgoing = @"CCCommonStickerCollectionViewCellOutgoing";
@@ -59,10 +61,18 @@ int kMessageLabelTag            = 998;
 int kCloseStickerMenuButtonTag  = 997;
 
 #define CC_WIDGETTYPECALENDER @"calendar"
+#define CC_COLOCATION_PREFERRED_INTERVAL    30.0
 
 @interface CCChatViewController ()<UIAlertViewDelegate>{
     UIView *inputMenuBar;
-//    CLLocationManager *locationManager;
+    CLLocationManager *locationManager;
+    CLLocation *lastUpdatedLocation;
+    NSTimer *colocationTimer;
+    int liveColocationShareDuration;
+    int liveColocationShareTimer;
+    UIBackgroundTaskIdentifier colocationBackgroundTask;
+    CCJSQMessage *colocationMessage;
+
     NSString *currentLatitude;
     NSString *currentLongitude;
     NSString *currentAddress;
@@ -149,6 +159,7 @@ int kCloseStickerMenuButtonTag  = 997;
               provider:(NSString *)provider
          providerToken:(NSString *)providerToken
    providerTokenSecret:(NSString *)providerTokenSecret
+  providerRefreshToken:(NSString *)providerRefreshToken
      providerCreatedAt:(NSDate *)providerCreatedAt
      providerExpiresAt:(NSDate *)providerExpiresAt
    channelInformations:(NSDictionary *)channelInformations
@@ -176,6 +187,7 @@ int kCloseStickerMenuButtonTag  = 997;
         [CCConnectionHelper sharedClient].provider = provider;
         [CCConnectionHelper sharedClient].providerToken = providerToken;
         [CCConnectionHelper sharedClient].providerTokenSecret = providerTokenSecret;
+        [CCConnectionHelper sharedClient].providerRefreshToken = providerRefreshToken;
         
         if (providerCreatedAt != nil)
         {
@@ -208,10 +220,6 @@ int kCloseStickerMenuButtonTag  = 997;
 #ifdef CC_VIDEO
     [self processUserMeVideoChatInfo];
 #endif
-    
-//    if ([[CCConstants sharedInstance].stickers containsObject:CC_RESPONSETYPELOCATION]) {
-//        [self locationSetup];
-//    }
 //
 //    UITapGestureRecognizer *tapGesture =
 //    [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(OtherContentTapped:)];
@@ -232,7 +240,9 @@ int kCloseStickerMenuButtonTag  = 997;
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardDidHideNotification
                                                object:nil];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reinstateBackgroundTask)
+                                                 name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)reloadCollectionViewData {
@@ -285,7 +295,6 @@ int kCloseStickerMenuButtonTag  = 997;
         // update left of input toolbar
         [self updateLeftOfInputToolbar];
     }];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -812,7 +821,6 @@ int kCloseStickerMenuButtonTag  = 997;
 //    locationManager.delegate = self;
 //    if ([CLLocationManager locationServicesEnabled] == NO) {
 //        NSLog(@"Location is denied");
-//        NSLog(@"AppSocially Inc.___LOcation    1");
 //    }else{
 //        NSLog(@"AppSocially Inc.___LOcation    2");
 //        if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) { //requestWhenInUseAuthorization can be used in iOS8
@@ -838,6 +846,7 @@ int kCloseStickerMenuButtonTag  = 997;
 #pragma mark - Actions
 
 -(void)pressBack:(id)sender {
+//    [self stopSharingLocation];
     [self removeNavigationBottomBorder];
     [self.navigationController popViewControllerAnimated:YES];
     [[CCConnectionHelper sharedClient] setDelegate:nil];
@@ -845,6 +854,7 @@ int kCloseStickerMenuButtonTag  = 997;
 }
 
 -(void)pressClose:(id)sender {
+//    [self stopSharingLocation];
     [self removeNavigationBottomBorder];
     self.parentViewController.modalTransitionStyle = UIModalPresentationOverCurrentContext;
     [self dismissViewControllerAnimated:YES completion:self.closeChatViewCallback];
@@ -1190,6 +1200,29 @@ int kCloseStickerMenuButtonTag  = 997;
 //    }
 }
 
+-(void)pressLocationWidget {
+    UIAlertController *alertVC;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location you want to share?") preferredStyle:UIAlertControllerStyleAlert];
+    } else {
+        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location you want to share?") preferredStyle:UIAlertControllerStyleActionSheet];
+    }
+    UIAlertAction *venueLocationAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Send Venue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self pressLocation];
+    }];
+    
+    UIAlertAction *liveLocationAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Share Live Location") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self pressLivelocation];
+    }];
+    
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:nil];
+    
+    [alertVC addAction:venueLocationAction];
+    [alertVC addAction:liveLocationAction];
+    [alertVC addAction:cancelAction];
+    [self presentViewController:alertVC animated:YES completion:nil];
+}
+
 -(void)pressLocation{
     if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
         [self pressCloseStickerMenu];
@@ -1202,6 +1235,22 @@ int kCloseStickerMenuButtonTag  = 997;
         
     }else{
        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
+    }
+}
+
+-(void)pressLivelocation{
+    [self locationSetup];
+    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
+        CCLiveLocationStickerViewController *locationStickerViewController = [[CCLiveLocationStickerViewController alloc] initWithNibName:@"CCLiveLocationStickerViewController" bundle:SDK_BUNDLE];
+        [locationStickerViewController setDelegate:self];
+        locationStickerViewController.isOpenedFromWidgetMessage = NO;
+        UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:locationStickerViewController];
+        [self presentViewController:rootNC animated:YES completion:^{
+            self.isReturnFromStickerView = YES;
+        }];
+        return;
+    }else{
+        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
     }
 }
 
@@ -1611,6 +1660,116 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     [self reloadCollectionViewData];
 }
 
+#pragma mark - Sending Co-location message functions
+-(void)sendUpdateColocationMessage {
+    if(colocationMessage == nil || [colocationMessage isEqual:[NSNull null]] || lastUpdatedLocation == nil || ![self checkLocationEnabled]) {
+        return;
+    }
+    
+    liveColocationShareTimer += colocationTimer.timeInterval;
+    //
+    // Send "Stop" message if shared time is greater than configed time
+    //
+    if (liveColocationShareTimer >= liveColocationShareDuration * 60) {
+        [self stopSharingLocation];
+        return;
+    }
+    NSDictionary *locationContent = @{
+                                      CC_STICKER_TYPE: CC_STICKERTYPECOLOCATION,
+                                      CC_RESPONSETYPESTICKERCONTENT:
+                                          @{CC_STICKER_DATA :
+                                                @{
+                                                    @"location" :
+                                                        @{@"lat":[NSString stringWithFormat:@"%f", lastUpdatedLocation.coordinate.latitude],
+                                                          @"lng":[NSString stringWithFormat:@"%f", lastUpdatedLocation.coordinate.longitude]}
+                                                    }
+                                            },
+                                      @"reply_to": colocationMessage.uid
+                                      };
+    
+    [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPERESPONSE completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+        if(result != nil){
+            NSLog(@"Update co-location SUCCESS! %f, %f", lastUpdatedLocation.coordinate.latitude, lastUpdatedLocation.coordinate.longitude);
+        }else{
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+                [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
+            }else{
+                NSLog(@"Update co-location Failed!");
+                [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
+            }
+        }
+    }];
+}
+
+-(void)stopSharingLocation {
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    if (task == nil) {
+        return;
+    }
+    colocationMessage = task.colocationMessage;
+    colocationTimer = task.colocationTimer;
+    if (colocationMessage == nil || colocationTimer == nil) {
+        return;
+    }
+    
+    [colocationTimer invalidate];
+    colocationTimer = nil;
+    colocationBackgroundTask = UIBackgroundTaskInvalid;
+    if ([[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId] != nil) {
+        [[CCConnectionHelper sharedClient].shareLocationTasks removeObjectForKey:self.channelId];
+    }
+    
+    NSDictionary *locationContent = @{
+                                      CC_STICKER_TYPE: CC_STICKERTYPECOLOCATION,
+                                      CC_RESPONSETYPESTICKERCONTENT:
+                                          @{CC_STICKER_DATA :
+                                                @{
+                                                    @"type": @"stop"
+                                                    }
+                                            },
+                                      @"reply_to": colocationMessage.uid
+                                      };
+    [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPERESPONSE completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+        [self reloadCollectionViewData];
+    }];
+}
+
+-(void) registerColocationBackgroundTask {
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    ///
+    /// If task already exists
+    ///
+    if (task != nil) {
+        colocationBackgroundTask = task.colocationBackgroundTask;
+    } else {
+        ///
+        /// Create new task
+        ///
+        colocationBackgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+            [self endColocationBackgroundTask];
+        }];
+        CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
+        newTask.colocationBackgroundTask = colocationBackgroundTask;
+        ///
+        /// Save task
+        ///
+        [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
+        assert(colocationBackgroundTask != UIBackgroundTaskInvalid);
+    }
+}
+
+-(void) reinstateBackgroundTask {
+    if (colocationTimer != nil && colocationBackgroundTask == UIBackgroundTaskInvalid) {
+        [self registerColocationBackgroundTask];
+    }
+}
+
+-(void) endColocationBackgroundTask {
+    [[UIApplication sharedApplication] endBackgroundTask:colocationBackgroundTask];
+    colocationBackgroundTask = UIBackgroundTaskInvalid;
+}
+
+
 -(void)sendMessage:(NSString *)type content:(NSDictionary *)content{
     CCJSQMessage *message = [self appendTempMessage:type content:content];
     [self sendMsg:content channelId:self.channelId type:type message:message];
@@ -1628,6 +1787,44 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
          if(result != nil){
             NSLog(@"Message POST Success!");
             self.inputToolbar.contentView.rightBarButtonItem.enabled = NO;
+             if(result[@"content"] != nil && ![result[@"content"] isEqual:[NSNull null]]) {
+                 NSDictionary *stickerContent = result[@"content"][CC_STICKERCONTENT];
+                 if(stickerContent != nil && stickerContent[CC_STICKER_DATA] != nil && ![stickerContent[CC_STICKER_DATA] isEqual:[NSNull null]]) {
+                     colocationMessage = message;
+                     colocationMessage.uid = result[@"id"];
+                     NSDictionary *stickerData = stickerContent[CC_STICKER_DATA];
+                     float preferredInterval;
+                     if(stickerData[@"preferred_interval"] != nil) {
+                         preferredInterval = [stickerData[@"preferred_interval"] floatValue];
+                     } else {
+                         preferredInterval = CC_COLOCATION_PREFERRED_INTERVAL;
+                     }
+                     
+                     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+                     liveColocationShareTimer = 0;
+                     liveColocationShareDuration = (int)[userDefaults integerForKey:kCCUserDefaults_liveLocationDuration];
+                     CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+                     ///
+                     /// 1. Remove old task if exists
+                     ///
+                     if (task != nil) {
+                         [[CCConnectionHelper sharedClient].shareLocationTasks removeObjectForKey:self.channelId];
+                     }
+                     
+                     ///
+                     /// 2. Create new task
+                     ///
+                     colocationTimer = [NSTimer scheduledTimerWithTimeInterval:preferredInterval target:self selector:@selector(sendUpdateColocationMessage) userInfo:nil repeats:YES];
+                     CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
+                     newTask.colocationTimer = colocationTimer;
+                     newTask.liveColocationShareTimer = liveColocationShareTimer;
+                     newTask.liveColocationShareDuration = liveColocationShareDuration;
+                     newTask.colocationMessage = colocationMessage;
+                     [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
+                     
+                     [self registerColocationBackgroundTask];
+                 }
+             }
         }else{
 //            [self updateStatusForMessage:message sendSuccess:NO];
             if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
@@ -1713,7 +1910,25 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 NSMutableDictionary *stickerAction = [NSMutableDictionary dictionaryWithDictionary:[newContent objectForKey:@"sticker-action"]];
                 NSMutableArray *actionResponseData = [NSMutableArray array];
                 
-                
+                NSMutableDictionary *stickerContent = [NSMutableDictionary dictionaryWithDictionary:[content objectForKey:CC_STICKERCONTENT]];
+                NSMutableDictionary *stickerData = [NSMutableDictionary dictionaryWithDictionary:[stickerContent objectForKey:CC_STICKER_DATA]];
+                NSString *stickerType = [content objectForKey:@"sticker-type"];
+                NSString *stickerDataType = [stickerData objectForKey:@"type"];
+                if ([stickerType isEqualToString:CC_STICKERTYPECOLOCATION] && stickerDataType != nil && [stickerDataType isEqualToString:@"stop"]) {
+                    NSMutableDictionary *oldStickerContent = [NSMutableDictionary dictionaryWithDictionary:[msg.content objectForKey:CC_STICKERCONTENT]];
+                    NSMutableDictionary *oldStickerData = [NSMutableDictionary dictionaryWithDictionary:[oldStickerContent objectForKey:CC_STICKER_DATA]];
+                    NSMutableArray *oldUsers = [[oldStickerData objectForKey:@"users"] mutableCopy];
+                    for(NSDictionary *user in oldUsers) {
+                        NSString *uid = [[user objectForKey:@"id"] stringValue];
+                        if (uid!= nil && [uid isEqualToString:userUid]) {
+                            [oldUsers removeObject:user];
+                            break;
+                        }
+                    }
+                    [oldStickerData setObject:oldUsers forKey:@"users"];
+                    [oldStickerContent setObject:oldStickerData forKey:CC_STICKER_DATA];
+                    [newContent setObject:oldStickerContent forKey:CC_STICKERCONTENT];
+                }
                 //
                 // Since version Moon the response comes in "answers", which accepts multiple choices.
                 // On top of that, for backward compatibility we should also keep accepting conventional "answer" and "answer_label" format.
@@ -1989,6 +2204,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                             provider:[CCConnectionHelper sharedClient].provider
                                        providerToken:[CCConnectionHelper sharedClient].providerToken
                                  providerTokenSecret:[CCConnectionHelper sharedClient].providerTokenSecret
+                                providerRefreshToken:[CCConnectionHelper sharedClient].providerRefreshToken
                                    providerCreatedAt:providerCreatedAtDate
                                    providerExpiresAt:providerExpiresAtDate
                                          deviceToken:nil
@@ -2272,6 +2488,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     //
     CCStickerCollectionViewCellOptions options = [self getStickerCellOptionsForIndexPath:indexPath message:msg previousMessage:preMsg];
     
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    if (task != nil) {
+        options |= CCStickerCollectionViewCellOptionShowLiveIcon;
+    }
 
     //
     // Prepare avatar image
@@ -2920,6 +3140,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                             provider:[CCConnectionHelper sharedClient].provider
                                        providerToken:[CCConnectionHelper sharedClient].providerToken
                                  providerTokenSecret:[CCConnectionHelper sharedClient].providerTokenSecret
+                                providerRefreshToken:[CCConnectionHelper sharedClient].providerRefreshToken
                                    providerCreatedAt:providerCreatedAtDate
                                    providerExpiresAt:providerExpiresAtDate
                                  channelInformations:self.channelInformations
@@ -3442,7 +3663,204 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }];
 }
 
-#pragma mark -
+#pragma mark - LocationManagerDelegate
+
+-(void)locationSetup { // for colocation widget
+    colocationBackgroundTask = UIBackgroundTaskInvalid;
+    locationManager = [[CLLocationManager alloc] init];
+    lastUpdatedLocation = [[CLLocation alloc] init];
+    locationManager.delegate = self;
+    if ([self checkLocationEnabled]) {
+        [locationManager requestWhenInUseAuthorization];
+        [locationManager startUpdatingLocation];
+    }
+}
+
+-(BOOL)checkLocationEnabled {
+    // Check if location services are available
+    if ([CLLocationManager locationServicesEnabled] == NO) {
+        
+        // Display alert to the user.
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Location services")
+                                                                       message:CCLocalizedString(@"Location services are not enabled on this device. Please enable location services in settings.")
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Dismiss") style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {}];
+        
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
+        return NO;
+        
+    }
+    
+    if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) { //requestWhenInUseAuthorization can be used in iOS8
+        switch ([CLLocationManager authorizationStatus]) {
+            case kCLAuthorizationStatusNotDetermined: {
+                [locationManager requestWhenInUseAuthorization];
+                return NO;
+            }
+                
+            case kCLAuthorizationStatusAuthorizedAlways:
+            case kCLAuthorizationStatusAuthorizedWhenInUse: {
+                return YES;
+            }
+                
+            case kCLAuthorizationStatusDenied:
+            case kCLAuthorizationStatusRestricted: {
+                // Display alert to the user.
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Location services")
+                                                                               message:CCLocalizedString(@"Location services are not enabled on this device. Please enable location services in settings.")
+                                                                        preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Dismiss") style:UIAlertActionStyleDefault
+                                                                      handler:^(UIAlertAction * action) {}];
+                
+                [alert addAction:defaultAction];
+                [self presentViewController:alert animated:YES completion:nil];
+                NSLog(@"Location is denied");
+                return NO;
+            }
+        }
+    }
+    
+    return YES;
+}
+
+-(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+    switch (status) {
+        case kCLAuthorizationStatusNotDetermined:
+            NSLog(@"Location is denied");
+            break;
+        case kCLAuthorizationStatusAuthorizedAlways:
+        case kCLAuthorizationStatusAuthorizedWhenInUse:
+            [locationManager startUpdatingLocation];
+            break;
+        case kCLAuthorizationStatusDenied:
+        case kCLAuthorizationStatusRestricted:
+            NSLog(@"Location is denied");
+            break;
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    CLLocation *lastLocation = [locations lastObject];
+    lastUpdatedLocation = lastLocation;
+}
+
+#pragma mark - Live Location Widget Delegate
+- (void)didStopSharingLiveLocation {
+    [self stopSharingLocation];
+}
+
+- (void)didStartSharingLiveLocation {
+    NSString *text = CCLocalizedString(@"Location");
+    
+    NSDictionary *locationContent = @{@"uid":[self generateMessageUniqueId],
+                                      @"message":@{@"text":text},
+                                      @"sticker-type": CC_STICKERTYPECOLOCATION,
+                                      CC_RESPONSETYPESTICKERCONTENT:
+                                          @{@"sticker-data" :
+                                                @{
+                                                    @"type": @"start",
+                                                    @"location" :
+                                                        @{@"lat":[NSString stringWithFormat:@"%f", lastUpdatedLocation.coordinate.latitude],
+                                                          @"lng":[NSString stringWithFormat:@"%f", lastUpdatedLocation.coordinate.longitude]}
+                                                    }
+                                            }
+                                      };
+    CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
+    msg.type = CC_RESPONSETYPESTICKER;
+    msg.content = locationContent;
+    [[CCConnectionHelper sharedClient] sendMessage:msg.content channelId:self.channelId type:CC_RESPONSETYPESTICKER completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+        if(result != nil){
+            msg.uid = result[@"id"];
+            colocationMessage = msg;
+            
+            [[CCCoredataBase sharedClient] updateMessage:msg.uid withResponseContent:result[@"content"]];
+            for (CCJSQMessage *message in self.messages) {
+                if (message.uid == msg.uid) {
+                    message.content = result[@"content"];
+                    break;
+                }
+            }
+            [self.collectionView reloadData];
+            
+            if(result[@"content"] != nil && ![result[@"content"] isEqual:[NSNull null]]) {
+                NSDictionary *stickerContent = result[@"content"][CC_STICKERCONTENT];
+                if(stickerContent != nil && stickerContent[CC_STICKER_DATA] != nil && ![stickerContent[CC_STICKER_DATA] isEqual:[NSNull null]]) {
+                    NSDictionary *stickerData = stickerContent[CC_STICKER_DATA];
+                    float preferredInterval;
+                    if(stickerData[@"preferred_interval"] != nil) {
+                        preferredInterval = [stickerData[@"preferred_interval"] floatValue];
+                    } else {
+                        preferredInterval = CC_COLOCATION_PREFERRED_INTERVAL;
+                    }
+                    
+                    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+                    liveColocationShareTimer = 0;
+                    liveColocationShareDuration = (int)[userDefaults integerForKey:kCCUserDefaults_liveLocationDuration];
+                    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+                    ///
+                    /// 1. Remove old task if exists
+                    ///
+                    if (task != nil) {
+                        [[CCConnectionHelper sharedClient].shareLocationTasks removeObjectForKey:self.channelId];
+                    }
+                    
+                    ///
+                    /// 2. Create new task
+                    ///
+                    colocationTimer = [NSTimer scheduledTimerWithTimeInterval:preferredInterval target:self selector:@selector(sendUpdateColocationMessage) userInfo:nil repeats:YES];
+                    CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
+                    newTask.colocationTimer = colocationTimer;
+                    newTask.liveColocationShareTimer = liveColocationShareTimer;
+                    newTask.liveColocationShareDuration = liveColocationShareDuration;
+                    newTask.colocationMessage = colocationMessage;
+                    [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
+                    [self registerColocationBackgroundTask];
+                    ///
+                    /// Reload collection data
+                    ///
+                    [self reloadCollectionViewData];
+                    if(stickerContent[CC_STICKERCONTENT_ACTION] != nil && [stickerContent[CC_STICKERCONTENT_ACTION] count] > 0) {
+                        ///
+                        /// Open webview after share location
+                        ///
+                        NSString *urlString = [stickerContent[CC_STICKERCONTENT_ACTION] objectAtIndex:0];
+                        CCLiveLocationWebviewController *liveLocationWebviewController = [[CCLiveLocationWebviewController alloc] initWithNibName:@"CCLiveLocationWebviewController" bundle:SDK_BUNDLE];
+                        liveLocationWebviewController.urlString = urlString;
+                        if ([[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId] != nil) {
+                            liveLocationWebviewController.isSharingLocation = YES;
+                        } else {
+                            liveLocationWebviewController.isSharingLocation = NO;
+                        }
+                        liveLocationWebviewController.delegate = self;
+                        liveLocationWebviewController.isOpenedFromWidgetMessage = YES;
+                        NSMutableArray *viewControllers = [[self.navigationController viewControllers] mutableCopy];
+                        [viewControllers removeLastObject];
+                        [viewControllers addObject:liveLocationWebviewController];
+                        [self.navigationController setViewControllers:viewControllers animated:YES];
+                    }
+                }
+            }
+            
+        }else{
+            //            [self updateStatusForMessage:message sendSuccess:NO];
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+                [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
+            }else{
+                NSLog(@"Message POST Failed!");
+                //                //If send fail, wait 3 second then retry
+                //                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                //                    [NSThread sleepForTimeInterval:3.0];
+                //                    [self sendMsg:content channelId:channelId type:type message:message];
+                //                });
+            }
+        }
+        [self reloadCollectionViewData];
+    }];
+}
+
 #pragma mark - Keyboard Control For MenuBar
 
 -(void)keyboardWillShow:(NSNotification*)notification
@@ -4480,6 +4898,20 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 NSString *imageUrlString = [urlString substringFromIndex:[@"open:sticker/image?url=" length]];
                 [self openImageWithURLString:imageUrlString];
                 return;
+            } else if (data[CC_STICKER_TYPE] != nil && [data[CC_STICKER_TYPE] isEqualToString:CC_STICKERTYPECOLOCATION]) {
+                [self locationSetup];
+                _isReturnFromStickerView = YES;
+                CCLiveLocationWebviewController *liveLocationWebviewController = [[CCLiveLocationWebviewController alloc] initWithNibName:@"CCLiveLocationWebviewController" bundle:SDK_BUNDLE];
+                liveLocationWebviewController.urlString = urlString;
+                CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+                if (task != nil) {
+                    liveLocationWebviewController.isSharingLocation = YES;
+                } else {
+                    liveLocationWebviewController.isSharingLocation = NO;
+                }
+                liveLocationWebviewController.delegate = self;
+                liveLocationWebviewController.isOpenedFromWidgetMessage = YES;
+                [self.navigationController pushViewController:liveLocationWebviewController animated:YES];
             }
 //            else if ([urlString rangeOfString:@"open:sticker/location"].location != NSNotFound) {
 //                NSString *latKey = @"lat=", *lngKey = @"lng=";
@@ -4644,8 +5076,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                             status:CC_MESSAGE_STATUS_DELIVERING];
     if (messages != nil && [messages count] > 0) {
         CCJSQMessage *message = [messages objectAtIndex:0];
-        [self.messages addObject:message];
-        [self.sendingMessages addObject:message];
+        if(![message.content[CC_STICKER_TYPE] isEqualToString:CC_STICKERTYPECOLOCATION]) {
+            [self.messages addObject:message];
+            [self.sendingMessages addObject:message];
+        }
         [self finishReceivingMessageAnimated:YES];
         return message;
     }
@@ -4688,7 +5122,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 - (void)sendStickerWithType:(NSString *)msgType andContent:(NSDictionary *)content {
     [self sendMessage:msgType content:content];
 }
-
 
 - (BOOL) checkShowDateForMessageAtIndexPath:(NSIndexPath *)indexPath {
     // check date of current message & previous message

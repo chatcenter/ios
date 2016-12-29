@@ -46,12 +46,14 @@ typedef enum {
 @property (nonatomic, strong) NSString *provider;
 @property (nonatomic, strong) NSString *providerToken;
 @property (nonatomic, strong) NSString *providerTokenSecret;
+@property (nonatomic, strong) NSString *providerRefreshToken;
 @property (nonatomic, strong) NSString *providerCreatedAt;
 @property (nonatomic, strong) NSString *providerExpiresAt;
 @property (nonatomic, strong) NSString *providerOldCreatedAt;
 @property (nonatomic, strong) NSString *providerOldExpiresAt;
 @property BOOL twoColumnLayoutMode;
 @property BOOL isRefreshingData;
+@property (nonatomic, strong) NSMutableDictionary *shareLocationTasks;
 
 + (CCConnectionHelper *)sharedClient;
 
@@ -90,11 +92,12 @@ typedef enum {
  channelInformations:(NSDictionary *)channelInformations
                 note:(NSString *)note
    completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
-- (void)loadUserToken:(NSString *)email
-             password:(NSString *)password
+- (void)loadUserToken:(NSString*)email
+             password:(NSString*)password
              provider:(NSString *)provider
         providerToken:(NSString *)providerToken
   providerTokenSecret:(NSString *)providerTokenSecret
+ providerRefreshToken:(NSString *)providerRefreshToken
     providerCreatedAt:(NSDate *)providerCreatedAt
     providerExpiresAt:(NSDate *)providerExpiresAt
           deviceToken:(NSString *)deviceToken
@@ -121,6 +124,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken
@@ -173,6 +177,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
  channelInformations:(NSDictionary *)channelInformations

@@ -29,6 +29,7 @@
 - (id)initWithUserdata:(int)channelType provider:(NSString *)provider
          providerToken:(NSString *)providerToken
    providerTokenSecret:(NSString *)providerTokenSecret
+  providerRefreshToken:(NSString *)providerRefreshToken
      providerCreatedAt:(NSDate *)providerCreatedAt
      providerExpiresAt:(NSDate *)providerExpiresAt
       closeViewHandler:(void (^)(void))closeViewHandler;
@@ -48,6 +49,7 @@
         [CCConnectionHelper sharedClient].provider = provider;
         [CCConnectionHelper sharedClient].providerToken = providerToken;
         [CCConnectionHelper sharedClient].providerTokenSecret = providerTokenSecret;
+        [CCConnectionHelper sharedClient].providerRefreshToken = providerRefreshToken;
         
         if (providerCreatedAt != nil)
         {
@@ -93,6 +95,7 @@
                                                                                     provider:[CCConnectionHelper sharedClient].provider
                                                                                providerToken:[CCConnectionHelper sharedClient].providerToken
                                                                          providerTokenSecret:[CCConnectionHelper sharedClient].providerTokenSecret
+                                                                        providerRefreshToken:[CCConnectionHelper sharedClient].providerRefreshToken 
                                                                            providerCreatedAt:providerCreatedAtDate
                                                                            providerExpiresAt:providerExpiresAtDate
                                                                            completionHandler:self.closeHistoryViewCallback];
@@ -207,6 +210,7 @@
                                                                     provider:nil
                                                                providerToken:nil
                                                          providerTokenSecret:nil
+                                                        providerRefreshToken:nil
                                                            providerCreatedAt:nil
                                                            providerExpiresAt:nil
                                                          channelInformations:nil

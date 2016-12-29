@@ -21,11 +21,11 @@
 #import "ChatCenterPrivate.h"
 #import "CCImageHelper.h"
 #import "ChatCenterPrivate.h"
-
+#import "CCConnectionHelper.h"
 #import "CCQuestionComponent.h"
 #import "CCDefaultSelectionQuestionComponent.h"
 #import "UIImage+CCSDKImage.h"
-
+#import "CCLiveLocationTask.h"
 
 // Text area size calculation by NSAttributedString always underestimates the width
 // and the text will be chopped at the drawing step.
@@ -84,8 +84,13 @@
         //
         if(options & CCStickerCollectionViewCellOptionShowAsMyself) {
             self.stickerContainer.backgroundColor = [[CCConstants sharedInstance] baseColor];
+            self.stickerContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
+            self.stickerContainer.layer.borderWidth = 1.0;
         } else {
-            self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
+//            self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
+            stickerActionsContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
+            self.stickerContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
+            self.stickerContainer.layer.borderWidth = 1.0;
         }
     }
     
@@ -177,13 +182,13 @@
         //
         if( options & CCStickerCollectionViewCellOptionShowAsWidget ) {
             // If it's a widget use baseColor no matter if it's outgoing or incoming
-            self.discriptionView.textColor = [[CCConstants sharedInstance] baseColor];
+            self.discriptionView.textColor = [[CCConstants sharedInstance] defaultChatTextColor];
         } else if ( options & CCStickerCollectionViewCellOptionShowAsMyself ) {
             // For normal message cell, use white for outgoing cell
             self.discriptionView.textColor = [UIColor whiteColor];
         } else {
-            // For normal message cell, use black for outgoing cell
-            self.discriptionView.textColor = [UIColor blackColor];
+            // For normal message cell, use black for incoming cell
+            self.discriptionView.textColor = [[CCConstants sharedInstance] defaultChatTextColor];
         }
         
         // Link is automatically detected by UITextView.  Just setting link style here
@@ -351,6 +356,48 @@
     //
     [self setMessageStatusLabel:msg delegate:delegate];
 
+    //------------------------------
+    //
+    // Part J: Live Label
+    //
+    NSString *stickerType = [msg getStringAtPath:@"sticker-type"];
+    if(stickerType != nil && [stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
+        //
+        // Show list users whom is sharing live location
+        //
+        NSDictionary *stickerData = [msg getDictionaryAtPath:@"sticker-content/sticker-data"];
+        if (stickerData != nil) {
+            int avatarWidth = 20;
+            int avatarHeight = 20;
+            int padding = 4;
+            NSArray *users = stickerData[@"users"];
+            if(users.count > 0) {
+                self.headerLiveWidgetLabel.hidden = NO;
+            } else {
+                self.headerLiveWidgetLabel.hidden = YES;
+            }
+            for(int i = 0; i < users.count; i++) {
+                NSDictionary *user = users[i];
+                UIImageView *imageView = [[UIImageView alloc] init];
+                imageView.backgroundColor = [UIColor whiteColor];
+                imageView.frame = CGRectMake((avatarWidth + padding) * i, 0, avatarWidth, avatarHeight);
+                imageView.contentMode = UIViewContentModeScaleAspectFill;
+                [self setupAvatar:user imageView:imageView];
+                imageView.layer.cornerRadius = avatarWidth / 2;
+                imageView.clipsToBounds = YES;
+                [self.liveUsersContainer addSubview:imageView];
+            }
+            self.liveUsersContainer.backgroundColor = [UIColor clearColor];
+            float containerWidth = (avatarWidth + padding) * users.count > 60.0 ? 60.0:(avatarWidth + padding) * users.count;
+            self.liveUserContainerWidth.constant = containerWidth;
+            self.liveUsersContainer.contentSize = CGSizeMake((avatarWidth + padding) * users.count, avatarHeight);
+            self.liveUsersContainer.hidden = NO;
+        }
+    } else {
+        self.headerLiveWidgetLabel.hidden = YES;
+        self.liveUsersContainer.hidden = YES;
+    }
+
     return YES;
 }
 
@@ -484,6 +531,22 @@
     }
 }
 
+-(void)setupAvatar:(NSDictionary *)user imageView:(UIImageView *)imageView{
+    NSString *userUid = user[@"id"];
+    NSLog(@"Load avatar of user %@", userUid);
+    NSString *firstCharacter = [user[@"display_name"] substringToIndex:1];
+    UIImage *textImage = [[ChatCenter sharedInstance] createAvatarImage:firstCharacter width:32.0 height:32.0 color:[[ChatCenter sharedInstance] getRandomColor:user[@"id"]] fontSize:24 textOffset:1.5];
+    if (textImage != nil) {
+        imageView.image = textImage;
+    }
+    
+    if (user[@"icon_url"] != nil && !([user[@"icon_url"] isEqual:[NSNull null]])) {
+        if([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable) {
+            [imageView sd_setImageWithURL:[NSURL URLWithString:user[@"icon_url"]]];
+        }
+    }
+}
+
 //
 // Convert sticker data if needed
 //
@@ -609,6 +672,11 @@
     
     if (!text) {
         text = [msg getStringAtPath:@"text"];
+    }
+
+    NSString *stickerType = [msg.content objectForKey:CC_STICKER_TYPE];
+    if ([stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
+        text = CCLocalizedString(@"Live Location");
     }
     
     if (!text) {
@@ -746,8 +814,12 @@
 }
 
 - (void)onStickerContentTap:(UIGestureRecognizer*)gestureRecognizer {
+    NSLog(@"Message content = %@", _msg.content);
     if (_msg.content[CC_STICKERCONTENT][CC_STICKERCONTENT_ACTION] != nil) {
-        NSDictionary *data = @{ @"msgId":_msg.uid, CC_STICKERCONTENT_ACTION:_msg.content[CC_STICKERCONTENT][CC_STICKERCONTENT_ACTION]};
+        NSMutableDictionary *data = [@{ @"msgId":_msg.uid, CC_STICKERCONTENT_ACTION:_msg.content[CC_STICKERCONTENT][CC_STICKERCONTENT_ACTION]} mutableCopy];
+        if(_msg.content[CC_STICKER_TYPE] != nil) {
+            [data setValue:_msg.content[CC_STICKER_TYPE] forKey:CC_STICKER_TYPE];
+        }
         [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToStickerContent object:nil userInfo:data];
     }
 }

@@ -687,7 +687,9 @@
             //
             // Conventional style single-choice
             //
-            [actionResponseData addObject:response[@"answer"]];
+            if(response[@"answer"] != nil) {
+                [actionResponseData addObject:response[@"answer"]];
+            }
         }
         
         //

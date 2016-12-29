@@ -12,6 +12,7 @@
 #import "CCCommonWidgetEditorDelegate.h"
 #import "CCJSQMessage.h"
 #import "CCConstants.h"
+#import "CCConnectionHelper.h"
 
 @interface CCCommonWidgetPreviewViewController ()
 @property (weak, nonatomic) IBOutlet UIScrollView *widgetContainer;
@@ -61,6 +62,9 @@
     CCCommonStickerPreviewCollectionViewCell *previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
     CCStickerCollectionViewCellOptions options = 0;
     options |= CCStickerCollectionViewCellOptionShowAsWidget;
+    if(![[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:channelId]) {
+        options |= CCStickerCollectionViewCellOptionShowLiveIcon;
+    }
     
     float previewFrameY = height / 2 - previewCellSize.height / 2 - 64> 0 ? height / 2 - previewCellSize.height / 2 - 64: 0; // 64 for navigation
     

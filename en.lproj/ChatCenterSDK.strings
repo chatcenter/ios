@@ -1,5 +1,5 @@
 /* 
-  ChatCenterSDK.strings Version 1.0.8
+  ChatCenterSDK.strings Version 1.0.9
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -247,7 +247,7 @@
 "minute" = "minute";
 "This message is invisible to the customer." = "This message is invisible to the customer.";
 "Log out" = "Log out";
-"Change apps" = "Change apps";
+"Change apps" = "Please select an app";
 "Please input 2000 characters or less." = "Please input 2000 characters or less.";
 "Option" = "Option";
 
@@ -262,3 +262,16 @@
 "Add more options" = "Add more options";
 "Suggestion" = "Suggestion";
 
+// Left Panel Menu
+"Switch" = "Switch";
+"Inbox" = "Inbox";
+"Settings" = "Settings";
+
+// Co-location
+"What kind of Location you want to share?" = "What kind of Location you want to share?";
+"Send Venue" = "Send Venue";
+"Share Live Location" = "Share Live Location";
+"For how long do you want to share it?" = "For how long do you want to share it?";
+"Share my Live Location" = "Share my Live Location";
+"Live Location" = "Live Location";
+"Stop" = "Stop";

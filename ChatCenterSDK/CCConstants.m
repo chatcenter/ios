@@ -40,6 +40,8 @@ NSString *const kCCUserDefaults_userIconUrl = @"ChatCenterUserdefaults_currentIc
 NSString *const kCCUserDefaults_userId = @"ChatCenterUserdefaults_currentUserUid";
 NSString *const kCCUserDefaults_userEmail = @"ChatCenterUserdefaults_currentEmail";
 
+NSString *const kCCUserDefaults_liveLocationDuration = @"ChatCenterUserdefaults_liveLocationDuration";
+
 const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
 
 + (CCConstants *)sharedInstance
@@ -54,6 +56,11 @@ const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
         
     });
     return instance;
+}
+
+- (UIColor *)defaultChatTextColor {
+    UIColor *color = [UIColor colorWithRed:0.29 green:0.29 blue:0.29 alpha:1.0];
+    return color;
 }
 
 + (UIColor *)defaultBaseColor
@@ -105,7 +112,7 @@ const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
 
 + (UIColor *)defaultHistoryHeaderBackgroundColor
 {
-    UIColor *color = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:0.5];
+    UIColor *color = [UIColor colorWithRed:227/255.0 green:227/255.0 blue:227/255.0 alpha:1.0];
     return color;
 }
 
@@ -117,13 +124,13 @@ const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
 
 + (UIColor *)defaultHistoryCellBackgroundColor
 {
-    UIColor *color = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0];
+    UIColor *color = [UIColor colorWithRed:227/255.0 green:227/255.0 blue:227/255.0 alpha:1.0];
     return color;
 }
 
 + (UIColor *)defaultHistorySelectedCellBackgroundColor
 {
-    UIColor *color = [UIColor colorWithRed:227/255.0 green:227/255.0 blue:227/255.0 alpha:1.0];
+    UIColor *color = [UIColor colorWithRed:214/255.0 green:214/255.0 blue:214/255.0 alpha:1.0];
     return color;
 }
 

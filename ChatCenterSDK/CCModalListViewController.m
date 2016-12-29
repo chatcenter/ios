@@ -17,6 +17,7 @@
 #import <SafariServices/SafariServices.h>
 #import "CCWebViewController.h"
 #import "UIImage+CCSDKImage.h"
+#import "CCModalListHeader.h"
 
 int const CCMaxLoadOrg = 10000;
 
@@ -26,17 +27,16 @@ int const CCMaxLoadOrg = 10000;
     float circleAvatarSize;
     float randomCircleAvatarFontSize;
     float randomCircleAvatarTextOffset;
+    
+    BOOL isInboxOpen;
 }
 
 @property (nonatomic, strong) NSMutableArray *orgLabels;
 @property (nonatomic, strong) NSMutableArray *settingList;
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
-@property (nonatomic, weak) IBOutlet NSLayoutConstraint* tableViewHorizontalSpace;
 @property (weak, nonatomic) IBOutlet UILabel *header;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *headerHorizontalSpace;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *spacerHorizontalSpace;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *profileHorizontalSpace;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *appInfohorizontalSpace;
+@property (weak, nonatomic) IBOutlet UIView *slideView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *slideViewHorizontalSpace;
 
 @property int spacePath;
 @property int switchAppPath;
@@ -63,11 +63,12 @@ int const CCMaxLoadOrg = 10000;
     self.tableView.tintColor = [UIColor blackColor];
     self.tableView.rowHeight = 40;
 
-    ///Disappearing boarder of void cells
-    UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
-    v.backgroundColor = [UIColor clearColor];
-    [self.tableView setTableHeaderView:v];
-    [self.tableView setTableFooterView:v];
+    ///Remove the unnecessary space on top and bottom of the table
+    [[self.tableView tableHeaderView] setFrame:CGRectZero];
+    [[self.tableView tableFooterView] setFrame:CGRectZero];
+    ///..
+    [self.tableView registerNib:[UINib nibWithNibName:@"CCModalListHeader" bundle:SDK_BUNDLE] forHeaderFooterViewReuseIdentifier:@"Header"];
+    
     self.header.text = CCLocalizedString(@"Menu");
     if ([[CCConstants sharedInstance].apps count] > 1) {
         self.isAppSwitch = YES;
@@ -86,6 +87,8 @@ int const CCMaxLoadOrg = 10000;
     UITapGestureRecognizer *tapGeusture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onClickSwithApp:)];
     [self.appInforView setUserInteractionEnabled:YES];
     [self.appInforView addGestureRecognizer:tapGeusture];
+    
+    isInboxOpen = [[NSUserDefaults standardUserDefaults] boolForKey:@"inboxOpen"];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -104,11 +107,7 @@ int const CCMaxLoadOrg = 10000;
 - (void)viewDidAppear:(BOOL)animated
 {
     [self.view setNeedsUpdateConstraints];
-    self.tableViewHorizontalSpace.constant = 0.0f;
-    self.headerHorizontalSpace.constant = 0.0f;
-    self.spacerHorizontalSpace.constant = 0.0f;
-    self.profileHorizontalSpace.constant = 0.0f;
-    self.appInfohorizontalSpace.constant = 0.0f;
+    self.slideViewHorizontalSpace.constant = 0.0f;
     [self.tableView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^ {
         [self.view layoutIfNeeded];
@@ -126,38 +125,49 @@ int const CCMaxLoadOrg = 10000;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return self.settingList.count;
+    if (section==0) { // List of Inbox
+        if (isInboxOpen) {
+            return self.settingList.count;
+        } else {
+            return 0;
+        }
+    } else { // Settings
+        return 0;
+    }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell;
+    CCModalListCell *cell;
     UILabel *title;
     ///Labe: Setting
     NSDictionary *setting = self.settingList[indexPath.row];
-    cell = [tableView dequeueReusableCellWithIdentifier:setting[@"identifier"]];
+    cell = (CCModalListCell*)[tableView dequeueReusableCellWithIdentifier:setting[@"identifier"]];
     if(![setting[@"image"] isEqualToString:@""]){
         cell.imageView.image = [UIImage SDKImageNamed:setting[@"image"]];
     }else{
         cell.imageView.image = nil;
-        cell.separatorInset = UIEdgeInsetsMake(0, 52, 0, 0);
+        cell.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0);
     }
-    title = (UILabel*)[cell viewWithTag:0];
+    title = cell.titleLabel;
     
     // set title-text and set font bold
     NSNumber *unreadChannelsCount = setting[@"unreadChannelsCount"];
     if(unreadChannelsCount != nil && unreadChannelsCount.intValue > 0) {
         title.font = [UIFont boldSystemFontOfSize:14.0];
+        title.text = setting[@"label"];
+        NSString *unreadStr;
         if(unreadChannelsCount.intValue > 999) {
-            title.text = [NSString stringWithFormat:@"%@ (%@)", setting[@"label"], @"999+"];
+            unreadStr = [NSString stringWithFormat:@"%@", @"999+"];
         } else {
-            title.text = [NSString stringWithFormat:@"%@ (%@)", setting[@"label"], unreadChannelsCount];
+            unreadStr = [NSString stringWithFormat:@"%@",unreadChannelsCount];
         }
+        cell.unreadLabel.text = unreadStr;
     } else {
         title.font = [UIFont systemFontOfSize:14.0];
             title.text = setting[@"label"];
@@ -166,7 +176,7 @@ int const CCMaxLoadOrg = 10000;
     if(indexPath.row == selectedOrgPath){
         cell.backgroundColor = [CCConstants sharedInstance].leftMenuViewSelectColor;
     }else{
-        cell.backgroundColor = [UIColor whiteColor];
+        cell.backgroundColor = [CCConstants sharedInstance].leftMenuViewNormalColor;
     }
     
     ///change highlight color
@@ -188,6 +198,42 @@ int const CCMaxLoadOrg = 10000;
     }else if([setting[@"identifier"] isEqualToString:@"SignOut"]){
         [self pressSignOut];
     }
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    CCModalListHeader *header = [tableView dequeueReusableHeaderFooterViewWithIdentifier:@"Header"];
+    
+    UIImage *img;
+    NSString *text;
+    switch (section) {
+        case 0:
+        {
+            img = [UIImage SDKImageNamed:@"LeftPanel-Inbox"];
+            text = CCLocalizedString(@"Inbox");
+            [header setArrowState: isInboxOpen?CCArrowStateOpen:CCArrowStateClose];
+        }
+            break;
+        case 1:
+        {
+            img = [UIImage SDKImageNamed:@"LeftPanel-Settings"];
+            text = CCLocalizedString(@"Settings");
+            [header setArrowState: CCArrowStateHidden];
+        }
+            break;
+        default:
+            break;
+    }
+    
+    [header setupWithSectionIndex:section
+                            label:text
+                            image:img
+                      andDelegate:self];
+    
+
+    return header;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 60.0;
 }
 
 # pragma mark - Private methods
@@ -230,6 +276,41 @@ int const CCMaxLoadOrg = 10000;
             }
         }
     }
+}
+
+- (void)headerCellTapped:(CCModalListHeader *)header {
+    switch (header.sectionIndex) {
+        case 0: // Inbox
+            [self showHideInbox:header];
+            break;
+        case 1: // Settings
+            [self onClickSetting:nil];
+            break;
+        default:
+            break;
+    }
+    
+}
+
+- (void)showHideInbox:(CCModalListHeader*)headerView {
+    isInboxOpen = !isInboxOpen;
+    
+    NSMutableArray *targetRows = [NSMutableArray new];
+    for(NSInteger i=0; i<self.settingList.count; i++) {
+        NSIndexPath *path = [NSIndexPath indexPathForRow:i inSection:0];
+        [targetRows addObject:path];
+    }
+    
+    if(isInboxOpen) {
+        [self.tableView insertRowsAtIndexPaths:targetRows withRowAnimation:UITableViewRowAnimationAutomatic];
+    } else {
+        [self.tableView deleteRowsAtIndexPaths:targetRows withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+    
+    [headerView setArrowState: isInboxOpen?CCArrowStateOpen:CCArrowStateClose ];
+    
+    [[NSUserDefaults standardUserDefaults] setBool:isInboxOpen forKey:@"inboxOpen"];
+
 }
 
 -(NSDictionary *)getSetting:(NSString *)identifier
@@ -284,11 +365,7 @@ int const CCMaxLoadOrg = 10000;
         return;
     }
     /// close animation
-    self.tableViewHorizontalSpace.constant = -270.0f;
-    self.headerHorizontalSpace.constant = -270.0f;
-    self.spacerHorizontalSpace.constant = -270.0f;
-    self.profileHorizontalSpace.constant = -270.0f;
-    self.appInfohorizontalSpace.constant = -270.0f;
+    self.slideViewHorizontalSpace.constant = -280.0f;
     [UIView animateWithDuration:0.25f delay:0.2f options:UIViewAnimationOptionCurveEaseInOut animations:^ {
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -299,6 +376,11 @@ int const CCMaxLoadOrg = 10000;
         
         [self reloadChannelsAndConnectWebSocket:orgUid];
     }];
+}
+
+
+-(IBAction)switchAppButtonPressed:(id)sender {
+    [self onClickSwithApp:nil];
 }
 
 -(void)pressSwitchApp:(NSDictionary *)app{
@@ -321,11 +403,7 @@ int const CCMaxLoadOrg = 10000;
         if(self.didTapSwitchAppCallback != nil) self.didTapSwitchAppCallback();
         ///close self
         [self.view setNeedsUpdateConstraints];
-        self.tableViewHorizontalSpace.constant = -270.0f;
-        self.headerHorizontalSpace.constant = -270.0f;
-        self.spacerHorizontalSpace.constant = -270.0f;
-        self.profileHorizontalSpace.constant = -270.0f;
-        self.appInfohorizontalSpace.constant = -270.0f;
+        self.slideViewHorizontalSpace.constant = -280.0f;
         [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^ {
             [self.view layoutIfNeeded];
         } completion:^(BOOL finished) {
@@ -337,11 +415,7 @@ int const CCMaxLoadOrg = 10000;
 
 -(void)pressSignOut{
    [self.view setNeedsUpdateConstraints];
-    self.tableViewHorizontalSpace.constant = -270.0f;
-    self.headerHorizontalSpace.constant = -270.0f;
-    self.spacerHorizontalSpace.constant = -270.0f;
-    self.profileHorizontalSpace.constant = -270.0f;
-    self.appInfohorizontalSpace.constant = -270.0f;
+    self.slideViewHorizontalSpace.constant = -280.0f;
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^ {
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -425,11 +499,7 @@ int const CCMaxLoadOrg = 10000;
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [self.view setNeedsUpdateConstraints];
-    self.tableViewHorizontalSpace.constant = -270.0f;
-    self.headerHorizontalSpace.constant = -270.0f;
-    self.spacerHorizontalSpace.constant = -270.0f;
-    self.profileHorizontalSpace.constant = -270.0f;
-    self.appInfohorizontalSpace.constant = -270.0f;
+    self.slideViewHorizontalSpace.constant = -280.0f;
     [UIView animateWithDuration:0.25f delay:0.0f options:UIViewAnimationOptionCurveEaseInOut animations:^ {
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -479,8 +549,9 @@ int const CCMaxLoadOrg = 10000;
         if ([app[@"token"] isEqualToString:[ChatCenterClient sharedClient].appToken]) {
             self.lablelSwithApp.text = appName;
             UIImage *imageApp = [UIImage SDKImageNamed:[CCConstants sharedInstance].appIconName];
-            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:imageApp diameter:circleAvatarSize];
-            self.avatarApp.image = newIconImageAvatar.avatarImage;
+//            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:imageApp diameter:circleAvatarSize];
+//            self.avatarApp.image = newIconImageAvatar.avatarImage;
+            self.avatarApp.image = imageApp;
             if (app[@"app_icons"] != nil && [app[@"app_icons"] count] > 0 && app[@"app_icons"][0][@"icon_url"] != nil
                 && ![app[@"app_icons"][0][@"icon_url"] isEqualToString:@""]) {
                 dispatch_queue_t q_global = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -495,10 +566,13 @@ int const CCMaxLoadOrg = 10000;
                         __block NSData *dt = [NSData dataWithContentsOfURL:url options:NSDataReadingUncached error:&error];
                         dispatch_async(q_main, ^{
                             UIImage *newIconImage = [[UIImage alloc] initWithData:dt scale:[UIScreen mainScreen].scale];
-                            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:newIconImage diameter:circleAvatarSize];
-                            if (newIconImageAvatar != nil) {
-                                self.avatarApp.image = newIconImageAvatar.avatarImage;
+                            if (newIconImage != nil) {
+                                self.avatarApp.image = newIconImage;
                             }
+
+                            /*
+                            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:newIconImage diameter:circleAvatarSize];
+                             */
                         });
                     }
                 });
@@ -531,5 +605,10 @@ int const CCMaxLoadOrg = 10000;
 #endif
     [[UIApplication sharedApplication] openURL:URL];
 }
+
+@end
+
+
+@implementation CCModalListCell
 
 @end

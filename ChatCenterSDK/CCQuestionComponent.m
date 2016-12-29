@@ -122,7 +122,7 @@
 
 - (void)setDefaultStyleToLabel:(UILabel*)label {
     [label setTextColor:[[CCConstants sharedInstance] baseColor]];
-    [label setFont:[UIFont systemFontOfSize:14]];
+    [label setFont:[UIFont boldSystemFontOfSize:14]];
 }
 
 

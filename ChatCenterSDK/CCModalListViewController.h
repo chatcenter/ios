@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCModalListHeader.h"
 
-@interface CCModalListViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface CCModalListViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, CCModalListHeaderDelegate>
 
 @property (nonatomic, copy) void (^didTapAboutCallback)(void);
 @property (nonatomic, copy) void (^didTapLogoutCallback)(void);
@@ -22,5 +23,11 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraintImageRight;
 @property (weak, nonatomic) IBOutlet UILabel *lablelSwithApp;
 @property (weak, nonatomic) IBOutlet UIView *appInforView;
+
+@end
+
+@interface CCModalListCell : UITableViewCell
+@property (nonatomic, weak) IBOutlet UILabel *unreadLabel;
+@property (nonatomic, weak) IBOutlet UILabel *titleLabel;
 
 @end

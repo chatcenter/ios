@@ -58,6 +58,28 @@
                                     <constraint firstAttribute="width" constant="30" id="KaN-i4-4rt"/>
                                 </constraints>
                             </imageView>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gr3-34-7aL" userLabel="LiveUserContainer">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="5po-NF-RsW"/>
+                                    <constraint firstAttribute="height" constant="20" id="yyj-Z2-J8L"/>
+                                </constraints>
+                            </scrollView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Live" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GzG-Iw-ev3">
+                                <color key="backgroundColor" red="0.98039215690000003" green="0.35686274509999999" blue="0.32156862749999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="15" id="8fU-fz-a0K"/>
+                                    <constraint firstAttribute="width" constant="30" id="zYe-0L-Doc"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="12"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="clipsToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </label>
                             <textView multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cVh-vt-RW4">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="5Wr-66-Xk8"/>
@@ -78,14 +100,17 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="GzG-Iw-ev3" secondAttribute="trailing" constant="5" id="13f-Es-s8s"/>
                             <constraint firstItem="Nx5-5g-vBt" firstAttribute="top" secondItem="R5s-2k-zs1" secondAttribute="bottom" id="33M-K9-Mac"/>
                             <constraint firstItem="Nx5-5g-vBt" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="4UT-zU-ddT"/>
                             <constraint firstItem="cVh-vt-RW4" firstAttribute="leading" secondItem="r2r-Wc-Yf0" secondAttribute="trailing" id="8c1-z6-NZi"/>
                             <constraint firstAttribute="trailing" secondItem="Nx5-5g-vBt" secondAttribute="trailing" id="95e-h9-kbb"/>
                             <constraint firstItem="cVh-vt-RW4" firstAttribute="top" secondItem="GVY-1j-0Ml" secondAttribute="top" id="TOZ-H4-Ua3"/>
                             <constraint firstItem="r2r-Wc-Yf0" firstAttribute="top" secondItem="GVY-1j-0Ml" secondAttribute="top" id="W7B-ol-k0E"/>
+                            <constraint firstItem="GzG-Iw-ev3" firstAttribute="top" secondItem="GVY-1j-0Ml" secondAttribute="top" constant="10" id="bpc-gp-wyR"/>
+                            <constraint firstItem="GzG-Iw-ev3" firstAttribute="leading" secondItem="gr3-34-7aL" secondAttribute="trailing" constant="5" id="dri-dN-Iba"/>
+                            <constraint firstItem="GzG-Iw-ev3" firstAttribute="centerY" secondItem="gr3-34-7aL" secondAttribute="centerY" id="feS-ki-kHS"/>
                             <constraint firstItem="R5s-2k-zs1" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="nWV-Bv-FUt"/>
                             <constraint firstItem="r2r-Wc-Yf0" firstAttribute="leading" secondItem="GVY-1j-0Ml" secondAttribute="leading" id="pHb-dM-LEk"/>
                             <constraint firstAttribute="trailing" secondItem="R5s-2k-zs1" secondAttribute="trailing" id="rdw-R1-nRN"/>
@@ -128,6 +153,9 @@
                 <outlet property="discriptionViewHeight" destination="5Wr-66-Xk8" id="vvQ-Dm-NSV"/>
                 <outlet property="headerImageView" destination="r2r-Wc-Yf0" id="CBe-PY-6UD"/>
                 <outlet property="headerImageViewWidthConstraint" destination="KaN-i4-4rt" id="V6F-bs-C14"/>
+                <outlet property="headerLiveWidgetLabel" destination="GzG-Iw-ev3" id="zKf-AE-PIk"/>
+                <outlet property="liveUserContainerWidth" destination="5po-NF-RsW" id="jHi-wv-hCf"/>
+                <outlet property="liveUsersContainer" destination="gr3-34-7aL" id="MEB-h6-K71"/>
                 <outlet property="stickerActionsContainer" destination="Nx5-5g-vBt" id="GEs-ZO-KQP"/>
                 <outlet property="stickerActionsContainerHeight" destination="dQK-fh-xEd" id="7xw-zc-fCk"/>
                 <outlet property="stickerContainer" destination="GVY-1j-0Ml" id="OUi-Sx-7UR"/>

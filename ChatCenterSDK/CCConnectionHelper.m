@@ -156,6 +156,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             [self.delegate receiveDeleteChannelFromWebSocket];
         }
     }];
+    
+    self.shareLocationTasks = [[NSMutableDictionary alloc] init];
 }
 
 # pragma mark - Load Data
@@ -741,6 +743,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
              provider:(NSString *)provider
         providerToken:(NSString *)providerToken
   providerTokenSecret:(NSString *)providerTokenSecret
+ providerRefreshToken:(NSString *)providerRefreshToken
     providerCreatedAt:(NSDate *)providerCreatedAt
     providerExpiresAt:(NSDate *)providerExpiresAt
           deviceToken:(NSString *)deviceToken
@@ -755,6 +758,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                          provider:provider
                                     providerToken:providerToken
                               providerTokenSecret:providerTokenSecret
+                             providerRefreshToken:providerRefreshToken
                                 providerCreatedAt:providerCreatedAt
                                 providerExpiresAt:providerExpiresAt
                                       deviceToken:deviceToken
@@ -815,6 +819,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken
@@ -830,6 +835,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                          provider:provider
                                     providerToken:providerToken
                               providerTokenSecret:providerTokenSecret
+                             providerRefreshToken:providerRefreshToken
                                 providerCreatedAt:providerCreatedAt
                                 providerExpiresAt:providerExpiresAt
                                       deviceToken:deviceToken
@@ -950,6 +956,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                provider:nil
           providerToken:nil
     providerTokenSecret:nil
+   providerRefreshToken:nil
       providerCreatedAt:nil
       providerExpiresAt:nil
             deviceToken:nil
@@ -1261,6 +1268,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                             provider:(NSString *)provider
                        providerToken:(NSString *)providerToken
                  providerTokenSecret:(NSString *)providerTokenSecret
+                providerRefreshToken:(NSString *)providerRefreshToken
                    providerCreatedAt:(NSDate *)providerCreatedAt
                    providerExpiresAt:(NSDate *)providerExpiresAt
                  channelInformations:(NSDictionary *)channelInformations
@@ -1273,6 +1281,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                             provider:provider
                                        providerToken:providerToken
                                  providerTokenSecret:providerTokenSecret
+                                providerRefreshToken:providerRefreshToken
                                    providerCreatedAt:providerCreatedAt
                                    providerExpiresAt:providerExpiresAt
                                  channelInformations:channelInformations
@@ -1570,6 +1579,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
  channelInformations:(NSDictionary *)channelInformations
@@ -1598,6 +1608,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                    provider:provider
                               providerToken:providerToken
                         providerTokenSecret:providerTokenSecret
+                       providerRefreshToken:providerRefreshToken
                           providerCreatedAt:providerCreatedAt
                           providerExpiresAt:providerExpiresAt
                         channelInformations:channelInformations

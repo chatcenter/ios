@@ -27,7 +27,13 @@
 
 @end
 
-@interface CCChatViewController : CCJSQMessagesViewController <UIActionSheetDelegate, CLLocationManagerDelegate, CCConectionHelperDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChoosedPhraseProtocol, CClocationStickerViewDelegate, CCCommonStickerCreatorDelegate, CCCommonWidgetEditorDelegate, CCChatViewNavigationTitleDelegate, CCStickerCollectionViewCellActionProtocol>
+@protocol CCLiveLocationWidgetDelegate <NSObject>
+@required
+-(void)didStopSharingLiveLocation;
+-(void)didStartSharingLiveLocation;
+@end
+
+@interface CCChatViewController : CCJSQMessagesViewController <UIActionSheetDelegate, CLLocationManagerDelegate, CCConectionHelperDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, ChoosedPhraseProtocol, CClocationStickerViewDelegate, CCCommonStickerCreatorDelegate, CCCommonWidgetEditorDelegate, CCChatViewNavigationTitleDelegate, CCStickerCollectionViewCellActionProtocol, CCLiveLocationWidgetDelegate>
 
 @property (nonatomic, strong) NSString *channelId;
 @property (nonatomic, strong) NSString *channelUid;
@@ -73,6 +79,7 @@
               provider:(NSString *)provider
          providerToken:(NSString *)providerToken
    providerTokenSecret:(NSString *)providerTokenSecret
+  providerRefreshToken:(NSString *)providerRefreshToken
      providerCreatedAt:(NSDate *)providerCreatedAt
      providerExpiresAt:(NSDate *)providerExpiresAt
    channelInformations:(NSDictionary *)channelInformations
@@ -85,7 +92,7 @@
 
 //// Called from CCWidgetMenuView
 - (void) pressCalendar;
-- (void) pressLocation;
+- (void) pressLocationWidget;
 - (void) pressThumb;
 - (void) pressImage;
 - (void) takePhoto;

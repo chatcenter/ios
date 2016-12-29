@@ -35,6 +35,9 @@
 @property (weak, nonatomic) IBOutlet CCJSQMessagesCellTextView *textView; ///Prevent crash when user long tap
 @property (weak, nonatomic) IBOutlet UITextView *inforDescriptionView;
 @property (strong, nonatomic) IBOutlet UILabel *stickerStatusLabel;
+@property (weak, nonatomic) IBOutlet UILabel *headerLiveWidgetLabel;
+@property (weak, nonatomic) IBOutlet UIScrollView *liveUsersContainer;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *liveUserContainerWidth;
 
 -(BOOL)setupWithIndex:(NSIndexPath*)indexPath
               message:(CCJSQMessage*)msg

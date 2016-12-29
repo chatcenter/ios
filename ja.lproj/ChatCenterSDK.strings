@@ -1,5 +1,5 @@
 /*
-  ChatCenterSDK.strings Version 1.0.8
+  ChatCenterSDK.strings Version 1.0.9
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -243,7 +243,7 @@
 "minute" = "分";
 "This message is invisible to the customer." = "このメッセージは、お客様からは閲覧できません。";
 "Log out" = "ログアウト";
-"Change apps" = "アプリを変更する";
+"Change apps" = "アプリを選択してください";
 "Please input 2000 characters or less." = "2000文字以内で入力してください。";
 "Option" = "オプション";
 
@@ -258,3 +258,17 @@
 "Add more options" = "選択肢を追加";
 "Suggestion" = "サジェスチョン";
 "Question" = "質問";
+
+// Left Panel Menu
+"Switch" = "切替え";
+"Inbox" = "受信トレイ";
+"Settings" = "設定";
+
+// Co-location
+"What kind of Location you want to share?" = "どの位置情報を共有しますか？";
+"Send Venue" = "地図から選択";
+"Share Live Location" = "ライブ位置情報";
+"For how long do you want to share it?" = "シェアする時間を設定してください";
+"Share my Live Location" = "自分の位置情報を共有";
+"Live Location" = "ライブ位置情報";
+"Stop" = "ストップ";

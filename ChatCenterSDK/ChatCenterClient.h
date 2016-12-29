@@ -21,6 +21,7 @@
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -31,6 +32,7 @@
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken

@@ -187,6 +187,7 @@ en.lproj/ChatCenterSDK.strings
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -237,6 +238,10 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 		<td>nilを指定してください</td>
 		<td><b>Access token secretを指定してください</b></td>
 	</tr>
+    <tr>
+        <td>providerRefreshToken(NSString)</td>
+        <td colspan="2">nilを指定してください</td>
+    </tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
 		<td colspan="2">nilを指定してください</td>
@@ -272,6 +277,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
                                     provider:@”facebook”
                                providerToken:token.tokenString
                          providerTokenSecret:nil
+                        providerRefreshToken:nil
                            providerCreatedAt:nil
                            providerExpiresAt:token.expirationDate
                          channelInformations:@{@"url":@”http://xxxxxxx”}
@@ -292,6 +298,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
                                     provider:@”twitter”
                                providerToken:session.authToken
                          providerTokenSecret:session.authTokenSecret
+                        providerRefreshToken:nil
                            providerCreatedAt:nil
                            providerExpiresAt:nil
                          channelInformations:@{@"url":self.propertyUrl}
@@ -381,7 +388,8 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 - (void)presentHistoryView:(UIViewController *)viewController
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
-       providerTokenSecret:(NSString *)providerTokenSecret
+       providerTokenSecret:(NSString *)providerTokenSecret 
+      providerRefreshToken:(NSString *)providerRefreshToken
          providerCreatedAt:(NSDate *)providerCreatedAt
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler;
@@ -414,6 +422,10 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 		<td>nilを指定してください</td>
 		<td><b>Access token secretを指定してください</b></td>
 	</tr>
+    <tr>
+        <td>providerRefreshToken(NSString)</td>
+        <td colspan="2">nilを指定してください</td>
+   </tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
 		<td colspan="2">nilを指定してください</td>
@@ -437,7 +449,8 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 [[ChatCenter sharedInstance] presentHistoryView:self
                                        provider:@"facebook"
                                   providerToken:token.tokenString 
-                            providerTokenSecret:nil
+                            providerTokenSecret:nil 
+                           providerRefreshToken:nil
                               providerCreatedAt:nil 
                               providerExpiresAt:token.expirationDate
                               completionHandler:nil];
@@ -452,7 +465,8 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 [[ChatCenter sharedInstance] presentHistoryView:self
                                        provider:@"twitter"
                                   providerToken:session.authToken 
-                            providerTokenSecret:session.authTokenSecret
+                            providerTokenSecret:session.authTokenSecret 
+                           providerRefreshToken:nil
                               providerCreatedAt:nil 
                               providerExpiresAt:nil
                               completionHandler:nil];
@@ -519,14 +533,15 @@ ChatCenter iOS SDKではチャットデータをローカルDB(Coredata)へ保�
 
 ```
 - (void)signInDeviceToken:(NSString*)email
-password:(NSString*)password
-provider:(NSString *)provider
-providerToken:(NSString *)providerToken
-providerTokenSecret:(NSString *)providerTokenSecret 
-providerCreatedAt:(NSDate *)providerCreatedAt
-providerExpiresAt:(NSDate *)providerExpiresAt
-deviceToken:(NSString *)deviceToken
-completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
+                 password:(NSString*)password
+                 provider:(NSString *)provider
+            providerToken:(NSString *)providerToken
+      providerTokenSecret:(NSString *)providerTokenSecret 
+     providerRefreshToken:(NSString *)providerRefreshToken
+        providerCreatedAt:(NSDate *)providerCreatedAt
+        providerExpiresAt:(NSDate *)providerExpiresAt
+              deviceToken:(NSString *)deviceToken
+        completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 ```
 
 以下がパラメータです。太字が必須です。他のパラメータで不要な場合はnilをご指定ください。
@@ -557,6 +572,10 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHand
 <td>providerTokenSecret(NSString)</td>
 <td>nilを指定してください</td>
 <td><b>Access token secretを指定してください</b></td>
+</tr>
+<tr>
+<td>providerRefreshToken(NSString)</td>
+<td colspan="2">nilを指定してください</td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>
@@ -763,6 +782,7 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
                  provider:(NSString *)provider
             providerToken:(NSString *)providerToken
       providerTokenSecret:(NSString *)providerTokenSecret 
+     providerRefreshToken:(NSString *)providerRefreshToken
         providerCreatedAt:(NSDate *)providerCreatedAt
         providerExpiresAt:(NSDate *)providerExpiresAt
               deviceToken:(NSString *)deviceToken
@@ -797,6 +817,10 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
 <td>providerTokenSecret(NSString)</td>
 <td>nilを指定してください</td>
 <td><b>Access token secretを指定してください</b></td>
+</tr>
+<tr>
+<td>providerRefreshToken(NSString)</td>
+<td colspan="2">nilを指定してください</td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>

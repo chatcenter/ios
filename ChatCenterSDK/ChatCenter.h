@@ -44,6 +44,7 @@ typedef enum {
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken
 providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
 providerCreatedAt:(NSDate *)providerCreatedAt
 providerExpiresAt:(NSDate *)providerExpiresAt
 channelInformations:(NSDictionary *)channelInformations
@@ -56,6 +57,7 @@ completionHandler:(void (^)(void))completionHandler;
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken
 providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
 providerCreatedAt:(NSDate *)providerCreatedAt
 providerExpiresAt:(NSDate *)providerExpiresAt
 channelInformations:(NSDictionary *)channelInformations
@@ -67,6 +69,7 @@ completionHandler:(void (^)(void))completionHandler;
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -80,6 +83,7 @@ completionHandler:(void (^)(void))completionHandler;
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -121,6 +125,7 @@ completionHandler:(void (^)(void))completionHandler;
 - (id)getHistoryView:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
    completionHandler:(void (^)(void))completionHandler;
@@ -128,6 +133,7 @@ completionHandler:(void (^)(void))completionHandler;
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
    completionHandler:(void (^)(void))completionHandler;
@@ -136,6 +142,7 @@ completionHandler:(void (^)(void))completionHandler;
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
        providerTokenSecret:(NSString *)providerTokenSecret
+      providerRefreshToken:(NSString *)providerRefreshToken
          providerCreatedAt:(NSDate *)providerCreatedAt
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler;
@@ -162,6 +169,7 @@ completionHandler:(void (^)(void))completionHandler;
                  provider:(NSString *)provider
             providerToken:(NSString *)providerToken
       providerTokenSecret:(NSString *)providerTokenSecret
+     providerRefreshToken:(NSString *)providerRefreshToken
         providerCreatedAt:(NSDate *)providerCreatedAt
         providerExpiresAt:(NSDate *)providerExpiresAt
               deviceToken:(NSString *)deviceToken

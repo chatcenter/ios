@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.0.8"
+#define CC_SDK_VERSION                    @"1.0.9"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_VIDEO 1
@@ -46,6 +46,7 @@
 #define CC_RESPONSETYPEIMAGE            @"image"
 #define CC_RESPONSETYPEPDF              @"pdf"
 #define CC_RESPONSETYPELOCATION         @"location"
+#define CC_RESPONSETYPECOLOCATION       @"co-location"
 #define CC_RESPONSETYPETHUMB            @"yes_no"
 #define CC_RESPONSETYPEPAYMENT          @"payment"
 #define CC_RESPONSETYPEEMOTION          @"emotion"
@@ -65,6 +66,7 @@
 
 #define CC_STICKERCONTENT               @"sticker-content"
 #define CC_STICKER_DATA                  @"sticker-data"
+#define CC_STICKER_TYPE                 @"sticker-type"
 #define CC_STICKERCONTENT_ACTION        @"action"
 #define CC_CONTENTACTION                @"content-action"
 #define CC_ACTIONTYPE                   @"action-type"
@@ -77,6 +79,7 @@
 #define CC_STICKERTYPEDATETIMEAVAILABILITY @"datetime"
 #define CC_STICKERTYPEFILE                 @"file_upload"
 #define CC_STICKERTYPELOCATION             @"location"
+#define CC_STICKERTYPECOLOCATION           @"co-location"
 #define CC_STICKERTYPETHUMB                @"yes_no"
 #define CC_STICKERTYPEFIXEDPHRASE          @"fixed_phrase"
 #define CC_STICKERTYPEVIDEOCHAT            @"video_chat"
@@ -113,6 +116,7 @@ extern NSString *const kCCUserDefaults_userDisplayName;
 extern NSString *const kCCUserDefaults_userIconUrl;
 extern NSString *const kCCUserDefaults_userId;
 extern NSString *const kCCUserDefaults_userEmail;
+extern NSString *const kCCUserDefaults_liveLocationDuration;
 
 // Google Maps API key
 #define CC_GOOGLEMAPS_API_KEY @"AIzaSyClywESBIw6gxHBQiz12wtC7DZ9hjGdyQI"
@@ -128,6 +132,7 @@ enum {
     CCStickerCollectionViewCellOptionShowStatus  = (1 << 2),
     CCStickerCollectionViewCellOptionShowAsMyself  = (1 << 3),
     CCStickerCollectionViewCellOptionShowAsWidget  = (1 << 4),
+    CCStickerCollectionViewCellOptionShowLiveIcon = (1<<5)
 };
 typedef uint32_t CCStickerCollectionViewCellOptions;
 
@@ -147,6 +152,7 @@ typedef uint32_t CCStickerCollectionViewCellOptions;
 @property (nonatomic, strong) NSString *businessType;
 @property BOOL showReadStatusForGuest;
 @property (nonatomic, strong) UIColor *baseColor;
+@property (nonatomic, readonly) UIColor *defaultChatTextColor;
 @property (nonatomic, strong) UIColor *headerBackgroundColor;
 @property (nonatomic, strong) UIColor *historyCellBackgroundColor;
 @property (nonatomic, strong) UIColor *historySelectedCellBackgroundColor;
@@ -157,6 +163,7 @@ typedef uint32_t CCStickerCollectionViewCellOptions;
 @property (nonatomic, strong) UIColor *sendButtonColor;
 @property (nonatomic, strong) UIColor *historyViewSelectColor;
 @property (nonatomic, strong) UIColor *leftMenuViewSelectColor;
+@property (nonatomic, strong) UIColor *leftMenuViewNormalColor;
 @property (nonatomic, strong) NSString *historyViewTitle;
 @property (nonatomic, strong) NSString *historyViewVoidMessage;
 @property (nonatomic, strong) NSString *chatViewLinkURL;

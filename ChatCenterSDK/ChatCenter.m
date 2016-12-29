@@ -77,7 +77,8 @@
     [self setHideChatViewPhoneBtn:[CCConstants defaultHideChatViewPhoneBtn]];
     [self setHideChatViewCloseBtn:[CCConstants defaultHideChatViewCloseBtn]];
     [self setInfoBtnImage:CC_INFO_ICON_NORMAL hilighted:nil disable:nil];
-    [self setLeftMenuViewSelectColor:[UIColor colorWithRed:221/255.0 green:221/255.0 blue:221/255.0 alpha:1.0]];
+    [self setLeftMenuViewSelectColor:[UIColor colorWithRed:214/255.0 green:214/255.0 blue:214/255.0 alpha:1.0]];
+    [self setLeftMenuViewNormalColor:[UIColor colorWithRed:227/255.0 green:227/255.0 blue:227/255.0 alpha:1.0]];
     [self setHistoryCellBackgroundColor:[CCConstants defaultHistoryCellBackgroundColor]];
     [self setHistorySelectedCellBackgroundColor:[CCConstants defaultHistorySelectedCellBackgroundColor]];
     [self setHeaderBottomLineColor:[CCConstants defaultHeaderBottomLineColor]];
@@ -128,6 +129,9 @@
 
 + (void)setLeftMenuViewSelectColor:(UIColor *)leftMenuViewSelectColor{
     [[CCConstants sharedInstance] setLeftMenuViewSelectColor:leftMenuViewSelectColor];
+}
++ (void)setLeftMenuViewNormalColor:(UIColor *)leftMenuViewNormalColor{
+    [[CCConstants sharedInstance] setLeftMenuViewNormalColor:leftMenuViewNormalColor];
 }
 
 + (void)setHistoryViewTitle:(NSString *)historyViewTitle{
@@ -215,6 +219,7 @@
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken
 providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
 providerCreatedAt:(NSDate *)providerCreatedAt
 providerExpiresAt:(NSDate *)providerExpiresAt
 channelInformations:(NSDictionary *)channelInformations
@@ -234,6 +239,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                   provider:provider
                                                              providerToken:providerToken
                                                        providerTokenSecret:providerTokenSecret
+                                                      providerRefreshToken:providerRefreshToken
                                                          providerCreatedAt:providerCreatedAt
                                                          providerExpiresAt:providerExpiresAt
                                                        channelInformations:channelInformations
@@ -249,6 +255,7 @@ completionHandler:(void (^)(void))completionHandler
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken
 providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
 providerCreatedAt:(NSDate *)providerCreatedAt
 providerExpiresAt:(NSDate *)providerExpiresAt
 channelInformations:(NSDictionary *)channelInformations
@@ -268,6 +275,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                   provider:provider
                                                              providerToken:providerToken
                                                        providerTokenSecret:providerTokenSecret
+                                                      providerRefreshToken:providerRefreshToken
                                                          providerCreatedAt:providerCreatedAt
                                                          providerExpiresAt:providerExpiresAt
                                                        channelInformations:channelInformations
@@ -281,6 +289,7 @@ completionHandler:(void (^)(void))completionHandler
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -294,6 +303,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                      provider:provider
                                                                                 providerToken:providerToken
                                                                           providerTokenSecret:providerTokenSecret
+                                                                         providerRefreshToken:providerRefreshToken
                                                                             providerCreatedAt:providerCreatedAt
                                                                             providerExpiresAt:providerExpiresAt
                                                                           channelInformations:channelInformations
@@ -311,6 +321,7 @@ completionHandler:(void (^)(void))completionHandler
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -324,6 +335,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                      provider:provider
                                                                                 providerToken:providerToken
                                                                           providerTokenSecret:providerTokenSecret
+                                                                         providerRefreshToken:providerRefreshToken
                                                                             providerCreatedAt:providerCreatedAt
                                                                             providerExpiresAt:providerExpiresAt
                                                                           channelInformations:channelInformations
@@ -348,6 +360,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                   provider:nil
                                                              providerToken:nil
                                                        providerTokenSecret:nil
+                                                      providerRefreshToken:nil
                                                          providerCreatedAt:nil
                                                          providerExpiresAt:nil
                                                        channelInformations:channelInformations
@@ -372,6 +385,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                      provider:nil
                                                                                 providerToken:nil
                                                                           providerTokenSecret:nil
+                                                                         providerRefreshToken:nil
                                                                             providerCreatedAt:nil
                                                                             providerExpiresAt:nil
                                                                           channelInformations:channelInformations
@@ -386,6 +400,7 @@ completionHandler:(void (^)(void))completionHandler
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
        providerTokenSecret:(NSString *)providerTokenSecret
+      providerRefreshToken:(NSString *)providerRefreshToken
          providerCreatedAt:(NSDate *)providerCreatedAt
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler{
@@ -394,6 +409,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                     provider:provider
                                                                                providerToken:providerToken
                                                                          providerTokenSecret:providerTokenSecret
+                                                                        providerRefreshToken:providerRefreshToken
                                                                            providerCreatedAt:providerCreatedAt
                                                                            providerExpiresAt:providerExpiresAt
                                                                            completionHandler:completionHandler];
@@ -404,6 +420,7 @@ completionHandler:(void (^)(void))completionHandler
 - (id)getHistoryView:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
    completionHandler:(void (^)(void))completionHandler{
@@ -417,6 +434,7 @@ completionHandler:(void (^)(void))completionHandler
                                                               provider:provider
                                                          providerToken:providerToken
                                                    providerTokenSecret:providerTokenSecret
+                                                  providerRefreshToken:providerRefreshToken
                                                      providerCreatedAt:providerCreatedAt
                                                      providerExpiresAt:providerExpiresAt
                                                      completionHandler:completionHandler];
@@ -427,6 +445,7 @@ completionHandler:(void (^)(void))completionHandler
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
    completionHandler:(void (^)(void))completionHandler{
@@ -440,6 +459,7 @@ completionHandler:(void (^)(void))completionHandler
                                                               provider:provider
                                                          providerToken:providerToken
                                                    providerTokenSecret:providerTokenSecret
+                                                  providerRefreshToken:providerRefreshToken
                                                      providerCreatedAt:providerCreatedAt
                                                      providerExpiresAt:providerExpiresAt
                                                      completionHandler:completionHandler];
@@ -472,6 +492,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                               provider:nil
                                                                          providerToken:nil
                                                                    providerTokenSecret:nil
+                                                                  providerRefreshToken:nil
                                                                      providerCreatedAt:nil
                                                                      providerExpiresAt:nil
                                                                      completionHandler:closeViewHandler];
@@ -488,6 +509,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                       provider:nil
                                                                  providerToken:nil
                                                            providerTokenSecret:nil
+                                                          providerRefreshToken:nil
                                                              providerCreatedAt:nil
                                                              providerExpiresAt:nil
                                                              completionHandler:closeViewHandler];
@@ -502,6 +524,7 @@ completionHandler:(void (^)(void))completionHandler
                                                               provider:nil
                                                          providerToken:nil
                                                    providerTokenSecret:nil
+                                                  providerRefreshToken:nil
                                                      providerCreatedAt:nil
                                                      providerExpiresAt:nil
                                                      completionHandler:completionHandler];
@@ -515,6 +538,7 @@ completionHandler:(void (^)(void))completionHandler
                                                               provider:nil
                                                          providerToken:nil
                                                    providerTokenSecret:nil
+                                                  providerRefreshToken:nil
                                                      providerCreatedAt:nil
                                                      providerExpiresAt:nil
                                                      completionHandler:completionHandler];
@@ -528,6 +552,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                     provider:nil
                                                                                providerToken:nil
                                                                          providerTokenSecret:nil
+                                                                        providerRefreshToken:nil
                                                                            providerCreatedAt:nil
                                                                            providerExpiresAt:nil
                                                                            completionHandler:completionHandler];
@@ -580,6 +605,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                   provider:nil
                                                                              providerToken:nil
                                                                        providerTokenSecret:nil
+                                                                      providerRefreshToken:nil
                                                                          providerCreatedAt:nil
                                                                          providerExpiresAt:nil
                                                                           closeViewHandler:closeViewHandler];
@@ -596,6 +622,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                           provider:nil
                                                                      providerToken:nil
                                                                providerTokenSecret:nil
+                                                              providerRefreshToken:nil
                                                                  providerCreatedAt:nil
                                                                  providerExpiresAt:nil
                                                                   closeViewHandler:closeViewHandler];
@@ -617,6 +644,7 @@ completionHandler:(void (^)(void))completionHandler
                                                   provider:(NSString *)provider
                                              providerToken:(NSString *)providerToken
                                        providerTokenSecret:(NSString *)providerTokenSecret
+                                      providerRefreshToken:(NSString *)providerRefreshToken
                                          providerCreatedAt:(NSDate *)providerCreatedAt
                                          providerExpiresAt:(NSDate *)providerExpiresAt
                                        channelInformations:(NSDictionary *)channelInformations
@@ -631,6 +659,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                                     provider:provider
                                                                                providerToken:providerToken
                                                                          providerTokenSecret:providerTokenSecret
+                                                                        providerRefreshToken:providerRefreshToken
                                                                            providerCreatedAt:providerCreatedAt
                                                                            providerExpiresAt:providerExpiresAt
                                                                            completionHandler:completionHandler];
@@ -642,6 +671,7 @@ completionHandler:(void (^)(void))completionHandler
                                                                            provider:provider
                                                                       providerToken:providerToken
                                                                 providerTokenSecret:providerTokenSecret
+                                                               providerRefreshToken:providerRefreshToken
                                                                   providerCreatedAt:providerCreatedAt
                                                                   providerExpiresAt:providerExpiresAt
                                                                 channelInformations:channelInformations
@@ -733,6 +763,7 @@ completionHandler:(void (^)(void))completionHandler
                  provider:(NSString *)provider
             providerToken:(NSString *)providerToken
       providerTokenSecret:(NSString *)providerTokenSecret
+     providerRefreshToken:(NSString *)providerRefreshToken
         providerCreatedAt:(NSDate *)providerCreatedAt
         providerExpiresAt:(NSDate *)providerExpiresAt
               deviceToken:(NSString *)deviceToken
@@ -748,6 +779,7 @@ completionHandler:(void (^)(void))completionHandler
                                             provider:provider
                                        providerToken:providerToken
                                  providerTokenSecret:providerTokenSecret
+                                providerRefreshToken:providerRefreshToken
                                    providerCreatedAt:providerCreatedAt
                                    providerExpiresAt:providerExpiresAt
                                          deviceToken:deviceToken
@@ -786,6 +818,7 @@ completionHandler:(void (^)(void))completionHandler
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken
@@ -796,6 +829,7 @@ completionHandler:(void (^)(void))completionHandler
                                            provider:provider
                                       providerToken:providerToken
                                 providerTokenSecret:providerTokenSecret
+                               providerRefreshToken:providerRefreshToken
                                   providerCreatedAt:providerCreatedAt
                                   providerExpiresAt:providerExpiresAt
                                         deviceToken:deviceToken

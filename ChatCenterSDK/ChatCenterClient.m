@@ -140,6 +140,7 @@
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -153,6 +154,7 @@
     if (provider != nil)            [param setValue:provider            forKey:@"provider"];
     if (providerToken != nil)       [param setValue:providerToken       forKey:@"provider_token"];
     if (providerTokenSecret != nil) [param setValue:providerTokenSecret forKey:@"provider_token_secret"];
+    if (providerRefreshToken != nil)[param setValue:providerRefreshToken forKey:@"provider_refresh_token"];
     if (providerCreatedAt != nil){
         NSTimeInterval providerCreatedAtInterval = [providerCreatedAt timeIntervalSince1970];
         NSNumber *providerCreatedAtNumber = [NSNumber numberWithDouble:providerCreatedAtInterval];
@@ -185,6 +187,7 @@
             provider:(NSString *)provider
        providerToken:(NSString *)providerToken
  providerTokenSecret:(NSString *)providerTokenSecret
+providerRefreshToken:(NSString *)providerRefreshToken
    providerCreatedAt:(NSDate *)providerCreatedAt
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken
@@ -195,6 +198,7 @@
     if (provider      != nil)     [param setValue:provider      forKey:@"provider"];
     if (providerToken != nil)     [param setValue:providerToken forKey:@"provider_token"];
     if (providerTokenSecret != nil) [param setValue:providerTokenSecret forKey:@"provider_token_secret"];
+    if (providerRefreshToken != nil) [param setValue:providerRefreshToken forKey:@"provider_refresh_token"];
     if (providerCreatedAt != nil){
         NSTimeInterval providerCreatedAtInterval = [providerCreatedAt timeIntervalSince1970];
         NSNumber *providerCreatedAtNumber = [NSNumber numberWithDouble:providerCreatedAtInterval];

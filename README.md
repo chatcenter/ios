@@ -190,6 +190,7 @@ Please insert the following code in a convenient place.
                provider:(NSString *)provider
           providerToken:(NSString *)providerToken
     providerTokenSecret:(NSString *)providerTokenSecret
+   providerRefreshToken:(NSString *)providerRefreshToken
       providerCreatedAt:(NSDate *)providerCreatedAt
       providerExpiresAt:(NSDate *)providerExpiresAt
     channelInformations:(NSDictionary *)channelInformations
@@ -240,6 +241,10 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 		<td>Please specify nil</td>
 		<td><b>Please specify Access token secret</b></td>
 	</tr>
+    <tr>
+       <td>providerRefreshToken(NSString)</td>
+       <td colspan="2">Please specify nil</td>
+    </tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
 		<td colspan="2">Please specify nil</td>
@@ -275,7 +280,8 @@ Ex)Facebook
                                       orgUid:orgUid
                                     provider:@”facebook”
                                providerToken:token.tokenString
-                         providerTokenSecret:nil
+                         providerTokenSecret:nil 
+                        providerRefreshToken:nil
                            providerCreatedAt:nil
                            providerExpiresAt:token.expirationDate
                          channelInformations:@{@"url":@”http://xxxxxxx”}
@@ -295,7 +301,8 @@ Ex)Twitter
                                       orgUid:orgUid					
                                     provider:@”twitter”
                                providerToken:session.authToken
-                         providerTokenSecret:session.authTokenSecret
+                         providerTokenSecret:session.authTokenSecret 
+                        providerRefreshToken:nil
                            providerCreatedAt:nil
                            providerExpiresAt:nil
                          channelInformations:@{@"url":self.propertyUrl}
@@ -385,7 +392,8 @@ Please insert the following code in a convenient place.
 - (void)presentHistoryView:(UIViewController *)viewController
                   provider:(NSString *)provider
              providerToken:(NSString *)providerToken
-       providerTokenSecret:(NSString *)providerTokenSecret
+       providerTokenSecret:(NSString *)providerTokenSecret 
+    providerRefreshToken:(NSString *)providerRefreshToken
          providerCreatedAt:(NSDate *)providerCreatedAt
          providerExpiresAt:(NSDate *)providerExpiresAt
          completionHandler:(void (^)(void))completionHandler;
@@ -418,6 +426,10 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 		<td>Please specify nil</td>
 		<td><b>Please specify Access token secret</b></td>
 	</tr>
+    <tr>
+        <td>providerRefreshToken(NSString)</td>
+        <td colspan="2">Please specify nil</td>
+    </tr>
 	<tr>
 		<td>providerCreatedAt(NSDate)</td>
 		<td colspan="2">Please specify nil</td>
@@ -441,7 +453,8 @@ Ex)Facebook
 [[ChatCenter sharedInstance] presentHistoryView:self
                                        provider:@"facebook"
                                   providerToken:token.tokenString 
-                            providerTokenSecret:nil
+                            providerTokenSecret:nil 
+                           providerRefreshToken:nil
                               providerCreatedAt:nil 
                               providerExpiresAt:token.expirationDate
                               completionHandler:nil];
@@ -456,7 +469,8 @@ Ex)Twitter
 [[ChatCenter sharedInstance] presentHistoryView:self
                                        provider:@"twitter"
                                   providerToken:session.authToken 
-                            providerTokenSecret:session.authTokenSecret
+                            providerTokenSecret:session.authTokenSecret 
+                           providerRefreshToken:nil
                               providerCreatedAt:nil 
                               providerExpiresAt:nil
                               completionHandler:nil];
@@ -524,14 +538,15 @@ Please call the following at the timing when you want to enable Push notificatio
 
 ```
 - (void)signInDeviceToken:(NSString*)email
-password:(NSString*)password
-provider:(NSString *)provider
-providerToken:(NSString *)providerToken
-providerTokenSecret:(NSString *)providerTokenSecret 
-providerCreatedAt:(NSDate *)providerCreatedAt
-providerExpiresAt:(NSDate *)providerExpiresAt
-deviceToken:(NSString *)deviceToken
-completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
+                 password:(NSString*)password
+                 provider:(NSString *)provider
+            providerToken:(NSString *)providerToken
+      providerTokenSecret:(NSString *)providerTokenSecret 
+     providerRefreshToken:(NSString *)providerRefreshToken
+        providerCreatedAt:(NSDate *)providerCreatedAt
+        providerExpiresAt:(NSDate *)providerExpiresAt
+              deviceToken:(NSString *)deviceToken
+        completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 ```
 
 The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
@@ -562,6 +577,10 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 <td>providerTokenSecret(NSString)</td>
 <td>Please specify nil</td>
 <td><b>Please specify Access token secret</b></td>
+</tr>
+<tr>
+<td>providerRefreshToken(NSString)</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>
@@ -769,6 +788,7 @@ If you want to load unread counts in advance, insert the following code after se
                  provider:(NSString *)provider
             providerToken:(NSString *)providerToken
       providerTokenSecret:(NSString *)providerTokenSecret 
+     providerRefreshToken:(NSString *)providerRefreshToken
         providerCreatedAt:(NSDate *)providerCreatedAt
         providerExpiresAt:(NSDate *)providerExpiresAt
               deviceToken:(NSString *)deviceToken
@@ -803,6 +823,10 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 <td>providerTokenSecret(NSString)</td>
 <td>Please specify nil</td>
 <td><b>Please specify Access token secret</b></td>
+</tr>
+<tr>
+<td>providerRefreshToken(NSString)</td>
+<td colspan="2">Please specify nil</td>
 </tr>
 <tr>
 <td>providerCreatedAt(NSDate)</td>

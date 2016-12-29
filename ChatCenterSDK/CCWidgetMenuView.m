@@ -27,6 +27,7 @@
                 [stickers insertObject: CC_STICKERTYPECAMERA atIndex:i + 1]; // user can upload file from library and camera
             }
         }
+
         ///Remove unexpected sticker
         for (int i = 0;i < stickers.count; i++) {
             if (![stickers[i] isEqualToString:CC_STICKERTYPEDATETIMEAVAILABILITY]

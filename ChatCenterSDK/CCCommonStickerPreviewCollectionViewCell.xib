@@ -1,7 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11521.1" systemVersion="15G1108" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16A323" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11517.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -15,27 +18,48 @@
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Czv-rc-PGu" userLabel="Sticker container">
+                        <rect key="frame" x="40" y="0.0" width="240" height="114"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Eo-Ty-6NC">
+                                <rect key="frame" x="0.0" y="0.0" width="30" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="V3j-td-w71"/>
                                     <constraint firstAttribute="height" constant="38" id="gox-AI-o6z"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Live" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L7M-DF-Z8N">
+                                <rect key="frame" x="205" y="10" width="30" height="15"/>
+                                <color key="backgroundColor" red="0.98039215690000003" green="0.35686274509999999" blue="0.32156862749999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="15" id="Bpv-fe-dUl"/>
+                                    <constraint firstAttribute="width" constant="30" id="vHL-iD-kWr"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="clipsToBounds" value="YES"/>
+                                </userDefinedRuntimeAttributes>
+                            </label>
                             <textView multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gVf-yo-XVA">
+                                <rect key="frame" x="30" y="0.0" width="210" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="tgh-Re-ey4"/>
                                 </constraints>
-                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oPi-CS-z63">
+                                <rect key="frame" x="0.0" y="50" width="240" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="kXz-Z5-xyh"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="49L-W3-fJg">
+                                <rect key="frame" x="0.0" y="100" width="240" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="14" id="vd9-Gb-Gi2"/>
                                 </constraints>
@@ -52,7 +76,9 @@
                             <constraint firstItem="7Eo-Ty-6NC" firstAttribute="top" secondItem="Czv-rc-PGu" secondAttribute="top" id="Swe-KU-cvx"/>
                             <constraint firstAttribute="trailing" secondItem="49L-W3-fJg" secondAttribute="trailing" id="U2T-Co-amq"/>
                             <constraint firstAttribute="bottom" secondItem="49L-W3-fJg" secondAttribute="bottom" id="Yg1-PH-a1p"/>
+                            <constraint firstItem="L7M-DF-Z8N" firstAttribute="top" secondItem="Czv-rc-PGu" secondAttribute="top" constant="10" id="jXo-cD-mSH"/>
                             <constraint firstAttribute="trailing" secondItem="gVf-yo-XVA" secondAttribute="trailing" id="kkL-ia-B90"/>
+                            <constraint firstAttribute="trailing" secondItem="L7M-DF-Z8N" secondAttribute="trailing" constant="5" id="lPK-hL-SLo"/>
                             <constraint firstItem="oPi-CS-z63" firstAttribute="top" secondItem="gVf-yo-XVA" secondAttribute="bottom" id="oDU-xD-qsv"/>
                             <constraint firstItem="49L-W3-fJg" firstAttribute="leading" secondItem="Czv-rc-PGu" secondAttribute="leading" id="sqO-V9-Dxg"/>
                             <constraint firstItem="gVf-yo-XVA" firstAttribute="top" secondItem="Czv-rc-PGu" secondAttribute="top" id="vYW-Oz-bWH"/>
@@ -72,6 +98,7 @@
                 <outlet property="discriptionViewHeight" destination="tgh-Re-ey4" id="Iet-Rt-A6S"/>
                 <outlet property="headerImageView" destination="7Eo-Ty-6NC" id="HYI-kp-AmH"/>
                 <outlet property="headerImageViewWidthConstraint" destination="V3j-td-w71" id="deb-Hz-fOg"/>
+                <outlet property="headerLiveWidgetLabel" destination="L7M-DF-Z8N" id="kN1-w9-Hpk"/>
                 <outlet property="stickerActionsContainer" destination="49L-W3-fJg" id="CZ3-0b-59s"/>
                 <outlet property="stickerActionsContainerHeight" destination="vd9-Gb-Gi2" id="Nke-1T-3uh"/>
                 <outlet property="stickerContainer" destination="Czv-rc-PGu" id="fRd-MZ-eMg"/>

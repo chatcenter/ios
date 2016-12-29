@@ -88,6 +88,7 @@ int const CCRandomCircleAvatarTextOffset = 15;
               provider:(NSString *)provider
          providerToken:(NSString *)providerToken
    providerTokenSecret:(NSString *)providerTokenSecret
+  providerRefreshToken:(NSString *)providerRefreshToken
      providerCreatedAt:(NSDate *)providerCreatedAt
      providerExpiresAt:(NSDate *)providerExpiresAt
      completionHandler:(void (^)(void))completionHandler
@@ -107,6 +108,7 @@ int const CCRandomCircleAvatarTextOffset = 15;
         [CCConnectionHelper sharedClient].provider = provider;
         [CCConnectionHelper sharedClient].providerToken = providerToken;
         [CCConnectionHelper sharedClient].providerTokenSecret = providerTokenSecret;
+        [CCConnectionHelper sharedClient].providerRefreshToken = providerRefreshToken;
         
         if (providerCreatedAt != nil)
         {
@@ -1424,6 +1426,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                             provider:[CCConnectionHelper sharedClient].provider
                                        providerToken:[CCConnectionHelper sharedClient].providerToken
                                  providerTokenSecret:[CCConnectionHelper sharedClient].providerTokenSecret
+                                providerRefreshToken:nil
                                    providerCreatedAt:providerCreatedAtDate
                                    providerExpiresAt:providerExpiresAtDate
                                          deviceToken:nil
