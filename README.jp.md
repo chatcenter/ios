@@ -8,9 +8,10 @@
 * [SDKをアプリに組み込む](#InstallYourApp)
 	* [1. Xcodeでの設定](#SettingOfXcode)
 	* [2. App Tokenのセット](#SetAppToken)
-    * [3. チャットビューの呼び出し](#DispalyChatView)
-    * [4. ヒストリービューの呼び出し](#DispalyHistoryView)
-    * [5. ユーザーのログアウト](#LogoutUser)
+	* [3. Google APIキーのセット](#SetGoogleAPIKey)
+    * [4. チャットビューの呼び出し](#DispalyChatView)
+    * [5. ヒストリービューの呼び出し](#DispalyHistoryView)
+    * [6. ユーザーのログアウト](#LogoutUser)
 * [オプション](#Opptions)
     * [1. プッシュ通知](#Pushnotification)
     * [2. デザインのカスタマイズ](#DesignCustom)
@@ -104,8 +105,6 @@ pod 'GooglePlacePicker'
 end
 ```
 
-既にGoogle Maps SDKをご使用の場合はAPIキーの重複を防ぐため、[5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)をご確認ください。
-
 該当のフォルダにてpod installを実施してください。
 ```
 例)
@@ -173,12 +172,23 @@ en.lproj/ChatCenterSDK.strings
 ```
 ***
 
+<a id="SetGoogleAPIKey"></a>
+## 3. Google APIキーのセット
+ChatCenterSDKではGoogleMapSDKを使用しています。そのため、Google APIのダッシュボードよりAPIキーを取得し、以下の設定をお願いします。<br>
+もし既にGoogle Maps SDKをご使用の場合はコードの重複を防ぐため、[5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)の設定もお願いします。<br>
+
+下図のように、プロジェクト > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor MacrosにCC_GOOGLEMAPS_API_KEY=\@\"GoogleAPIキー\"を追加してください。<br>
+<p align="center"><img src="InstallationImages/googlemapssdk3.png"></p>
+またGoogle APIのダッシュボードにて、Google Maps SDK for iOSおよびGoogle Places API for iOSが有効になっていることをご確認ください。
+<p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>
+***
+
 <a id="DispalyChatView"></a>
-## 3. チャットビューの呼び出し
+## 4. チャットビューの呼び出し
 チャットを表示するチャットビューを呼び出します。
 <p align="center"><img src="InstallationImages/chatview.png" width="375" height="667"></p>
 
-### 3-1. 認証ありの場合
+### 4-1. 認証ありの場合
 以下のコードを任意の場所に挿入してください。
 
 ```
@@ -310,7 +320,7 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 …
 ```
 
-### 3-2. 認証なしの場合(Anonymousログイン)
+### 4-2. 認証なしの場合(Anonymousログイン)
 **注意: 認証なしの場合は、ログインから30日後に自動ログアウトされます。また、後から認証処理を紐付けることは現在対応しておりません**  
 以下のコードを任意の場所に挿入してください。  
 
@@ -380,11 +390,11 @@ NavigationControlloer付きのチャットビューをpresentViewControllerし�
 ***
 
 <a id="DispalyHistoryView"></a>
-## 4. ヒストリービューの呼び出し
+## 5. ヒストリービューの呼び出し
 チャットの履歴一覧を表示するヒストリービューを呼び出します。  
 <p align="center"><img src="InstallationImages/historyview.png" width="375" height="667"></p>
 
-### 4-1. 認証ありの場合
+### 5-1. 認証ありの場合
 以下のコードを任意の場所に挿入してください。
 
 ```
@@ -476,7 +486,7 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 …
 ```
 
-### 4-2. 認証なしの場合(Anonymousログイン)
+### 5-2. 認証なしの場合(Anonymousログイン)
 **注意: 認証なしの場合は、ログインから30日後に自動ログアウトされます。また、後から認証処理を紐付けることは現在対応しておりません**    
 以下のコードを任意の場所に挿入してください。  
 
@@ -514,7 +524,7 @@ NavigationControlloer付きのHistroy ViewをpresentViewControllerします。
 ***
 
 <a id="LogoutUser"></a>
-## 5. ユーザーのログアウト
+## 6. ユーザーのログアウト
 ChatCenter iOS SDKではチャットデータをローカルDB(Coredata)へ保存しており、ユーザーのログアウト時には以下をコールしてデータのリセットをお願いします。  
 ``- (BOOL)signOut;``
 ***
@@ -916,7 +926,7 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
 <a id="DuplicateGoogleMapSDK"></a>
 ### 5. Google Maps SDKを既に使用している場合
 ChatCenterSDKでは、ロケーションウィジェットでGoogle Maps SDKを使用しています。
-もし導入されるアプリで既にGoogle Maps SDKを使用している場合は、APIキーの重複が生じる可能性があるため、以下の設定をお願いします。
+もし導入されるアプリで既にGoogle Maps SDKを使用している場合は、コードの重複が生じる可能性があるため、以下の設定をお願いします。
 #### 5-1. Preprocessor Macrosの登録
 下図のように、プロジェクト > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macrosに"EXIST_GOOGLEMAPS_API_KEY=1"を追加してください。<br>
 この設定により、ChatCenterSDK内でAPIキーのセットが実施されないようになります。
@@ -940,7 +950,3 @@ ChatCenterSDKでは、ロケーションウィジェットでGoogle Maps SDKを�
 …
 }
 ```
-
-#### 5-3. APIの有効化
-[Google APIのダッシュボード](#https://console.developers.google.com/apis/dashboard)にて、Google Maps SDK for iOSおよびGoogle Places API for iOSが有効になっていることをご確認ください。
-<p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>

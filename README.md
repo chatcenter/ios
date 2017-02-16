@@ -8,9 +8,10 @@
 * [Install SDK in to your app](#InstallYourApp)
 	* [1. Setting of Xcode](#SettingOfXcode)
 	* [2. Set App Token](#SetAppToken)
-    * [3. Display chat view](#DispalyChatView)
-    * [4. Display history view](#DispalyHistoryView)
-    * [5. Log out user](#LogoutUser)
+	* [3. Set Google API Key](#SetGoogleAPIKey)
+    * [4. Display chat view](#DispalyChatView)
+    * [5. Display history view](#DispalyHistoryView)
+    * [6. Log out user](#LogoutUser)
 * [Options](#Options)
     * [1. Push notification](#Pushnotification)
     * [2. Custom design](#DesignCustom)
@@ -172,12 +173,22 @@ Ex)
 ```
 ***
 
+<a id="SetGoogleAPIKey"></a>
+## 3. Set Google API Key
+We are using Google Maps SDK in the Location Widget.  Please create Google API Key in dashboard of Google API and set it into your project like below.<br>
+If you are already using Google Maps SDK, please refer to [5. Already using Google Maps SDK](#DuplicateGoogleMapSDK) for preventing duplication of codes.<br>
+As shown below, please add CC_GOOGLEMAPS_API_KEY=\@\"YOUR_API_KEY\" in Project > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macros.<br>
+<p align="center"><img src="InstallationImages/googlemapssdk3.png"></p>
+Next please confirm both Google Maps SDK for iOS and Google Places API are enable in dashboard of Google API. 
+<p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>
+***
+
 <a id="DispalyChatView"></a>
-## 3. Display chat view
+## 4. Display chat view
 Call chat view to display chat.
 <p align="center"><img src="InstallationImages/chatview_en.PNG" width="375" height="667"></p>
 
-### 3-1. When requiring authentication
+### 4-1. When requiring authentication
 Please insert the following code in a convenient place.
 
 ```
@@ -310,7 +321,7 @@ Ex)Twitter
 …
 ```
 
-### 3-2. When authentication is not required (Anonymous login)
+### 4-2. When authentication is not required (Anonymous login)
 **Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
 Please insert the following code in a convenient place.
 
@@ -380,11 +391,11 @@ Ex)
 ***
 
 <a id="DispalyHistoryView"></a>
-## 4. Display history view
+## 5. Display history view
 Call history view to display chat history list.  
 <p align="center"><img src="InstallationImages/historyview_en.PNG" width="375" height="667"></p>
 
-### 4-1. When requiring authentication
+### 5-1. When requiring authentication
 Please insert the following code in a convenient place.
 
 ```
@@ -476,7 +487,7 @@ Ex)Twitter
 …
 ```
 
-### 4-2. When authentication is not required (Anonymous login)
+### 5-2. When authentication is not required (Anonymous login)
 **Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
 Please insert the following code in a convenient place.
 
@@ -515,7 +526,7 @@ Ex)
 ***
 
 <a id="LogoutUser"></a>
-## 5. Log out user
+## 6. Log out user
 In ChatCenter iOS SDK, chat data is saved in the local DB (Coredata), please reset the data by calling the following when logging out user.  
 ``- (BOOL)signOut;``
 ***
@@ -912,4 +923,33 @@ Ex)
     }];
 
 …
+```
+
+***
+
+<a id="DuplicateGoogleMapSDK"></a>
+### 5. Already using Google Maps SDK
+If you are already using Google Maps SDK in your app, please confirm steps below for preventing duplication of codes.
+#### 5-1. Set Preprocessor Macros
+Please add "EXIST_GOOGLEMAPS_API_KEY=1” in Project > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macros like below.<br>
+This prevent ChatCenterSDK from setting API key.
+<p align="center"><img src="InstallationImages/googlemapssdk1.png"></p>
+
+#### 5-2. Set Google API key
+Please confirm your Google API key is set in didFinishLaunchingWithOptions like below.
+
+```
+Ex)
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+…
+
+[GMSServices provideAPIKey:"YOUR_API_KEY];
+[GMSPlacesClient provideAPIKey:"YOUR_API_KEY"];
+
+…
+}
 ```
