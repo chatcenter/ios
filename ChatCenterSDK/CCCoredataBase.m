@@ -752,6 +752,7 @@
                  name:(NSString *)name
        direct_message:(BOOL)direct_message
              assignee:(NSDictionary *)assignee
+         display_name:(NSDictionary *)display_name
 {
     ///duplicate check
     NSArray *mutableFetchResults = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:channelUid];
@@ -780,6 +781,7 @@
         [newManagedObject setValue:unread_messages      forKey:@"unread_messages"];
         [newManagedObject setValue:[NSNumber numberWithBool:read] forKey:@"read"];
         [newManagedObject setValue:lastUpdatedAt        forKey:@"last_updated_at"];
+        [newManagedObject setValue:[NSKeyedArchiver archivedDataWithRootObject:display_name]         forKey:@"display_name"];
         if(icon_url != nil) [newManagedObject setValue:icon_url forKey:@"icon_url"];
         [newManagedObject setValue:[NSNumber numberWithBool:direct_message] forKey:@"direct_message"];
         if(name != nil) [newManagedObject setValue:name forKey:@"name"];
@@ -934,6 +936,7 @@
                               name:(NSString *)name
                     direct_message:(BOOL)direct_message
                           assignee:(NSDictionary *)assignee
+                      display_name:(NSDictionary *)display_name
 {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"CCChannel" inManagedObjectContext:[self managedObjectContext]];
@@ -969,6 +972,7 @@
         [object setValue:unread_messages      forKey:@"unread_messages"];
         [object setValue:[NSNumber numberWithBool:read] forKey:@"read"];
         [object setValue:lastUpdatedAt        forKey:@"last_updated_at"];
+        [object setValue:[NSKeyedArchiver archivedDataWithRootObject:display_name]         forKey:@"display_name"];
         if(icon_url != nil) [object setValue:icon_url forKey:@"icon_url"];
         [object setValue:[NSNumber numberWithBool:direct_message] forKey:@"direct_message"];
         if(name != nil) [object setValue:name forKey:@"name"];

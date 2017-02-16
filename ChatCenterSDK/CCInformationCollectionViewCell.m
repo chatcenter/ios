@@ -21,15 +21,6 @@
 
 
     self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
-/*
-    if(options & CCStickerCollectionViewCellOptionShowAsMyself) {
-        self.stickerContainer.backgroundColor = [[CCConstants sharedInstance] baseColor];
-    } else {
-        self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
-    }
-  */  
-
-    
     self.discriptionView.textContainer.lineFragmentPadding = 0;
     self.discriptionView.textContainerInset = UIEdgeInsetsMake(10, 5, 5, 5);
     NSString *titleStr = CCLocalizedString(@"Inquired information");

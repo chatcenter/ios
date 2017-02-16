@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11762" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -46,17 +46,13 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7I6-Gz-1xW" userLabel="NavigationBarView">
                     <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="99u-X8-jGb">
-                            <rect key="frame" x="10" y="0.0" width="80" height="40"/>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="99u-X8-jGb">
+                            <rect key="frame" x="10" y="0.0" width="40" height="40"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="80" id="SOr-UE-b3r"/>
+                                <constraint firstAttribute="width" constant="40" id="SOr-UE-b3r"/>
                                 <constraint firstAttribute="height" constant="40" id="YPT-9f-aRX"/>
                             </constraints>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                            <state key="normal" title="Cancel">
-                                <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                            </state>
+                            <state key="normal" image="CCcancel_btn.png"/>
                             <connections>
                                 <action selector="didTapCancelButton:" destination="-1" eventType="touchUpInside" id="Eay-sg-io5"/>
                             </connections>
@@ -76,7 +72,7 @@
                             </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Schedule" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ydm-RZ-Xux">
-                            <rect key="frame" x="151" y="0.0" width="73" height="40"/>
+                            <rect key="frame" x="151.5" y="0.0" width="73" height="40"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="Z34-IY-c19"/>
                             </constraints>
@@ -106,7 +102,7 @@
                         <constraint firstItem="99u-X8-jGb" firstAttribute="top" secondItem="7I6-Gz-1xW" secondAttribute="top" id="wRk-wc-skv"/>
                     </constraints>
                 </view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose the dates and times you are available" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aWC-Gw-oyS">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Choose dates and times you are available" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aWC-Gw-oyS">
                     <rect key="frame" x="0.0" y="64" width="375" height="42"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
@@ -172,4 +168,7 @@
             <point key="canvasLocation" x="-8" y="4"/>
         </view>
     </objects>
+    <resources>
+        <image name="CCcancel_btn.png" width="24" height="24"/>
+    </resources>
 </document>

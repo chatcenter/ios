@@ -89,18 +89,6 @@ static const CGFloat cellHeight = 125;
     }
 }
 
-/*
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(LINEAR_CELL_WIDTH, LINEAR_CELL_HEIGHT);
-}
-
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section {
-    float collectionViewWidth = self.collectionView.bounds.size.width;
-    float spacing = ((collectionViewWidth - (actionData.count * LINEAR_CELL_WIDTH)) / (actionData.count - 1));
-    return spacing;
-}
- */
-
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger row = [indexPath row];
     

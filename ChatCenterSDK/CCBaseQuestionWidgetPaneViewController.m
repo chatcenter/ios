@@ -69,8 +69,6 @@ CGFloat keyboardHeight;
     
     viewToShow = textField;
     
-//    [self.scrollViewDelegate bringViewToVisibleArea:textField];
-    
     if (keyboardHeight>0) {
 //        [self.scrollViewDelegate setViewMovedUp:keyboardHeight];
     }

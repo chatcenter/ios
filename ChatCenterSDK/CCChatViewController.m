@@ -70,6 +70,7 @@ int kCloseStickerMenuButtonTag  = 997;
     NSTimer *colocationTimer;
     int liveColocationShareDuration;
     int liveColocationShareTimer;
+    int preferredTimeInterval;
     UIBackgroundTaskIdentifier colocationBackgroundTask;
     CCJSQMessage *colocationMessage;
 
@@ -218,13 +219,8 @@ int kCloseStickerMenuButtonTag  = 997;
     [self viewSetUp];
     [self customNibsSetUp];
 #ifdef CC_VIDEO
-    [self processUserMeVideoChatInfo];
+    [[CCConnectionHelper sharedClient] isSupportVideoChat];
 #endif
-//
-//    UITapGestureRecognizer *tapGesture =
-//    [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(OtherContentTapped:)];
-//    [self.view addGestureRecognizer:tapGesture];
-    
     if(self.channelId != nil) {
         [self loadChannelInfo:self.channelId];
     }
@@ -295,6 +291,11 @@ int kCloseStickerMenuButtonTag  = 997;
         // update left of input toolbar
         [self updateLeftOfInputToolbar];
     }];
+    
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    if (task != nil) {
+        liveColocationShareTimer = task.liveColocationShareTimer;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -475,7 +476,7 @@ int kCloseStickerMenuButtonTag  = 997;
     // Title View
     //
     //--------------------------------------------------------------------
-    navigationTitleView = [[CCChatViewNavigationTitle alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height)];
+    navigationTitleView = [[CCChatViewNavigationTitle alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 80 * [UIScreen mainScreen].nativeScale, self.navigationController.navigationBar.frame.size.height)];
     navigationTitleView.delegate = self;
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == NO){
         self.navigationItem.titleView = navigationTitleView;
@@ -709,7 +710,7 @@ int kCloseStickerMenuButtonTag  = 997;
             
             if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
 #if CC_VIDEO
-                if (![self processUserMeVideoChatInfo] || ![self processChannelUserVideoChatInfo]){
+                if (![self isVideocallEnabled]){
                     [stickers removeObject:stickers[i]];
                 }
 #else
@@ -816,37 +817,9 @@ int kCloseStickerMenuButtonTag  = 997;
     [self.collectionView registerNib:nib forCellWithReuseIdentifier:nibName];
 }
 
-//-(void)locationSetup{ ///for map sticker
-//    locationManager = [[CLLocationManager alloc] init];
-//    locationManager.delegate = self;
-//    if ([CLLocationManager locationServicesEnabled] == NO) {
-//        NSLog(@"Location is denied");
-//    }else{
-//        NSLog(@"AppSocially Inc.___LOcation    2");
-//        if ([locationManager respondsToSelector:@selector(requestWhenInUseAuthorization)]) { //requestWhenInUseAuthorization can be used in iOS8
-//            switch ([CLLocationManager authorizationStatus]) {
-//                case kCLAuthorizationStatusNotDetermined:
-//                    [locationManager requestWhenInUseAuthorization];
-//                    break;
-//                case kCLAuthorizationStatusAuthorizedAlways:
-//                case kCLAuthorizationStatusAuthorizedWhenInUse:
-//                    [locationManager startUpdatingLocation];
-//                    break;
-//                case kCLAuthorizationStatusDenied:
-//                case kCLAuthorizationStatusRestricted:
-//                    NSLog(@"Location is denied");
-//                    break;
-//            }
-//        }else {
-//            [locationManager startUpdatingLocation]; //iOS7
-//        }
-//    }
-//}
-
 #pragma mark - Actions
 
 -(void)pressBack:(id)sender {
-//    [self stopSharingLocation];
     [self removeNavigationBottomBorder];
     [self.navigationController popViewControllerAnimated:YES];
     [[CCConnectionHelper sharedClient] setDelegate:nil];
@@ -854,7 +827,6 @@ int kCloseStickerMenuButtonTag  = 997;
 }
 
 -(void)pressClose:(id)sender {
-//    [self stopSharingLocation];
     [self removeNavigationBottomBorder];
     self.parentViewController.modalTransitionStyle = UIModalPresentationOverCurrentContext;
     [self dismissViewControllerAnimated:YES completion:self.closeChatViewCallback];
@@ -894,7 +866,7 @@ int kCloseStickerMenuButtonTag  = 997;
     // Call from Guest
     //
     if(!([CCConstants sharedInstance].isAgent== YES)) {
-        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": self.uid} receiverInfo:@[] actionCall:CC_ACTIONTYPE_VIDEOCALL];
+        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:@[] actionCall:CC_ACTIONTYPE_VIDEOCALL];
         return;
     }
     
@@ -905,7 +877,7 @@ int kCloseStickerMenuButtonTag  = 997;
     if(guests.count == 0) {
         return;
     } else if (guests.count == 1) {
-        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": self.uid} receiverInfo:guests actionCall:CC_ACTIONTYPE_VIDEOCALL];
+        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:guests actionCall:CC_ACTIONTYPE_VIDEOCALL];
     } else {
         UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Select a user to call") message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
         for(NSDictionary * guest in guests) {
@@ -933,7 +905,7 @@ int kCloseStickerMenuButtonTag  = 997;
     // Call from Guest
     //
     if(!([CCConstants sharedInstance].isAgent== YES)) {
-        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": self.uid} receiverInfo:@[] actionCall:CC_ACTIONTYPE_VOICECALL];
+        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:@[] actionCall:CC_ACTIONTYPE_VOICECALL];
         return;
     }
     
@@ -944,14 +916,14 @@ int kCloseStickerMenuButtonTag  = 997;
     if(guests.count == 0) {
         return;
     } else if (guests.count == 1) {
-        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": self.uid} receiverInfo:guests actionCall:CC_ACTIONTYPE_VOICECALL];
+        [self processVideoCall:self.channelUid callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:guests actionCall:CC_ACTIONTYPE_VOICECALL];
     } else {
         UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Select a user to call") message:@"" preferredStyle:UIAlertControllerStyleActionSheet];
         for(NSDictionary * guest in guests) {
             NSString *guestName = [guest valueForKey:@"display_name"];
             if (guestName != nil) {
                 UIAlertAction *action = [UIAlertAction actionWithTitle:guestName style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                    [self processVideoCall:self.channelUid callerInfo:@{@"user_id": self.uid} receiverInfo:@[guest] actionCall:CC_ACTIONTYPE_VOICECALL];
+                    [self processVideoCall:self.channelUid callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:@[guest] actionCall:CC_ACTIONTYPE_VOICECALL];
                 }];
                 [alertVC addAction:action];
             }
@@ -978,7 +950,7 @@ int kCloseStickerMenuButtonTag  = 997;
 }
 
 -(void)processVideoCall:(NSString *) channelId callerInfo:(NSDictionary *) callerInfo receiverInfo:(NSArray *) receiverInfo actionCall:(NSString *)actionCall {
-    [[CCConnectionHelper sharedClient] getCallIdentity:self.channelId callerInfo:@{@"user_id": self.uid} receiverInfo:@[] actionCall:actionCall completeHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] getCallIdentity:self.channelId callerInfo:@{@"user_id": @([self.uid intValue])} receiverInfo:@[] actionCall:actionCall completeHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
         [self pressCloseStickerMenu];
         if (error == nil && result != nil) {
             NSString *messageId = result[@"id"];
@@ -1189,23 +1161,14 @@ int kCloseStickerMenuButtonTag  = 997;
 
 -(void)pressFullScreen:(id)sender {
 ///TODO :fix chat bubble width and escape iOS7
-//    CGFloat width =[self.splitViewController primaryColumnWidth];
-//    NSLog(@"primaryColumnWidth: %f", width);
-//    if (fullScreen) {
-//        [self.splitViewController setPreferredPrimaryColumnWidthFraction:0.8];
-//        fullScreen = NO;
-//    }else{
-//        [self.splitViewController setPreferredPrimaryColumnWidthFraction:0];
-//        fullScreen = YES;
-//    }
 }
 
 -(void)pressLocationWidget {
     UIAlertController *alertVC;
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location you want to share?") preferredStyle:UIAlertControllerStyleAlert];
+        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location do you want to share?") preferredStyle:UIAlertControllerStyleAlert];
     } else {
-        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location you want to share?") preferredStyle:UIAlertControllerStyleActionSheet];
+        alertVC = [UIAlertController alertControllerWithTitle:@"" message:CCLocalizedString(@"What kind of Location do you want to share?") preferredStyle:UIAlertControllerStyleActionSheet];
     }
     UIAlertAction *venueLocationAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Send Venue") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self pressLocation];
@@ -1255,61 +1218,35 @@ int kCloseStickerMenuButtonTag  = 997;
 }
 
 -(void)pressCalendar{
-//    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
-        [self pressCloseStickerMenu];
-//        if (CCDevelopmentMode == YES) {
-//            CCRSDFDatePickerViewController *datePickerVC = [CCRSDFDatePickerViewController new];
-//            UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:datePickerVC];
-//            [self presentViewController:rootNC animated:YES completion:nil];
-//        }else{
-//            CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithDelegate:self];
+    [self pressCloseStickerMenu];
     CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithNibName:@"CCCalendarTimePicker" bundle:SDK_BUNDLE];
     calendarView.delegate = self;
-//    [[CCCalendarTimePickerController alloc] initWithDelegate:self];
-            [calendarView setCloseCalendarTimePickerCallback:^(NSArray *dateTimes) {
-                if (dateTimes != nil) {
-                    [self sendDateTime:dateTimes];
-                }
-            }];
-            UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
-            [self presentViewController:rootNC animated:YES completion:^{
-                self.isReturnFromStickerView = YES;
-            }];
-//        }
-//    }else{
-//        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//    }
+    [calendarView setCloseCalendarTimePickerCallback:^(NSArray *dateTimes) {
+        if (dateTimes != nil) {
+            [self sendDateTime:dateTimes];
+        }
+    }];
+    UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
+    [self presentViewController:rootNC animated:YES completion:^{
+        self.isReturnFromStickerView = YES;
+    }];
 }
 
 - (void)proposeOtherSlots:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
-//    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
-        [self pressCloseStickerMenu];
-        CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithDelegate:self];
-        [calendarView setCloseCalendarTimePickerCallback:^(NSArray *dateTimes) {
-            if (dateTimes != nil) {
-                // send response action Propose another
-                [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-//                    if (result != nil) {
-                        [self sendDateTime:dateTimes];
-//                    }else {
-//                        if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
-//                            [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
-//                        }
-//                        else{
-//                            NSLog(@"Message POST Failed!");
-//                            [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//                        }
-//                    }
-                }];
-            }
-        }];
-        UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
-        [self presentViewController:rootNC animated:YES completion:^{
-            self.isReturnFromStickerView = YES;
-        }];
-//    }else{
-//        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//    }
+    [self pressCloseStickerMenu];
+    CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithDelegate:self];
+    [calendarView setCloseCalendarTimePickerCallback:^(NSArray *dateTimes) {
+        if (dateTimes != nil) {
+            // send response action Propose another
+            [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                [self sendDateTime:dateTimes];
+            }];
+        }
+    }];
+    UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
+    [self presentViewController:rootNC animated:YES completion:^{
+        self.isReturnFromStickerView = YES;
+    }];
 }
 
 -(void)pressCalendarChoiceBtn:(CCChoiceButton*)btn{
@@ -1354,22 +1291,6 @@ int kCloseStickerMenuButtonTag  = 997;
     }];
     
     return;
-    
-    /*
-    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
-        [self pressCloseStickerMenu];
-        CCYesNoQuestionCreatorViewController *creatorViewController = [[CCYesNoQuestionCreatorViewController alloc] init];
-        [creatorViewController setChannelId:self.channelId];
-        [creatorViewController setUserId:self.uid];
-        [creatorViewController setDelegate:self];
-        UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:creatorViewController];
-        [self presentViewController:rootNC animated:YES completion:^{
-            self.isReturnFromStickerView = YES;
-        }];
-    }else{
-        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-    }
-     */
 }
 
 -(void)pressPdfLinkBtn:(CCChoiceButton*)btn{
@@ -1390,6 +1311,7 @@ int kCloseStickerMenuButtonTag  = 997;
             } else {
                 picker = [[UIImagePickerController alloc] init];
             }
+            picker.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
             picker.modalPresentationStyle = UIModalPresentationCurrentContext;
             picker.sourceType = sourceType;
             picker.delegate = self;
@@ -1415,6 +1337,7 @@ int kCloseStickerMenuButtonTag  = 997;
             } else {
                 picker = [[UIImagePickerController alloc] init];
             }
+            picker.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
             picker.modalPresentationStyle = UIModalPresentationCurrentContext;
             picker.sourceType = sourceType;
             picker.delegate = self;
@@ -1439,21 +1362,16 @@ int kCloseStickerMenuButtonTag  = 997;
     
         // show phrase sticker view controller
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
-        //CCPhraseStickerViewController *phraseViewController = [storyboard  instantiateViewControllerWithIdentifier:@"CCPhraseStickerViewController"];
         CCPhraseStickerCollectionViewController *phraseCollectionViewController = [storyboard instantiateViewControllerWithIdentifier:@"CCPhraseStickerCollectionViewController"];
         phraseCollectionViewController.delegate = self;
         phraseCollectionViewController.orgUid = self.orgUid;
         phraseCollectionViewController.channelId = self.channelId;
         phraseCollectionViewController.userId = self.uid;
         phraseCollectionViewController.title = CCLocalizedString(@"Fixed Phrases Controller Title");
-//        UIBarButtonItem *addPrivatePhrase = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:phraseCollectionViewController action:@selector(addPrivatePhrase)];
-//        [phraseViewController.navigationItem setRightBarButtonItem:addPrivatePhrase];
-
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:phraseCollectionViewController];
         [self presentViewController:navController animated:YES completion:^{
             self.isReturnFromStickerView = YES;
         }];
-//        [self.navigationController pushViewController:phraseViewController animated:YES];
     }else{
         [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
     }
@@ -1489,144 +1407,93 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 if (error) {
                     NSLog(@"Save image failed");
                 } else {
-                    NSDictionary *content = @{@"text":@"", @"uid":[self generateMessageUniqueId], @"url": assetURL, CC_STICKERCONTENT: @{CC_THUMBNAILURL:@""}};
-                    CCJSQMessage *message = [self appendTempMessage:CC_STICKERTYPEIMAGE content:content];
-                    NSString *extension = [assetURL pathExtension];
-                    CFStringRef imageUTI = (UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,(__bridge CFStringRef)extension , NULL));
-                    
-                    [self sendImage:selectedImage imageUTI:imageUTI isShowAlert:YES completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-                        [self updateTempMessage:message withResult:result];
-                        if(result != nil){
-                            NSLog(@"Message POST Success!");
-                            for (CCJSQMessage * msg in self.messages) {
-                                if ([msg.type isEqualToString:CC_STICKERTYPEIMAGE]){
-                                    if ([msg.uid integerValue] == [message.uid integerValue]) {
-                                        [self.messages removeObject:msg];
-                                        [self.collectionView reloadData];
-                                        break;
-                                    }
-                                }
-                            }
-                            [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
-                            [self.collectionView reloadData];
-                        }else{
-                            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
-                                [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
-                            }else{
-                                NSLog(@"Message POST Failed!");
-                                [self.sendingMessages removeObject:message];
-                                // Resend this image
-                                [self.collectionView reloadData];
-                                [self resendFailedMessage:self.channelId resendDelivering:YES];
-                            }
-                        }
-                    }];
-                    
-                    
-                    [self reloadCollectionViewData];
+                    NSDictionary *content = @{
+                                              @"text":@"",
+                                              @"uid":[self generateMessageUniqueId],
+                                              @"url": assetURL,
+                                              CC_STICKERCONTENT: @{
+                                                      CC_THUMBNAILURL:@""
+                                                      }
+                                              };
+                    CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
+                    CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
+                    msg.type = CC_STICKERTYPEIMAGE;
+                    msg.content = content;
+                    [vc setDelegate:self];
+                    [vc setMessage:msg];
+                    [self.navigationController pushViewController:vc animated:YES];
+                    return;
                 }
             }];
         }
         // Upload image from folder
         else {
             assetURL = info[UIImagePickerControllerReferenceURL];
-            NSString *extension = [assetURL pathExtension];
-            CFStringRef imageUTI = (UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,(__bridge CFStringRef)extension , NULL));
-            NSDictionary *content = @{@"text":@"", @"uid":[self generateMessageUniqueId], @"url": assetURL,CC_STICKERCONTENT: @{CC_THUMBNAILURL:@""}};
-            CCJSQMessage *message = [self appendTempMessage:CC_STICKERTYPEIMAGE content:content];            
-            
-            [self sendImage:selectedImage imageUTI:imageUTI isShowAlert:YES completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-                NSLog(@"%@", result);
-                [self updateTempMessage:message withResult:result];
-                if(result != nil){
-                    NSLog(@"Message POST Success!");
-                    [self.sendingMessages removeObject:message];
-                    for (CCJSQMessage * msg in self.messages) {
-                        if ([msg.type isEqualToString:CC_STICKERTYPEIMAGE]){
-                            if ([msg.uid integerValue] == [message.uid integerValue]) {
-                                [self.messages removeObject:msg];
-                                [self.collectionView reloadData];
-                                break;
-                            }
-                        }
-                    }
-                    [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
-                    [self.collectionView reloadData];
-                }else{
-                    if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
-                        [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
-                    }else{
-                        NSLog(@"Message POST Failed!");
-                        [self.sendingMessages removeObject:message];
-                        // Resend this image
-                        [self.collectionView reloadData];
-                        [self resendFailedMessage:self.channelId resendDelivering:YES];
-                    }
-                }
-            }];
-            
-            
-            
-            
-            [self reloadCollectionViewData];
+            NSDictionary *content = @{
+                                      @"text":@"",
+                                      @"uid":[self generateMessageUniqueId],
+                                      @"url": assetURL,
+                                      CC_STICKERCONTENT: @{
+                                              CC_THUMBNAILURL:@""
+                                              }
+                                      };
+            CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
+            CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
+            msg.type = CC_STICKERTYPEIMAGE;
+            msg.content = content;
+            [vc setDelegate:self];
+            [vc setMessage:msg];
+            [self.navigationController pushViewController:vc animated:YES];
+            return;
         };
     }];
 }
 
 -(void)sendCalendar:(NSMutableArray *)datepicker{
-//    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
+    NSMutableString *message = [[NSMutableString alloc] init];
+    NSMutableArray  *choices = [[NSMutableArray alloc] init];
+    [message appendString:@"Here are some dates that work for me:\n"];
+    for (NSString *date in datepicker) {
+        [choices addObject:date];
+    }
+    NSDictionary *content = @{@"text":message, CC_RESPONSETYPEDATETIMEAVAILABILITY:choices, @"uid":[self generateMessageUniqueId]};
+    [[CCConnectionHelper sharedClient] setDatepicker:nil];
     
-        NSMutableString *message = [[NSMutableString alloc] init];
-        NSMutableArray  *choices = [[NSMutableArray alloc] init];
-        [message appendString:@"Here are some dates that work for me:\n"];
-        for (NSString *date in datepicker) {
-            [choices addObject:date];
-        }
-        NSDictionary *content = @{@"text":message, CC_RESPONSETYPEDATETIMEAVAILABILITY:choices, @"uid":[self generateMessageUniqueId]};
-        [[CCConnectionHelper sharedClient] setDatepicker:nil];
-        
-        [self sendMessage:CC_RESPONSETYPEDATETIMEAVAILABILITY content:content];
-//    }else{
-//        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//    }
+    [self sendMessage:CC_RESPONSETYPEDATETIMEAVAILABILITY content:content];
 }
 
 -(void)sendDateTime:(NSArray *)dateTimes{
-//    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
-        NSMutableArray *actionsDatas = [NSMutableArray array];
-        for(int i=0; i<dateTimes.count; i++) {
-            long start = [[dateTimes objectAtIndex:i][@"from"] integerValue];
-            NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:start];
-            
-            long end = [[dateTimes objectAtIndex:i][@"to"] integerValue];
-            NSDate *endDate = [NSDate dateWithTimeIntervalSince1970:end];
-            
-            NSDateFormatter *formaterFrom = [[NSDateFormatter alloc] init];
-            [formaterFrom setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_from")];
-            [formaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
-            
-            NSDateFormatter *formaterTo = [[NSDateFormatter alloc] init];
-            [formaterTo setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_to")];
-            [formaterTo setTimeZone:[NSTimeZone defaultTimeZone]];
-            
-            NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), [formaterFrom stringFromDate:startDate], [formaterTo stringFromDate:endDate], [[NSTimeZone defaultTimeZone] abbreviation]];
-            
-            // set data
-            [actionsDatas addObject:@{@"label":label,
-                                      @"value":@{@"start":[NSNumber numberWithLong:start],
-                                                 @"end":[NSNumber numberWithLong:end]}}];
-        }
-        [actionsDatas addObject:@{@"label":CCLocalizedString(@"Propose other slots"), @"action":@[@"open:sticker/calender"]}];
+    NSMutableArray *actionsDatas = [NSMutableArray array];
+    for(int i=0; i<dateTimes.count; i++) {
+        long start = [[dateTimes objectAtIndex:i][@"from"] integerValue];
+        NSDate *startDate = [NSDate dateWithTimeIntervalSince1970:start];
+        
+        long end = [[dateTimes objectAtIndex:i][@"to"] integerValue];
+        NSDate *endDate = [NSDate dateWithTimeIntervalSince1970:end];
+        
+        NSDateFormatter *formaterFrom = [[NSDateFormatter alloc] init];
+        [formaterFrom setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_from")];
+        [formaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
+        
+        NSDateFormatter *formaterTo = [[NSDateFormatter alloc] init];
+        [formaterTo setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_to")];
+        [formaterTo setTimeZone:[NSTimeZone defaultTimeZone]];
+        
+        NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), [formaterFrom stringFromDate:startDate], [formaterTo stringFromDate:endDate], [[NSTimeZone defaultTimeZone] abbreviation]];
+        
+        // set data
+        [actionsDatas addObject:@{@"label":label,
+                                  @"value":@{@"start":[NSNumber numberWithLong:start],
+                                             @"end":[NSNumber numberWithLong:end]}}];
+    }
+    [actionsDatas addObject:@{@"label":CCLocalizedString(@"Propose other slots"), @"action":@[@"open:sticker/calender"]}];
 
-        NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
-                                  @"sticker-action":@{@"action-type":@"select",
-                                                      @"action-data":actionsDatas},
-                                  @"uid":[self generateMessageUniqueId]
-                                  };
-        [self sendMessage:CC_RESPONSETYPESTICKER content:content];
-//    }else{
-//        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//    }
+    NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
+                              @"sticker-action":@{@"action-type":@"select",
+                                                  @"action-data":actionsDatas},
+                              @"uid":[self generateMessageUniqueId]
+                              };
+    [self sendMessage:CC_RESPONSETYPESTICKER content:content];
 }
 
 -(void)sendThumb:(NSString *)message{
@@ -1642,21 +1509,21 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 }
 
 -(void)sendLocationMessage:(NSDictionary *)locationContent {
-        CCJSQMessage *message1 = [self appendTempMessage:CC_RESPONSETYPELOCATION content:locationContent];
-        [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPESTICKER completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
-            [self updateTempMessage:message1 withResult:result];
-            if(result != nil){
-                NSLog(@"Message POST Success!");
-                [self loadMessages:self.channelId];
+    CCJSQMessage *message1 = [self appendTempMessage:CC_RESPONSETYPELOCATION content:locationContent];
+    [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPESTICKER completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+        [self updateTempMessage:message1 withResult:result];
+        if(result != nil){
+            NSLog(@"Message POST Success!");
+            [self loadMessages:self.channelId];
+        }else{
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+                [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
             }else{
-                if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
-                    [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
-                }else{
-                    NSLog(@"Message POST Failed!");
-                    [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-                }
+                NSLog(@"Message POST Failed!");
+                [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
             }
-        }];
+        }
+    }];
     [self reloadCollectionViewData];
 }
 
@@ -1667,6 +1534,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     
     liveColocationShareTimer += colocationTimer.timeInterval;
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    task.liveColocationShareTimer = liveColocationShareTimer;
+    [[CCConnectionHelper sharedClient].shareLocationTasks setObject:task forKey:self.channelId];
     //
     // Send "Stop" message if shared time is greater than configed time
     //
@@ -1730,6 +1600,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                       @"reply_to": colocationMessage.uid
                                       };
     [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPERESPONSE completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+        NSLog(@"Send stop sharing co-location");
         [self reloadCollectionViewData];
     }];
 }
@@ -1773,73 +1644,72 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 -(void)sendMessage:(NSString *)type content:(NSDictionary *)content{
     CCJSQMessage *message = [self appendTempMessage:type content:content];
     [self sendMsg:content channelId:self.channelId type:type message:message];
-
 }
 
 -(void)sendMessageFromInputToolbar:(NSDictionary *)content{
     CCJSQMessage *message = [self appendTempMessage:CC_RESPONSETYPEMESSAGE content:content];
     [self sendMsg:content channelId:self.channelId type:CC_RESPONSETYPEMESSAGE message:message];
 }
+
 - (void)sendMsg:(NSDictionary*)content channelId:(NSString*)channelId type:(NSString*)type message:(CCJSQMessage*)message {
 
     [[CCConnectionHelper sharedClient] sendMessage:content channelId:channelId type:type completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
         [self updateTempMessage:message withResult:result];
          if(result != nil){
-            NSLog(@"Message POST Success!");
-            self.inputToolbar.contentView.rightBarButtonItem.enabled = NO;
-             if(result[@"content"] != nil && ![result[@"content"] isEqual:[NSNull null]]) {
-                 NSDictionary *stickerContent = result[@"content"][CC_STICKERCONTENT];
-                 if(stickerContent != nil && stickerContent[CC_STICKER_DATA] != nil && ![stickerContent[CC_STICKER_DATA] isEqual:[NSNull null]]) {
-                     colocationMessage = message;
-                     colocationMessage.uid = result[@"id"];
-                     NSDictionary *stickerData = stickerContent[CC_STICKER_DATA];
-                     float preferredInterval;
-                     if(stickerData[@"preferred_interval"] != nil) {
-                         preferredInterval = [stickerData[@"preferred_interval"] floatValue];
-                     } else {
-                         preferredInterval = CC_COLOCATION_PREFERRED_INTERVAL;
-                     }
-                     
-                     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                     liveColocationShareTimer = 0;
-                     liveColocationShareDuration = (int)[userDefaults integerForKey:kCCUserDefaults_liveLocationDuration];
-                     CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
-                     ///
-                     /// 1. Remove old task if exists
-                     ///
-                     if (task != nil) {
-                         [[CCConnectionHelper sharedClient].shareLocationTasks removeObjectForKey:self.channelId];
-                     }
-                     
-                     ///
-                     /// 2. Create new task
-                     ///
-                     colocationTimer = [NSTimer scheduledTimerWithTimeInterval:preferredInterval target:self selector:@selector(sendUpdateColocationMessage) userInfo:nil repeats:YES];
-                     CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
-                     newTask.colocationTimer = colocationTimer;
-                     newTask.liveColocationShareTimer = liveColocationShareTimer;
-                     newTask.liveColocationShareDuration = liveColocationShareDuration;
-                     newTask.colocationMessage = colocationMessage;
-                     [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
-                     
-                     [self registerColocationBackgroundTask];
-                 }
-             }
-        }else{
-//            [self updateStatusForMessage:message sendSuccess:NO];
+             NSLog(@"Message POST Success!");
+             self.inputToolbar.contentView.rightBarButtonItem.enabled = NO;
+             [self processStartSharingLocationResponse:result message:message];
+         }else{
             if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
                 [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
             }else{
                 NSLog(@"Message POST Failed!");
-//                //If send fail, wait 3 second then retry
-//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//                    [NSThread sleepForTimeInterval:3.0];
-//                    [self sendMsg:content channelId:channelId type:type message:message];
-//                });
             }
         }
         [self reloadCollectionViewData];
     }];
+}
+
+-(void)processStartSharingLocationResponse: (NSDictionary *) result message:(CCJSQMessage *)message {
+    if(result[@"content"] != nil && ![result[@"content"] isEqual:[NSNull null]]) {
+        NSDictionary *stickerContent = result[@"content"][CC_STICKERCONTENT];
+        if(stickerContent != nil && stickerContent[CC_STICKER_DATA] != nil && ![stickerContent[CC_STICKER_DATA] isEqual:[NSNull null]] && [result[@"content"][CC_STICKER_TYPE] isEqualToString:CC_STICKERTYPECOLOCATION]) {
+            colocationMessage = [message copy];
+            colocationMessage.uid = result[@"id"];
+            NSDictionary *stickerData = stickerContent[CC_STICKER_DATA];
+            float preferredInterval;
+            if(stickerData[@"preferred_interval"] != nil) {
+                preferredInterval = [stickerData[@"preferred_interval"] floatValue];
+            } else {
+                preferredInterval = CC_COLOCATION_PREFERRED_INTERVAL;
+            }
+            
+            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+            liveColocationShareTimer = 0;
+            liveColocationShareDuration = (int)[userDefaults integerForKey:kCCUserDefaults_liveLocationDuration];
+            CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+            ///
+            /// 1. Remove old task if exists
+            ///
+            if (task != nil) {
+                [[CCConnectionHelper sharedClient].shareLocationTasks removeObjectForKey:self.channelId];
+            }
+            
+            ///
+            /// 2. Create new task
+            ///
+            colocationTimer = [NSTimer scheduledTimerWithTimeInterval:preferredInterval target:self selector:@selector(sendUpdateColocationMessage) userInfo:nil repeats:YES];
+            preferredTimeInterval = preferredInterval;
+            CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
+            newTask.colocationTimer = colocationTimer;
+            newTask.liveColocationShareTimer = liveColocationShareTimer;
+            newTask.liveColocationShareDuration = liveColocationShareDuration;
+            newTask.colocationMessage = colocationMessage;
+            [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
+            
+            [self registerColocationBackgroundTask];
+        }
+    }
 }
 
 -(void)pressSendButton:(UIButton*)button{
@@ -1925,7 +1795,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                             break;
                         }
                     }
-                    [oldStickerData setObject:oldUsers forKey:@"users"];
+                    if (oldUsers != nil) {
+                        [oldStickerData setObject:oldUsers forKey:@"users"];
+                    }
                     [oldStickerContent setObject:oldStickerData forKey:CC_STICKER_DATA];
                     [newContent setObject:oldStickerContent forKey:CC_STICKERCONTENT];
                 }
@@ -2325,9 +2197,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
      *  Override the defaults in `viewDidLoad`
      */
     CCJSQMessage *message = [self.messages objectAtIndex:indexPath.item];
-//    if ([message.senderId isEqualToString:self.senderId]) {
-//        return nil;
-//    }
     return [self.avatars objectForKey:message.senderId];
 }
 
@@ -2436,53 +2305,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     if(indexPath.item > 1) preMsg = [self.messages objectAtIndex:indexPath.item-1];
     
     NSLog(@"Index: %ld - type: %@", (long)indexPath.item, msg.type);
-    
-    
-    /* Dummy data
-    
-    // Dummy Suggestion
-    if( [msg.type  isEqualToString: CC_RESPONSETYPESUGGESTION]) {
-        NSMutableDictionary *content = [msg.content mutableCopy];
-        NSMutableDictionary *stickerAction = [content[@"sticker-action"] mutableCopy];
-        
-        NSArray *actionData = @[
-                                @{
-                                    @"label":@"Sticker1",
-                                    @"action": @[ @"reply:suggestion/sticker/0"],
-                                    @"sticker": @{
-//                                            @"sticker-type": @"xxx",
-                                            @"message": @{
-                                                    @"text": @"Is it good?"
-                                                    },
-                                            @"sticker-action": @{
-                                                    @"action-data" : @[
-                                                            @{
-                                                                @"label" : @"Yes",
-                                                                @"value" : @{
-                                                                        @"answer" : @(YES)
-                                                                        }
-                                                                },
-                                                            @{
-                                                                @"label" : @"No",
-                                                                @"value" : @{
-                                                                        @"answer" : @(NO)
-                                                                        }
-                                                                }
-                                                            ],
-                                                    @"action-type" : @"confirm"
-                                                    }
-                                            
-                                            }
-                                    }
-                                ];
-        [stickerAction setObject:actionData forKey:@"action-data"];
-        [content setObject:stickerAction forKey:@"sticker-action"];
-        msg.content = content;
-    }
-    
-    */
 
-    
     //
     // Get cell options
     //
@@ -2709,13 +2532,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 - (void)collectionView:(CCJSQMessagesCollectionView *)collectionView didTapCellAtIndexPath:(NSIndexPath *)indexPath touchLocation:(CGPoint)touchLocation
 {
-//    [self.inputTextView resignFirstResponder];
     NSLog(@"Tapped cell at %@!", NSStringFromCGPoint(touchLocation));
 }
 
 - (void)OtherContentTapped:(UITapGestureRecognizer *)sender
 {
-//    [self.inputTextView resignFirstResponder];
     NSLog(@"OtherContentTapped");
 }
 
@@ -2875,6 +2696,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             }
             navigationTitleView.title.text = self.orgName;
         }
+        
+        ///
+        /// Update right button items
+        ///
+        if([self isVideocallEnabled]) {
+            self.navigationItem.rightBarButtonItems = @[rightSpacer,videoCallButton, voiceCallButton];
+        } else {
+            self.navigationItem.rightBarButtonItems = nil;
+        }
     }
 }
 
@@ -2904,8 +2734,17 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     NSLog(@"add new object!");
     // update user video chat info
     self.userVideoChat = tempUserVideoChat;
+    //--------------------------------------------------------------------
+    //
+    //  Right button
+    //
+    //--------------------------------------------------------------------
+    if([self isVideocallEnabled]) {
+        self.navigationItem.rightBarButtonItems = @[rightSpacer, videoCallButton, voiceCallButton];
+    } else {
+        self.navigationItem.rightBarButtonItems = nil;
+    }
     [self updateLeftOfInputToolbar];
-//    NSLog(@"after update, userVideoChat: %@", [self.userVideoChat description]);
 }
 
 - (void)receiveMessageFromWebSocket:(NSString *)messageType uid:(NSNumber *)uid
@@ -2965,8 +2804,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             
             // re-display data
             [self.collectionView reloadData];
- //           [self scrollToBottomAnimated:YES];
-//            [self showCustomViewWithMessage:@""];
         }
     }
     NSLog(@"receiveReceiptFromWebSocket in ChatView");
@@ -3013,13 +2850,16 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     self.pendingFixedPhrase = choosenPhrase;
 }
 
-- (void)receiveInviteCall:(NSString *)messageId content:(NSDictionary *)content {
+- (void)receiveInviteCall:(NSString *)messageId channelId:(NSString *)channelId content:(NSDictionary *)content {
     NSString *apiKey = content[@"api_key"];
     NSString *sessionId = content[@"session"];
     NSString *actionCall = content[@"action"];
     NSMutableDictionary *callerInfo = [content[@"caller"] mutableCopy];
     NSArray *receiversList = content[@"receivers"];
-
+    if (channelId != nil && ![channelId isEqualToString:self.channelId]) {
+        return;
+    }
+        
     if (callerInfo != nil && receiversList != nil && receiversList.count > 0) {
         for (int i = 0; i < receiversList.count; i++) {
             NSString *userId = [receiversList[i][@"user_id"] stringValue];
@@ -3103,6 +2943,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 [self updateLeftOfInputToolbar];
             }
             [self loadDraftMessage];
+            [self loadLocalDisplayname:channelId];
         }
     }];
 }
@@ -3171,6 +3012,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                  {
                      [self loadLocalMessages:channelId];
                  }];
+                 
+                 [self loadLocalDisplayname:channelId];
             }];
             isInitializedJSQMessange = YES;
             isInitViewLocked = NO;
@@ -3196,36 +3039,31 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 }
 
 - (BOOL)isVideocallEnabled {
+    if ([self isAppVideocallEnabled] && [[CCConnectionHelper sharedClient] isSupportVideoChat] && [self processChannelUserVideoChatInfo]){
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
+- (BOOL)isAppVideocallEnabled {
     NSArray *stickers = [[CCConstants sharedInstance].stickers copy];
+    NSLog(@"stickers = %@", stickers);
     for (int i = 0;i < stickers.count; i++) {
-        if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
+        if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT] || [stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]) {
             return YES;
         }
     }
     return NO;
 }
 
-- (BOOL)processUserMeVideoChatInfo {
-    if(self.userVideoChat == nil || self.userVideoChat.count <= 0) {
-        return NO;
-    }
-    
-    if([CC_SDK_SUPPORT_VIDEO_CHAT_VERSION compare:CC_SDK_VERSION options:NSNumericSearch] == NSOrderedDescending) {
-        // current version is lower than minimum support version
-        return NO;
-    } else {
-        return YES;
-    }
-}
-
 - (BOOL)processChannelUserVideoChatInfo {
     if(self.userVideoChat == nil || self.userVideoChat.count <= 0) {
         return NO;
     }
-    
     for (NSDictionary *videoChat in self.userVideoChat) {
-        NSString *userId = [[NSUserDefaults standardUserDefaults] valueForKey:kCCUserDefaults_userId];
-        if([[videoChat objectForKey:@"id"] integerValue] != [userId integerValue] &&
+        NSLog(@"videoChatUser: %@(%@, %@) == %@",[videoChat objectForKey:@"id"],[videoChat objectForKey:@"display_name"], [videoChat objectForKey:@"can_use_video_chat"], self.uid);
+        if([[videoChat objectForKey:@"id"] integerValue] != [self.uid integerValue] &&
            [[videoChat objectForKey:@"can_use_video_chat"] boolValue] == YES) {
             return YES; // at least one user can video chat
         }
@@ -3466,8 +3304,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             [self.messages addObject:message];
         }
     }
-    //Load display name from channel
-    [self loadLocalDisplayname:channelId];
+
     if (readMessageUids != nil && readMessageUids.count>0) {
         if ([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable || CCLocalDevelopmentMode) {
             [[CCConnectionHelper sharedClient] sendMessageReceivedStatus:self.channelId messageIds:readMessageUids];
@@ -3483,66 +3320,42 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     newMessageView.hidden = YES;
     // try to resend failed message
     [self resendFailedMessage:self.channelId resendDelivering:NO];
+    [self sendStopSharingLocationIfNeed];
 }
 
 -(void)loadMessagesIfNeeded:(NSString *)channelId{
     ///TODO:Need to improve reducing load
-//    NSArray *channelArray = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:channelId];
-//    if(channelArray != nil && channelArray.count > 0){
-//        // get latest message from channel
-//        NSManagedObject *object   = [channelArray objectAtIndex:0];
-//        NSDictionary *lastMessage    = [NSKeyedUnarchiver unarchiveObjectWithData:[object valueForKey:@"latest_message"]];
-//        
-//        // get latest message from table message
-//        bool flagNeedLoadMessages = true;
-//        NSManagedObject *lastMessageInDB = [[CCCoredataBase sharedClient] selectLatestMessageWithChannel:channelId];
-//        NSNumber *lastId = nil;
-//        NSNumber *lastIdInDB = nil;
-//        if(lastMessage != nil && ![lastMessage isEqual:[NSNull null]]) {
-//            lastId = [lastMessage valueForKey:@"id"];
-//        }
-//        if(lastMessageInDB != nil && ![lastMessageInDB isEqual:[NSNull null]]) {
-//            lastIdInDB = [lastMessageInDB valueForKey:@"id"];
-//        }
-//        if(lastIdInDB != nil) {
-//            if(lastId == nil || [lastId intValue] == [lastIdInDB intValue]) {
-//                flagNeedLoadMessages = false;
-//            }
-//        }
-
-        //if(flagNeedLoadMessages && !([[CCConnectionHelper sharedClient] getNetworkStatus] == CCNotReachable && CCLocalDevelopmentMode == NO)) {
-        if([CCConnectionHelper sharedClient].currentView != nil) {
-            [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
-        }
-        if(!([[CCConnectionHelper sharedClient] getNetworkStatus] == CCNotReachable && CCLocalDevelopmentMode == NO)) {
-            [[CCConnectionHelper sharedClient] loadMessages:channelId
-                                               showProgress:NO
-                                                      limit:CCloadLoacalMessageLimit
-                                                     lastId:nil
-                                          completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation)
-             {
-                 if (result != nil) {
-                     if([CCConnectionHelper sharedClient].currentView != nil) {
-                         [CCSVProgressHUD dismiss];
-                     }
-                     [self loadLocalMessages:channelId];
-                 } else {
-                     [[CCConnectionHelper sharedClient] loadChannels:NO getChennelType:CCGetChannelsMine org_uid:nil limit:CCloadChannelFirstLimit lastUpdatedAt:nil completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
-                         NSArray *channelArray = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:self.channelId];
-                         if (channelArray.count == 0) {
-                             [self receiveDeleteChannelFromWebSocket];
-                         } else {
-                             if([CCConnectionHelper sharedClient].currentView != nil) {
-                                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
-                             }
-                         }
-                     }];
+    if([CCConnectionHelper sharedClient].currentView != nil) {
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
+    }
+    if(!([[CCConnectionHelper sharedClient] getNetworkStatus] == CCNotReachable && CCLocalDevelopmentMode == NO)) {
+        [[CCConnectionHelper sharedClient] loadMessages:channelId
+                                           showProgress:NO
+                                                  limit:CCloadLoacalMessageLimit
+                                                 lastId:nil
+                                      completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation)
+         {
+             if (result != nil) {
+                 if([CCConnectionHelper sharedClient].currentView != nil) {
+                     [CCSVProgressHUD dismiss];
                  }
-             }];
-        } else {
-            [self loadLocalMessages:channelId];
-        }
-//    }
+                 [self loadLocalMessages:channelId];
+             } else {
+                 [[CCConnectionHelper sharedClient] loadChannels:NO getChennelType:CCGetChannelsMine org_uid:nil limit:CCloadChannelFirstLimit lastUpdatedAt:nil completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+                     NSArray *channelArray = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:self.channelId];
+                     if (channelArray.count == 0) {
+                         [self receiveDeleteChannelFromWebSocket];
+                     } else {
+                         if([CCConnectionHelper sharedClient].currentView != nil) {
+                             [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
+                         }
+                     }
+                 }];
+             }
+         }];
+    } else {
+        [self loadLocalMessages:channelId];
+    }
 }
 
 -(void)loadMessages:(NSString *)channelId{
@@ -3572,11 +3385,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     int loadMessageNum = 0;
     if (messageArray.count >= limit) { ///coredata's setFetchBatchSize is not accurate, it may select more than it's limit
         endMessageIndex = (int)messageArray.count-(limit-1);
-//        loadMessageNum = limit-1;
         self.showLoadEarlierMessagesHeader = YES;
     }else{
         endMessageIndex = 0;
-//        loadMessageNum = (int)messageArray.count;
         self.showLoadEarlierMessagesHeader = NO;
     }
     for (int i = (int)messageArray.count-1; endMessageIndex <= i ; i--) {
@@ -3597,15 +3408,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     [self.collectionView reloadData];
 
     loadPreviousMessageNum++;
-//    NSUInteger finalRow = MAX(0, [self.collectionView numberOfItemsInSection:0] - 20*loadPreviousMessageNum);
-//    NSUInteger finalRow = MAX(0, [self.messages count] - 20);
     NSIndexPath *finalIndexPath = [NSIndexPath indexPathForItem:loadMessageNum inSection:0];
-//    CGSize finalCellSize = [self.collectionView.collectionViewLayout sizeForItemAtIndexPath:finalIndexPath];
-    
-//    CGFloat maxHeightForVisibleMessage = CGRectGetHeight(self.collectionView.bounds) - self.collectionView.contentInset.top - CGRectGetHeight(self.inputToolbar.bounds);
-    
-//    UICollectionViewScrollPosition scrollPosition = (finalCellSize.height > maxHeightForVisibleMessage) ? UICollectionViewScrollPositionBottom : UICollectionViewScrollPositionTop;
-    
     [self.collectionView scrollToItemAtIndexPath:finalIndexPath
                                 atScrollPosition:UICollectionViewScrollPositionTop
                                         animated:NO];
@@ -3768,23 +3571,16 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                                     }
                                             }
                                       };
-    CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
-    msg.type = CC_RESPONSETYPESTICKER;
-    msg.content = locationContent;
-    [[CCConnectionHelper sharedClient] sendMessage:msg.content channelId:self.channelId type:CC_RESPONSETYPESTICKER completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    
+    CCJSQMessage *message = [self appendTempMessage:CC_RESPONSETYPESTICKER content:locationContent];
+    [[CCConnectionHelper sharedClient] sendMessage:message.content channelId:self.channelId type:CC_RESPONSETYPESTICKER completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
         if(result != nil){
-            msg.uid = result[@"id"];
-            colocationMessage = msg;
-            
-            [[CCCoredataBase sharedClient] updateMessage:msg.uid withResponseContent:result[@"content"]];
-            for (CCJSQMessage *message in self.messages) {
-                if (message.uid == msg.uid) {
-                    message.content = result[@"content"];
-                    break;
-                }
-            }
+            [self updateTempMessage:message withResult:result];
+            colocationMessage = [message copy];
+            colocationMessage.uid = result[@"id"];
             [self.collectionView reloadData];
-            
+            [self loadLocalData:NO];
+            [CCSVProgressHUD dismiss];
             if(result[@"content"] != nil && ![result[@"content"] isEqual:[NSNull null]]) {
                 NSDictionary *stickerContent = result[@"content"][CC_STICKERCONTENT];
                 if(stickerContent != nil && stickerContent[CC_STICKER_DATA] != nil && ![stickerContent[CC_STICKER_DATA] isEqual:[NSNull null]]) {
@@ -3811,11 +3607,13 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                     /// 2. Create new task
                     ///
                     colocationTimer = [NSTimer scheduledTimerWithTimeInterval:preferredInterval target:self selector:@selector(sendUpdateColocationMessage) userInfo:nil repeats:YES];
+                    preferredTimeInterval = preferredInterval;
                     CCLiveLocationTask *newTask = [[CCLiveLocationTask alloc] init];
                     newTask.colocationTimer = colocationTimer;
                     newTask.liveColocationShareTimer = liveColocationShareTimer;
                     newTask.liveColocationShareDuration = liveColocationShareDuration;
                     newTask.colocationMessage = colocationMessage;
+                    
                     [[CCConnectionHelper sharedClient].shareLocationTasks setObject:newTask forKey:self.channelId];
                     [self registerColocationBackgroundTask];
                     ///
@@ -3829,6 +3627,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                         NSString *urlString = [stickerContent[CC_STICKERCONTENT_ACTION] objectAtIndex:0];
                         CCLiveLocationWebviewController *liveLocationWebviewController = [[CCLiveLocationWebviewController alloc] initWithNibName:@"CCLiveLocationWebviewController" bundle:SDK_BUNDLE];
                         liveLocationWebviewController.urlString = urlString;
+                        liveLocationWebviewController.channelID = self.channelId;
                         if ([[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId] != nil) {
                             liveLocationWebviewController.isSharingLocation = YES;
                         } else {
@@ -3850,11 +3649,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
             }else{
                 NSLog(@"Message POST Failed!");
-                //                //If send fail, wait 3 second then retry
-                //                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                //                    [NSThread sleepForTimeInterval:3.0];
-                //                    [self sendMsg:content channelId:channelId type:type message:message];
-                //                });
             }
         }
         [self reloadCollectionViewData];
@@ -3935,14 +3729,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
      *  3. Call `finishSendingMessage`
      */
     NSDictionary *content = @{@"text":text, @"uid":[self generateMessageUniqueId]};
-//    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
     self.inputToolbar.contentView.textView.text = @"";
     [self saveDraftMessage];
     self.inputToolbar.contentView.rightBarButtonItem.enabled = NO;
     [self sendMessageFromInputToolbar:content];
-//    }else{
-//        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
-//    }
     [self scrollToBottomAnimated:YES];
 }
 
@@ -3958,19 +3748,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         [self switchToKeyboard];
         isDisplayingStickerMenu = NO;
     } else {
-//        [self loadChannelInfo:self.channelId callbackHandler:^{
-            [self displayStickerMenu];
-            isDisplayingStickerMenu = YES;
-//        }];
+        [self displayStickerMenu];
+        isDisplayingStickerMenu = YES;
     }
-    
-//    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Media messages"
-//                                                       delegate:self
-//                                              cancelButtonTitle:@"Cancel"
-//                                         destructiveButtonTitle:nil
-//                                              otherButtonTitles:@"Send availability", @"Send location", nil];
-//    
-//    [sheet showFromToolbar:self.inputToolbar];
 }
 
 - (UIView *)createStickersMenuView {
@@ -3998,7 +3778,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 - (void)displaySuggestionWithActionData:(NSArray<NSDictionary*> *)actionData {
     
     UIScreen *screen = [UIScreen mainScreen];
-    CGRect frame = CGRectMake(0.0, 0.0, screen.bounds.size.width, 128);
+    CGRect frame = CGRectMake(0.0, 0.0, screen.bounds.size.width, keyboardHeight);
     
     NSArray *nibs = [SDK_BUNDLE loadNibNamed:@"CCSuggestionInputView" owner:nil options:0];
     CCSuggestionInputView *inputAccessoryView = [nibs lastObject];
@@ -4034,7 +3814,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     
     switch (buttonIndex) {
         case 0:
-//            [self.demoData addPhotoMediaMessage];
             /**
              *  These for calendar sticker
              */
@@ -4045,16 +3824,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         case 1:
         {
             [self pressLocation];
-//            __weak UICollectionView *weakView = self.collectionView;
-//            
-//            [self.demoData addLocationMediaMessageCompletion:^{
-//                [weakView reloadData];
-//            }];
         }
             break;
             
         case 2:
-//            [self.demoData addVideoMediaMessage];
             break;
     }
     [self finishSendingMessageAnimated:YES];
@@ -4105,6 +3878,47 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     [self resendListMessage:failedMessages];
 }
 
+-(void) sendStopSharingLocationIfNeed {
+    CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
+    if (task != nil) {
+        return;
+    }
+    ///
+    /// Try to send stop sharing location request if need
+    ///
+    for (CCJSQMessage *message in self.messages) {
+        NSString *stickerType = [message getStringAtPath:@"sticker-type"];
+        if(stickerType != nil && [stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
+            NSDictionary *stickerData = [message getDictionaryAtPath:@"sticker-content/sticker-data"];
+            if (stickerData != nil) {
+                NSArray *users = stickerData[@"users"];
+                if (users != nil && users.count > 0) {
+                    for(int i = 0; i < users.count; i++) {
+                        NSDictionary *user = users[i];
+                        if (user[@"id"] != nil && [[user[@"id"] stringValue] isEqualToString:self.uid]) {
+                            NSDictionary *locationContent = @{
+                                                              CC_STICKER_TYPE: CC_STICKERTYPECOLOCATION,
+                                                              CC_RESPONSETYPESTICKERCONTENT:
+                                                                  @{CC_STICKER_DATA :
+                                                                        @{
+                                                                            @"type": @"stop"
+                                                                            }
+                                                                    },
+                                                              @"reply_to": message.uid
+                                                              };
+                            [[CCConnectionHelper sharedClient] sendMessage:locationContent channelId:self.channelId type:CC_RESPONSETYPERESPONSE completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+                                NSLog(@"Send stop sharing co-location");
+                                [self reloadCollectionViewData];
+                            }];
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
 - (void) resendListMessage:(NSMutableArray *) messages
 {
     if (messages == nil || messages.count == 0) {
@@ -4139,7 +3953,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                             } else {
                                 self.onResendingFailedMessages = NO;
                                 message.status = CC_MESSAGE_STATUS_SEND_FAILED;
-//                                [self.sendingMessages removeObject:message];
                                 // Resend this image
                                 [self.collectionView reloadData];
                             }
@@ -4169,6 +3982,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 [messages removeObject:message];
                 [self resendListMessage:messages];
                 [self loadMessages:self.channelId];
+                
+                [self processStartSharingLocationResponse:result message:message];
             }else{
                 if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
                     [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
@@ -4257,146 +4072,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     
     CCStickerCollectionViewCellOptions options = [self getStickerCellOptionsForIndexPath:indexPath message:msg previousMessage:preMsg];
-    
-    /*
-    
-    ///Yes/No sticker(Production)
-    if ([msg.type isEqualToString:CC_RESPONSETYPEQUESTION]) {
-        float height;
-        if (msg.content[@"question"][@"description"] != nil && ![msg.content[@"question"][@"description"] isEqualToString:@""]) {
-            NSAttributedString *string = [[NSAttributedString alloc] initWithString:msg.content[@"question"][@"description"]];
-            UITextView* tempDiscriptionView = [[UITextView alloc] init];
-            tempDiscriptionView.textContainer.lineFragmentPadding = 0;
-            tempDiscriptionView.textContainerInset = UIEdgeInsetsMake(2, 5, 2, 5);
-            tempDiscriptionView.attributedText = string;
-            CGRect tempDiscriptionViewFrame = [string boundingRectWithSize:CGSizeMake(190, 1800)
-                                                                   options:NSStringDrawingUsesLineFragmentOrigin
-                                                                   context:nil];
-            tempDiscriptionViewFrame.size.width = 200;
-            tempDiscriptionViewFrame.origin.y = 20;
-            float discriptionViewHeight = tempDiscriptionViewFrame.size.height+10;
-            height = 50 + discriptionViewHeight;
-        }else{
-            height = 50;
-        }
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        return CGSizeMake(width, height);
-    }
-    
-    /// PDF sticker(Production)
-    if ([msg.type isEqualToString:CC_RESPONSETYPEPDF] && msg.content[@"text"]) {
-        NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:msg.content[@"text"]];
-        NSRange link = [msg.content[@"text"] rangeOfString:msg.content[@"text"]];
-        [string addAttributes:@{@"NSLink":msg.content[@"pdfUrl"]} range:link];
-        [string addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:link];
-        [string addAttribute:NSUnderlineStyleAttributeName value:@(NSUnderlineStyleSingle) range:link];
-        [string addAttribute:NSFontAttributeName value:[UIFont systemFontOfSize:14] range:link];
-        UITextView* tempDiscriptionView = [[UITextView alloc] init];
-        tempDiscriptionView.textContainer.lineFragmentPadding = 0;
-        tempDiscriptionView.textContainerInset = UIEdgeInsetsMake(10, 5, 5, 5);
-        tempDiscriptionView.attributedText = string;
-        CGRect tempDiscriptionViewFrame = [string boundingRectWithSize:CGSizeMake(163, 1800) options:NSStringDrawingUsesLineFragmentOrigin context:nil];
-        float discriptionViewHeight = tempDiscriptionViewFrame.size.height + 20;
-        float height = discriptionViewHeight;
-        ///name label
-        if (preMsg != nil && ![msg.senderId isEqual:self.uid] && [preMsg.senderId isEqual:self.uid]) {
-            height += 20;
-        }
-        ///date label
-        if ([self checkShowDateForMessageAtIndexPath:indexPath]) {
-            height += 20;
-        }
-        ///bottom label
-        if([self canShowStatusForMessage:msg]) {
-            height += 20;
-        }
-        
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        return CGSizeMake(width, height);
-    }
-    
-    /// Calendar dateTime sticker(Production)
-    if (msg.content[CC_CONTENTKEYDATETIMEAVAILABILITY] != nil) {
-        float height = 0;
-        ///title
-        NSString *titleString = CCLocalizedString(@"Here are some times that works for me.");
-        NSDictionary *titleStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:14.0f]};
-        NSMutableAttributedString *titleAttributeString = [[NSMutableAttributedString alloc] initWithString:titleString
-                                                                                                 attributes:titleStringAttributes];
-        UITextView *titleView = [[UITextView alloc] init];
-        titleView.textContainer.lineFragmentPadding = 0;
-        titleView.textContainerInset = UIEdgeInsetsMake(10, 10, 2, 10);
-        titleView.attributedText = titleAttributeString;
-        CGRect titleViewFrame = [titleAttributeString boundingRectWithSize:CGSizeMake(180, 1800)
-                                                                   options:NSStringDrawingUsesLineFragmentOrigin
-                                                                   context:nil];
-        float titleViewHeight = titleViewFrame.size.height + 15;
-        height += titleViewHeight;
-        ///discripton
-        NSString *discriptionString = CCLocalizedString(@"Choose a slot and tap to reply.");
-        NSDictionary *discriptionStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:11.0f]};
-        NSMutableAttributedString *discriptionAttributeString = [[NSMutableAttributedString alloc] initWithString:discriptionString
-                                                                                                       attributes:discriptionStringAttributes];
-        UITextView *discriptionView = [[UITextView alloc] init];
-        discriptionView.textContainer.lineFragmentPadding = 0;
-        discriptionView.textContainerInset = UIEdgeInsetsMake(2, 10, 0, 10);
-        discriptionView.attributedText = discriptionAttributeString;
-        CGRect discriptionViewFrame = [discriptionAttributeString boundingRectWithSize:CGSizeMake(180, 1800)
-                                                                   options:NSStringDrawingUsesLineFragmentOrigin
-                                                                   context:nil];
-        float discriptionViewHeight = discriptionViewFrame.size.height + 15;
-        height += discriptionViewHeight;
-        ///Choice container
-        NSArray *selectedDateTimes = msg.content[CC_CONTENTKEYDATETIMEAVAILABILITY];
-        for (CCDateTimes *dateTimes in selectedDateTimes) {
-            NSArray *times = dateTimes.times;
-            if (times.count == 0) continue;
-            height += (DATE_LABEL_HEIGHT+DATE_LABEL_MARGIN) + (CHOICE_HEIGHT+CHOICE_MARGIN)*(int)times.count;
-        }
-        height += 7.0; ///Bottom margin in the cell
-        ///name label
-        if (preMsg != nil && ![msg.senderId isEqual:self.uid] && [preMsg.senderId isEqual:self.uid]) {
-            height += 20;
-        }
-        ///date label
-        if ([self checkShowDateForMessageAtIndexPath:indexPath]) {
-            height += 20;
-        }
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        return CGSizeMake(width, height);
-    }
-    
-    ///Calendar sticker(Development)
-    if (msg.content[CC_RESPONSETYPEDATETIMEAVAILABILITY] != nil
-        && ![msg.content[CC_RESPONSETYPEDATETIMEAVAILABILITY] isEqual:[NSNull null]]
-        && [[CCConstants sharedInstance].stickers containsObject:CC_RESPONSETYPEDATETIMEAVAILABILITY])
-    {
-        NSArray *choices = msg.content[CC_RESPONSETYPEDATETIMEAVAILABILITY];
-        
-        if ([choices[0] isEqualToString:CC_RESPONSETYPETHUMB]) {
-            float height1 = 40;
-            float width1 = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-            return CGSizeMake(width1, height1);
-        }
-        float height = 74 + choices.count*38;
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        return CGSizeMake(width, height);
-    }
-    if ([msg.type isEqualToString:CC_STICKERTYPEIMAGE]) {
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        BOOL isDisplayStickerTopLabel = YES;
-        if ([msg.senderId isEqualToString:self.uid] || (preMsg != nil && [preMsg.senderId isEqualToString:msg.senderId])) {
-            isDisplayStickerTopLabel = NO;
-        }
-        float height = [CCCommonStickerCollectionViewCell estimateSizeForMessage:msg atIndexPath:indexPath hasPreviousMessage:preMsg displayStickerTopLabel:isDisplayStickerTopLabel withListUser:channelUsers].height;
-        if ([self canShowStatusForMessage:msg]) {
-            height += 20;
-        }
-        return CGSizeMake(width, height);
-    }
-    
-     */
-    
+
     //
     // Sticker
     //
@@ -4440,20 +4116,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     if ([msg.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
         float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
         return CGSizeMake(width, 80);
-        /*
-        float width = [collectionViewLayout sizeForItemAtIndexPath:indexPath].width;
-        BOOL isDisplayStickerTopLabel = NO;
-        float height = [CCCommonStickerCollectionViewCell estimateSizeForMessage:msg atIndexPath:indexPath hasPreviousMessage:preMsg displayStickerTopLabel:isDisplayStickerTopLabel withListUser:channelUsers].height;
-        height += 40;
-        return CGSizeMake(width, height);
-         */
     }
 
     //
     // Property
     //
     if([msg.type isEqualToString:CC_RESPONSETYPEPROPERTY]) {
-        //NGOCNH
         int height = 0;
         const int CELL_TOP_LABEL_HEIGHT = 20;
         const int STICKER_CONTAINER_MARGIN = 10;
@@ -4527,9 +4195,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                                              hasPreviousMessage:preMsg
                                                                         options:options
                                                                    withListUser:channelUsers].height;
-
-//        NSLog(@"Index: %ld - def h: %0.2f - cal h: %0.2f - displayS: %d", (long)indexPath.row, defaultHeight, height, isDisplayStickerTopLabel);
-        
         ///date label
         if ([self checkShowDateForMessageAtIndexPath:indexPath]) {
             if(indexPath.item % 3 != 0) {
@@ -4541,8 +4206,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         
         // button "Call again" height
         // 20160624 AppSocially Inc. hide "call again" of call message (temporary)
-//         height += 30;
-        
         
         NSLog(@"CALL Index: %ld height: %f", (long)indexPath.row, height);
         NSLog(@"*****");
@@ -4843,8 +4506,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
                         CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
                         msg.type = CC_RESPONSETYPESTICKER;
-                        msg.content = stickerContentToPost;
                         [stickerContentToPost setObject:[self generateMessageUniqueId] forKey:@"uid"];
+                        msg.content = stickerContentToPost;
                         
                         CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
                         [vc setMessage:msg];
@@ -4854,7 +4517,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
                         UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:vc];
                         [self presentViewController:rootNC animated:YES completion:^{
-//                            self.isReturnFromStickerView = YES;
+                            self.isReturnFromStickerView = YES;
                         }];
                         return;
                     }
@@ -4903,6 +4566,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 _isReturnFromStickerView = YES;
                 CCLiveLocationWebviewController *liveLocationWebviewController = [[CCLiveLocationWebviewController alloc] initWithNibName:@"CCLiveLocationWebviewController" bundle:SDK_BUNDLE];
                 liveLocationWebviewController.urlString = urlString;
+                liveLocationWebviewController.channelID = self.channelId;
                 CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
                 if (task != nil) {
                     liveLocationWebviewController.isSharingLocation = YES;
@@ -4913,21 +4577,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 liveLocationWebviewController.isOpenedFromWidgetMessage = YES;
                 [self.navigationController pushViewController:liveLocationWebviewController animated:YES];
             }
-//            else if ([urlString rangeOfString:@"open:sticker/location"].location != NSNotFound) {
-//                NSString *latKey = @"lat=", *lngKey = @"lng=";
-//                NSString *lat = @"", *lng = @"";
-//                lat = [urlString substringFromIndex:[urlString rangeOfString:latKey].location + [latKey length]];
-//                lat = [lat substringToIndex:[lat rangeOfString:@"&lng"].location];
-//                lng = [urlString substringFromIndex:[urlString rangeOfString:lngKey].location + [lngKey length]];
-//                
-//                if ([lat length] > 0 && [lng length] > 0) {
-//                    CCLocationPreviewViewController *locationPreviewViewController = [[CCLocationPreviewViewController alloc] initWithNibName:@"CCLocationPreviewViewController" bundle:nil];
-//                    [locationPreviewViewController setCoordinate:CLLocationCoordinate2DMake([lat doubleValue], [lng doubleValue])];
-//                    UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:locationPreviewViewController];
-//                    [self presentViewController:rootNC animated:YES completion:nil];
-//                }
-//                return;
-//            }
+            
             else if(i == count - 1) {
                 // open last item in safari if needed
                 [self openURL:[NSURL URLWithString:urlString]];
@@ -5076,10 +4726,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                             status:CC_MESSAGE_STATUS_DELIVERING];
     if (messages != nil && [messages count] > 0) {
         CCJSQMessage *message = [messages objectAtIndex:0];
-        if(![message.content[CC_STICKER_TYPE] isEqualToString:CC_STICKERTYPECOLOCATION]) {
-            [self.messages addObject:message];
-            [self.sendingMessages addObject:message];
-        }
+        [self.messages addObject:message];
+        [self.sendingMessages addObject:message];
         [self finishReceivingMessageAnimated:YES];
         return message;
     }
@@ -5116,7 +4764,56 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 }
 
 - (void)sendWidgetWithType:(NSString *)msgType andContent:(NSDictionary *)content {
-    [self sendMessage:msgType content:content];
+    if ([msgType isEqualToString:CC_STICKERTYPEIMAGE]) {
+        [self sendImage:msgType content:content];
+    } else {
+        [self sendMessage:msgType content:content];
+    }
+}
+
+- (void)sendImage:(NSString *)type content:(NSDictionary *)content {
+    CCJSQMessage *message = [self appendTempMessage:type content:content];
+    if (content[@"url"] != nil) {
+        [[CCImageHelper sharedInstance] loadLocalImage:content[@"url"] completionHandler:^(UIImage *imagelocal) {
+            if (imagelocal != nil) {
+                NSURL *assetURL = content[@"url"];
+                NSString *extension = [assetURL pathExtension];
+                CFStringRef imageUTI = (UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension,(__bridge CFStringRef)extension , NULL));
+                message.status = CC_MESSAGE_STATUS_DELIVERING;
+                [self sendImage:imagelocal imageUTI:imageUTI isShowAlert:NO completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                    [self updateTempMessage:message withResult:result];
+                    if(result != nil){
+                        NSLog(@"Message POST Success!");
+                        for (CCJSQMessage * msg in self.messages) {
+                            if ([msg.type isEqualToString:CC_STICKERTYPEIMAGE]){
+                                if ([msg.uid integerValue] == [message.uid integerValue]) {
+                                    [self.messages removeObject:msg];
+                                    [self.collectionView reloadData];
+                                    break;
+                                }
+                            }
+                        }
+                        [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
+                        [self.collectionView reloadData];
+                    }else{
+                        if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+                            [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
+                        }else{
+                            NSLog(@"Message POST Failed!");
+                            [self.sendingMessages removeObject:message];
+                            // Resend this image
+                            [self.collectionView reloadData];
+                            [self resendFailedMessage:self.channelId resendDelivering:YES];
+                        }
+                    }
+                }];
+            } else {
+                [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
+                message.status = CC_MESSAGE_STATUS_SEND_SUCCESS;
+                [self.collectionView reloadData];
+            }
+        }];
+    }
 }
 
 - (void)sendStickerWithType:(NSString *)msgType andContent:(NSDictionary *)content {

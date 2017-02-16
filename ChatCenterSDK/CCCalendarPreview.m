@@ -28,14 +28,6 @@ const int DATE_LABEL_MARGIN = 0;
 const int CHOICE_HEIGHT = 28;
 const int CHOICE_MARGIN = 10;
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -85,7 +77,6 @@ const int CHOICE_MARGIN = 10;
                               withListUser:nil];
     CCCommonStickerPreviewCollectionViewCell *previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
     previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, 10, previewCellSize.width, previewCellSize.height);
-//    [previewCell setMessage:msg atIndexPath:nil withListUser:nil];
     
     [previewCell setupWithIndex:nil message:msg avatar:nil delegate:nil options:0];
     

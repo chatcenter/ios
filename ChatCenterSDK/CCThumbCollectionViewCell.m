@@ -10,14 +10,6 @@
 
 @implementation CCThumbCollectionViewCell
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 - (void)awakeFromNib
 {
     [super awakeFromNib];
@@ -34,7 +26,6 @@
         self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
     }
 
-    
     self.avatarImage.image = avatar.avatarImage;
     
     UIButton *yesButton = (UIButton*)[self.choiceContainer viewWithTag:10];

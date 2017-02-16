@@ -124,7 +124,8 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     subtitleLabel.adjustsFontSizeToFitWidth = YES;
     [titleView addSubview:subtitleLabel];
     UIButton *closeButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, 40)];
-    [closeButton setTitle:CCLocalizedString(@"Cancel") forState:UIControlStateNormal];
+    [closeButton setImage:[[UIImage imageNamed:@"CCcancel_btn"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    closeButton.tintColor = [[CCConstants sharedInstance] baseColor];
     [closeButton setTitleColor:[UIColor colorWithRed:64/255.0 green:116/255.0 blue:185/255.0 alpha:1.0] forState:UIControlStateNormal];
     [closeButton.titleLabel setFont:[UIFont systemFontOfSize:16]];
     closeButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
@@ -189,8 +190,6 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     
     CCCommonStickerCollectionViewCell *cell;
     cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCCCommonStickerPreviewCollectionViewCell forIndexPath:indexPath];
-//    [cell setMessage:message atIndexPath:nil withListUser:nil];
-    
     
     [cell setupWithIndex:nil message:message avatar:nil delegate:nil options:CCStickerCollectionViewCellOptionShowAsWidget];
     
@@ -201,7 +200,6 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     }
     
     cell.stickerTopLabelHeight.constant = 20;
-//    [self addLineSpliterForView:cell];
     return cell;
 }
 
@@ -243,7 +241,6 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
             messageStr = @"";
         }
         title.text = messageStr;
-//        [self addLineSpliterForView:reusableview];
     }
     
     return reusableview;
@@ -262,18 +259,6 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     [vc setMessage:message];
     
     [self.navigationController pushViewController:vc animated:YES];
-    
-
-    
-/*
-    
-    if([message.type  isEqual: CC_RESPONSETYPEMESSAGE]) {
-        [self.delegate receivedChoosenPhrase:[message.content valueForKey:@"text"]];
-    } else {
-        [self.delegate sendStickerWithType:message.type andContent:message.content];
-    }
-    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
- */
 }
 
 #pragma mark - Collection view delegate flow layout overrides
@@ -286,13 +271,6 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     CGSize size = [CCCommonStickerPreviewCollectionViewCell estimateSizeForMessage:message atIndexPath:nil hasPreviousMessage:nil options:0 withListUser:nil];
     return size;
 }
-
-/*
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
-{
-    return CGSizeMake([UIScreen mainScreen].bounds.size.width, 30);
-}
- */
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForFooterInSection:(NSInteger)section
 {

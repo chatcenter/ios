@@ -20,7 +20,7 @@
 @property (nonatomic, copy) void (^webSocketDidOpenCallback)(void);
 @property (nonatomic, copy) void (^didReceiveAssignedCallback)(NSString *channelUid);
 @property (nonatomic, copy) void (^didReceiveUnassignedCallback)(NSString *channelUid);
-@property (nonatomic, copy) void (^didReceiveInviteCallCallback) (NSString *messageId, NSDictionary *content);
+@property (nonatomic, copy) void (^didReceiveInviteCallCallback) (NSString *messageId, NSString *channelId, NSDictionary *content);
 @property (nonatomic, copy) void (^didReceiveCallEventCallback) (NSString *messageId, NSDictionary *content);
 @property (nonatomic, copy) void (^didReceiveDeleteChannelCallback)(void);
 

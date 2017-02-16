@@ -10,10 +10,15 @@
 #import "ChatCenterPrivate.h"
 #import "CCLiveLocationStickerViewController.h"
 #import "CCConnectionHelper.h"
+#import "CCLiveLocationTask.h"
 #import "CCConstants.h"
 
 @interface CCLiveLocationWebviewController () {
     UILabel *liveLabel;
+    NSTimer *timer;
+    CCLiveLocationTask *task;
+    int duration;
+    int sharedTime;
 }
 @end
 
@@ -21,23 +26,32 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelID];
+    if (_isSharingLocation && task != nil) {
+        sharedTime = task.liveColocationShareTimer;
+        duration = task.liveColocationShareDuration * 60 - sharedTime;
+        timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateTimer) userInfo:nil repeats:YES];
+        _lbStopStartSharingLocation.text = CCLocalizedString(@"Stop");
+    }
     [self setupView];
 }
 
 -(void)setupView {
-    self.navigationController.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
     self.navigationItem.title = CCLocalizedString(@"Live Location");
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(pressBack)];
+    self.navigationItem.leftBarButtonItem = backButton;
+    
     self.automaticallyAdjustsScrollViewInsets = NO;
     _liveLocationActionButton.layer.borderWidth = 1;
     _liveLocationActionButton.layer.cornerRadius = 5;
     _liveLocationActionButton.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     if(!_isSharingLocation) {
-        [_liveLocationActionButton setTitle:CCLocalizedString(@"Share my Live Location") forState:UIControlStateNormal];
-    } else {
-        [_liveLocationActionButton setTitle:CCLocalizedString(@"Stop") forState:UIControlStateNormal];
-
+        _lbStopStartSharingLocation.text = CCLocalizedString(@"Share my Live Location");
     }
+}
 
+-(void) pressBack {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void) addLiveLabel {
@@ -68,6 +82,48 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [liveLabel removeFromSuperview];
+    [self stopTimer];
+}
+
+- (void) stopTimer {
+    if (timer != nil) {
+        [timer invalidate];
+        timer = nil;
+        if (_isSharingLocation) {
+            task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelID];
+            if (task != nil) {
+                task.liveColocationShareTimer = sharedTime;
+                [[CCConnectionHelper sharedClient].shareLocationTasks setObject:task forKey:self.channelID];
+            }
+        }
+    }
+}
+
+- (void) updateTimer {
+    sharedTime += 1;
+    int remainingTime = duration - sharedTime;
+    if (remainingTime < 0) {
+        remainingTime = 0;
+        _lbStopStartSharingLocation.text = CCLocalizedString(@"Share my Live Location");
+        _isSharingLocation = NO;
+        [self.delegate didStopSharingLiveLocation];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    
+    NSString *timeString = [self getFormattedTimeString:remainingTime];
+    _lbStopStartSharingLocation.text = timeString;
+}
+
+- (NSString *) getFormattedTimeString:(int) time {
+    int hours = time / 3600;
+    int minutes = (time - hours * 3600) / 60;
+    int seconds = time - hours * 3600 - minutes * 60;
+    
+    if (hours > 0) {
+            return [NSString stringWithFormat:@"%@\n%@", CCLocalizedString(@"Stop"), [NSString stringWithFormat:@"%02d:%02d:%02d", hours, minutes, seconds]];
+    } else {
+        return [NSString stringWithFormat:@"%@\n%@", CCLocalizedString(@"Stop"), [NSString stringWithFormat:@"%02d:%02d", minutes, seconds]];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -90,6 +146,7 @@
 
 - (IBAction)onLiveLocationButtonClicked:(id)sender {
     if(_isSharingLocation) {
+        _isSharingLocation = NO;
         [self.delegate didStopSharingLiveLocation];
         [self.navigationController popViewControllerAnimated:YES];
     } else {

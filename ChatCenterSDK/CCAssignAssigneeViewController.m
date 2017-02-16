@@ -41,6 +41,13 @@
     rightSpacer.width = 10;
     
     self.navigationItem.rightBarButtonItems = @[rightSpacer, rightMenuButton];
+    
+    UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCBackArrow"] style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
+    self.navigationItem.leftBarButtonItem = closeBtn;
+}
+
+-(void)closeModal {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -191,6 +198,7 @@
             NSString *iconUrl           = [result valueForKey:@"icon_url"];
             NSNumber *read              = [result valueForKey:@"read"];
             NSDictionary *channelInformations = result[@"channel_informations"];
+            NSDictionary *displayName = result[@"display_name"];
             ///name and directmessage are only used for team now
             NSString *name = @"";
             BOOL directMessage = NO;
@@ -214,7 +222,8 @@
                                                             lastUpdatedAt:lastUpdatedAt
                                                                      name:name
                                                            direct_message:directMessage
-                                                                 assignee:assignee])
+                                                                 assignee:assignee
+                                                             display_name:displayName])
             {
                 NSLog(@"updateChannel Success!");
             }else{

@@ -1,5 +1,5 @@
 /* 
-  ChatCenterSDK.strings Version 1.0.9
+  ChatCenterSDK.strings Version 1.1.0
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -36,7 +36,7 @@
 "Sent a sticker."       = "Sent a widget.";
 "Sent a question sticker."       = "Sent a question widget.";
 "Tap dates and time you are available" = "Tap dates and time you are available";
-"Choose the dates and times you are available" = "Choose the dates and times you are available";
+"Choose dates and times you are available" = "Choose dates and times you are available";
 "Availability" = "Availability";
 "Schedule" = "Schedule";
 "Next" = "Next";
@@ -93,14 +93,14 @@
 "Please try after a while"   = "Please try after a while";
 "Can not make connection"    = "Can not make connection";
 "Can not load data"          = "Can not load data";
-"Come online"                = "Come online";
+"Came online"                = "Came online";
 "Finished data load"         = "Finished data load";
 "Please select chat"         = "Please select chat";
 "Connection Failed"          = "Connection Failed. Please make sure internet.";
 "Inquired information"       = "Inquired information";
 "Inquired property"          = "Inquired property";
 "Failed uploading"           = "Failed uploading";
-"Please select the time"     = "Please select the time";
+"Please select at least 1 time slot."     = "Please select at least 1 time slot.";
 "Invalid URL"                = "Invalid URL";
 "Load Earlier Messages" = "Load Earlier Messages";
 
@@ -177,7 +177,7 @@
 "Address" = "Address";
 
 // calendar sticker
-//"calendar_sticker_time_format" = "h:mm a, EEE MMM d"; // 11:00 PM, Fri Jan 8
+"calendar_sticker_time_format" = "h:mm a, EEE MMM d"; // 11:00 PM, Fri Jan 8
 "calendar_sticker_time_format_from" = "h:mm a"; // 11:00 PM
 "calendar_sticker_time_format_to" = "h:mm a, EEE MMM d"; // 11:00 PM, Fri Jan 8
 "Please select your available time." = "Please select your available time.";
@@ -249,6 +249,9 @@
 "Log out" = "Log out";
 "Change apps" = "Please select an app";
 "Please input 2000 characters or less." = "Please input 2000 characters or less.";
+"Please input %d characters or less for question title." = "Please input %d characters or less for question title.";
+"Please input %d characters or less for question text." = "Please input %d characters or less for question text.";
+"Please select up to %d choices" = "Please select up to %d choices";
 "Option" = "Option";
 
 // Question Widget Editor
@@ -268,10 +271,23 @@
 "Settings" = "Settings";
 
 // Co-location
-"What kind of Location you want to share?" = "What kind of Location you want to share?";
+"What kind of Location do you want to share?" = "What kind of Location do you want to share?";
 "Send Venue" = "Send Venue";
 "Share Live Location" = "Share Live Location";
 "For how long do you want to share it?" = "For how long do you want to share it?";
 "Share my Live Location" = "Share my Live Location";
 "Live Location" = "Live Location";
 "Stop" = "Stop";
+
+// Login
+"Log In" = "Log In";
+"Log in with Facebook" = "Log in with Facebook";
+"Log in with Google" = "Log in with Google";
+"Log in with Yahoo!Japan" = "Log in with Yahoo!Japan";
+"Log in with Twitter" = "Log in with Twitter";
+"Log in with Email" = "Log in with Email";
+
+"Do you want to switch app?(Data will be initialized)" = "Do you want to switch app?(Data will be initialized)";
+"ChatCenter iO for iOS" = "ChatCenter iO for iOS";
+"Version" = "Version";
+"Open Dashboard" = "Open Dashboard";

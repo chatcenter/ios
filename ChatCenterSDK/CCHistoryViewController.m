@@ -230,24 +230,6 @@ int const CCRandomCircleAvatarTextOffset = 15;
         }
         self.navigationItem.rightBarButtonItem = nil;
         
-        //create a lable size to fit the Table View
-//        UILabel *messageLbl = [[UILabel alloc] initWithFrame:CGRectMake(0, 0,
-//                                                                        self.tableView.bounds.size.width,
-//                                                                        self.tableView.bounds.size.height)];
-        //set the message
-//        NSMutableParagraphStyle *style =  [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-//        style.alignment = NSTextAlignmentJustified;
-//        style.firstLineHeadIndent = 10.0f;
-//        style.headIndent = 10.0f;
-//        style.tailIndent = -10.0f;
-//        NSString *title = CC_VOIDHISTORYVIEW_MESSAGE;
-//        NSAttributedString *attrText = [[NSAttributedString alloc] initWithString:title attributes:@{ NSParagraphStyleAttributeName : style}];
-//        messageLbl.numberOfLines = 0;
-//        messageLbl.attributedText = attrText;
-//        messageLbl.textColor = [UIColor colorWithRed:51/255.0 green:51/255.0 blue:51/255.0 alpha:1.0];
-        //set back to label view
-//        self.tableView.backgroundView = messageLbl;
-        //no separator
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     }else{
         self.noCellMessage.hidden = YES;
@@ -262,8 +244,6 @@ int const CCRandomCircleAvatarTextOffset = 15;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-//    UITableViewCell *cell;
-//    cell   = [CCHistoryViewCell dequeueReusableCellWithIdentifier:@"Cell"];
     CCHistoryViewCell *cell = (CCHistoryViewCell*)[tableView dequeueReusableCellWithIdentifier:@"Cell"];
     UILabel *title          = (UILabel*)[cell viewWithTag:4];
     UILabel *lastMessage    = (UILabel*)[cell viewWithTag:1];
@@ -304,9 +284,6 @@ int const CCRandomCircleAvatarTextOffset = 15;
         displayDF.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
     }
     
-    //Optionally for time zone converstions
-    //[formatter setTimeZone:[NSTimeZone timeZoneWithName:@"JST"]];
-    //NSString *stringFromDate = [displayDF stringFromDate:[self.ChatLastUpdateDates objectAtIndex:indexPath.row]];
     NSString *stringFromDate = [displayDF stringFromDate:labels[@"lastUpdatedAt"]];
     lastUpdateDate.text     = stringFromDate;
     ///icon_image
@@ -416,7 +393,7 @@ int const CCRandomCircleAvatarTextOffset = 15;
                                        @"unreadMessageNum":@"0"};
         [self.ChannelLabels insertObject:channelLabel atIndex:indexPath.row];
         // Show right side menu button
-        if([self isVideocallEnabled]) {
+        if ([self isVideocallEnabled:labels[@"canUseVideoChat"]]){
             self.chatAndHistoryViewController.navigationItem.rightBarButtonItems = @[_rightSpacer, _inforButton, _videoCallButton, _voiceCallButton];
         } else {
             self.chatAndHistoryViewController.navigationItem.rightBarButtonItems = @[_rightSpacer, _inforButton];
@@ -511,18 +488,6 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         NSLog(@"scrollViewDidEndDeceleratingTop");
     }
 }
-
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 #pragma mark - View Setup
 - (BOOL)hideNaviShadowWithView:(UIView *)view
@@ -803,8 +768,15 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     }
 }
 
-#pragma mark - CCConectionHelper delegate
-- (BOOL)isVideocallEnabled {
+- (BOOL)isVideocallEnabled:(NSArray *)userVideoChat{
+    if ([self isAppVideocallEnabled] && [[CCConnectionHelper sharedClient] isSupportVideoChat] && [self processChannelUserVideoChatInfo:userVideoChat]){
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
+- (BOOL)isAppVideocallEnabled {
     NSArray *stickers = [[CCConstants sharedInstance].stickers copy];
     for (int i = 0;i < stickers.count; i++) {
         if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
@@ -813,6 +785,23 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     }
     return NO;
 }
+
+- (BOOL)processChannelUserVideoChatInfo:(NSArray *)userVideoChat{
+    if(userVideoChat == nil || userVideoChat.count <= 0) {
+        return NO;
+    }
+    
+    for (NSDictionary *videoChat in userVideoChat) {
+        NSString *userId = [[NSUserDefaults standardUserDefaults] valueForKey:kCCUserDefaults_userId];
+        if([[videoChat objectForKey:@"id"] integerValue] != [userId integerValue] &&
+           [[videoChat objectForKey:@"can_use_video_chat"] boolValue] == YES) {
+            return YES; // at least one user can video chat
+        }
+    }
+    return NO;
+}
+
+#pragma mark - CCConectionHelper delegate
 
 - (void)closeChatView{
     [self pressClose:nil];
@@ -914,9 +903,9 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     [self loadLocalChannles:NO lastUpdatedAt:nil];
 }
 
-- (void)receiveInviteCall:(NSString *)messageId content:(NSDictionary *)content{
+- (void)receiveInviteCall:(NSString *)messageId channelId:(NSString *)channelId content:(NSDictionary *)content{
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
-        [self.chatAndHistoryViewController.chatViewController receiveInviteCall:messageId content:content];
+        [self.chatAndHistoryViewController.chatViewController receiveInviteCall:messageId channelId:channelId content:content];
     }
 }
 
@@ -985,6 +974,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         NSData *usersData       = [object valueForKey:@"users"];
         NSString *status       = [object valueForKey:@"status"];
         NSArray *users          = [NSKeyedUnarchiver unarchiveObjectWithData:usersData];
+        NSDictionary *displayName = [NSKeyedUnarchiver unarchiveObjectWithData:[object valueForKey:@"display_name"]];
         NSMutableArray *usersVideoChat = [[NSMutableArray alloc] init];
         
         ///duplicate check
@@ -1075,7 +1065,19 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                 }
             }else{
                 ///Display names of chat members
-                ChannelDisplayNames = names;
+                if ([CCConstants sharedInstance].isAgent == YES){
+                    if (displayName == nil) {
+                        ChannelDisplayNames = CCLocalizedString(@"Guest");
+                    } else {
+                        ChannelDisplayNames = displayName[@"admin"];
+                    }
+                }else{
+                    if (displayName == nil) {
+                        ChannelDisplayNames = orgName;
+                    } else {
+                        ChannelDisplayNames = displayName[@"guest"];
+                    }
+                }
             }
         }
         ///create avatar image if no avatar yet(Agent isn't assigned yet)

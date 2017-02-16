@@ -26,6 +26,9 @@ const int CCloadLoacalUserLimit = 10000;
 const int CCloadLoacalOrgLimit = 10000;
 const int CCdeleteLoacalLimit = 10000;
 const int CCInputTextLimit = 2000;
+const int CCWidgetInputTitleLimit = 100;
+const int CCWidgetInputChoiceTextLimit = 100;
+const int CCWidgetInputNumberChoiceLimit = 10;
 
 const int CCImageMaxSize = 100 * 1024; //Kilobytes
 

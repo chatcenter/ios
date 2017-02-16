@@ -19,6 +19,7 @@
     BOOL is24h;
     NSMutableArray *addedSlotViews;
     CCCalendarTimeSlotView *draggedSlotView;
+    CCCalendarTimeViewBorder *border;
 }
 
 @end
@@ -175,7 +176,11 @@ const int SWIPE_MOVEMENT = 60;
 #endif
     NSDateComponents *crtComponents = [[NSCalendar currentCalendar] components:flags fromDate:crtDate];
     CGFloat height = columnHeight*(crtComponents.hour + (float)crtComponents.minute/60) + (float)columnHeight/2 -SCROLL_VIEW_OFFSET - (float)borderLineHeight/2;
-    CCCalendarTimeViewBorder *border = [[CCCalendarTimeViewBorder alloc] initWithFrame:CGRectMake(0,height ,width, borderLineHeight)];
+    
+    if(border != nil) {
+        [border removeFromSuperview];
+    }
+    border = [[CCCalendarTimeViewBorder alloc] initWithFrame:CGRectMake(0,height ,width, borderLineHeight)];
     [self addSubview:border];
     ///Scroll to current time
     CGRect frame = self.frame;
@@ -224,34 +229,6 @@ const int SWIPE_MOVEMENT = 60;
         [addedSlotViews addObject:calendarTimeSlotView];
     }
     [self resetProperties];
-    
-    //--------------------------------------------------------------------
-    //
-    // Old Version
-    //
-    //--------------------------------------------------------------------
-//    for (int i = 0; i < self.hourTimes.count; i++) {
-//        CCCalendarTimeView *timeView = self.hourTimes[i];
-//        
-//        CCHourTime *topHourTime = timeView.topHourTimeButton.hourTime;
-//        CCHourTime *bottomHourTime = timeView.bottomHourTimeButton.hourTime;
-//        NSPredicate *topPredicate = [NSPredicate
-//                                     predicateWithFormat:@"startHour == %@ AND startTime == %@", topHourTime.startHour, topHourTime.startTime];
-//        NSArray *topResult = [selectedHourTimes filteredArrayUsingPredicate:topPredicate];
-//        if (topResult.count > 0) {
-//            timeView.selectedTopView.alpha = 1;
-//        }else{
-//            timeView.selectedTopView.alpha = 0;
-//        }
-//        NSPredicate *bottomPredicate = [NSPredicate
-//                                        predicateWithFormat:@"startHour == %@ AND startTime == %@", bottomHourTime.startHour, bottomHourTime.startTime];
-//        NSArray *bottomResult = [selectedHourTimes filteredArrayUsingPredicate:bottomPredicate];
-//        if (bottomResult.count > 0) {
-//            timeView.selectedBottomView.alpha = 1;
-//        }else{
-//            timeView.selectedBottomView.alpha = 0;
-//        }
-//    }
 }
 
 #pragma mark - Drag events

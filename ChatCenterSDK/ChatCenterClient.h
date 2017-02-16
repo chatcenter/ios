@@ -119,12 +119,6 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 ///App
 - (void)getApps:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
 - (void)getAppManifest:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
-///Video call
-//- (void)getVideoAccessToken:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
-//- (void)getReceiverIdentityWithChannelId:(NSString *)channelId
-//                                  caller:(NSDictionary *)callerInfo
-//                               receivers:(NSArray *)receiversList
-//                       completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
 
 #pragma mark - Video Call
 - (void) getCallIdentity: (NSString *) channelId
@@ -155,4 +149,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                          funnelId:(NSString *)funnelId
                      showProgress:(BOOL)showProgress
                 completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
+
+//Video chat
+- (BOOL)isSupportVideoChat;
 @end

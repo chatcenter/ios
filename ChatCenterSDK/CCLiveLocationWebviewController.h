@@ -10,8 +10,11 @@
 #import "CCChatViewController.h"
 
 @interface CCLiveLocationWebviewController : UIViewController<UIWebViewDelegate>
+@property (strong, nonatomic) NSString *channelID;
 @property (strong, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) IBOutlet UIButton *liveLocationActionButton;
+@property (weak, nonatomic) IBOutlet UILabel *lbStopStartSharingLocation;
+
 @property (nonatomic, strong) NSString *urlString;
 @property (nonatomic) BOOL isSharingLocation;
 @property id<CCLiveLocationWidgetDelegate> delegate;

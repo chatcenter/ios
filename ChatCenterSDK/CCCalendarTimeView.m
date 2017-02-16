@@ -21,14 +21,6 @@
 
 const int LIMIT_OF_MOVEMENT = 20;
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -74,42 +66,6 @@ const int LIMIT_OF_MOVEMENT = 20;
     dispatched = NO;
     return self;
 }
-
-
-//- (id)initWithFrame:(CGRect)frame {
-//    self = [super initWithFrame:frame];
-//    if (self) {
-//        CCCalendarTimeView *nib = [[[UINib nibWithNibName:@"CCCalendarTimeView" bundle:nil] instantiateWithOwner:self options:nil] objectAtIndex:0];
-//        nib.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-//        [self addSubview:nib];
-//    }
-//    return self;
-//}
-
-//- (id)initWithFrameAndLabels:(CGRect)frame
-//               timeLabelText:(NSString *)timeLabelText
-//            topTimeLabelText:(NSString *)topTimeLabelText
-//         bottomTimeLabelText:(NSString *)bottomTimeLabelText
-//                 topHourTime:(CCHourTime *)topHourTime
-//              bottomHourTime:(CCHourTime *)bottomHourTime
-//                    delegate:(id)delegate
-//{
-//    self = [super initWithFrame:frame];
-//    if (self) {
-//        CCCalendarTimeView *nib = [[[UINib nibWithNibName:@"CCCalendarTimeView" bundle:nil] instantiateWithOwner:self options:nil] objectAtIndex:0];
-//        nib.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
-//        nib.timeLabel.text = timeLabelText;
-//        nib.topTimeLabel.text = topTimeLabelText;
-//        nib.bottomTimeLabel.text = bottomTimeLabelText;
-//        nib.topHourTimeButton.hourTime = topHourTime;
-//        nib.bottomHourTimeButton.hourTime = bottomHourTime;
-//        nib.delegate = delegate;
-//        isDragging = NO;
-//        dispatched = NO;
-//        [self addSubview:nib];
-//    }
-//    return self;
-//}
 
 - (IBAction)pressSelectedTopView:(id)sender {
     isDragging = NO;

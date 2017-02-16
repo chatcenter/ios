@@ -30,7 +30,7 @@
     - (void)receiveUnassignFromWebSocket:(NSString *)channelUid;
     - (void)receiveFollowFromWebSocket:(NSString *)channelUid;
     - (void)receiveUnfollowFromWebSocket:(NSString *)channelUid;
-    - (void)receiveInviteCall:(NSString *)messageId content:(NSDictionary *) content;
+    - (void)receiveInviteCall:(NSString *)messageId channelId:(NSString *)channelId content:(NSDictionary *) content;
     - (void)receiveCallEvent:(NSString *)messageId content:(NSDictionary *) content;
     - (void)closeChatView;
     - (void)reloadLocalDataWhenComeOnline;

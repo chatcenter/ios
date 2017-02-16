@@ -4,6 +4,9 @@
 target 'Example' do
   pod 'ChatCenterSDK', :git => "https://github.com/chatcenter/ios.git"
   pod 'OpenTok'
+  pod 'GoogleMaps'
+  pod 'GooglePlaces'
+  pod 'GooglePlacePicker'
 
   # Uncomment this line if you're using Swift or would like to use dynamic frameworks
   # use_frameworks!

@@ -15,12 +15,8 @@
 - (void)didSelectLocationWithLatitude:(double)latitude longitude:(double)longitude address:(NSString*)address;
 @end
 
-@interface CCLocationStickerViewController : UIViewController <UISearchBarDelegate, CLLocationManagerDelegate>
+@interface CCLocationStickerViewController : UIViewController <CLLocationManagerDelegate>
 @property (nonatomic, strong) CLLocationManager *locationManager;
-@property (weak, nonatomic) IBOutlet UISearchBar *searchInput;
-@property (weak, nonatomic) IBOutlet MKMapView *mapView;
-@property (weak, nonatomic) IBOutlet UIButton *localLocation;
 @property (nonatomic, weak) id<CCCommonWidgetEditorDelegate> delegate;
 @property BOOL isLocalLocationActive;
-
 @end

@@ -1,11 +1,10 @@
-# ChatCenteriO iOS SDK Installation guide Ver. 1.0.8
+# ChatCenteriO iOS SDK Installation guide Ver. 1.1.0
 
 ## Table of contents
 * [Getting Started](#GettingStarted)
 	* [1. Download sample project](#DLSample)
 	* [2. Pod install](#PodInstall)
-	* [3. Set app org](#SetAppOrg)
-	* [4. Launch app](#LaunchApp)
+	* [3. Launch app](#LaunchApp)
 * [Install SDK in to your app](#InstallYourApp)
 	* [1. Setting of Xcode](#SettingOfXcode)
 	* [2. Set App Token](#SetAppToken)
@@ -30,14 +29,8 @@ Example project is included.
 #### 2. Pod install
 Please execute pod install in the Example folder
 
-<a id="SetAppOrg"></a>
-#### 3. Set app org
-<p align="center"><img src="InstallationImages/sample1.png"></p>
-Open the sample project and set app org in ViewController.m.
-You can check the application token and team ID from the dashboard.
-
 <a id="LaunchApp"></a>
-#### 4. Launch app
+#### 3. Launch app
 <p align="center"><img src="InstallationImages/sample2.png" width="320"></p>
 
 <a id="InstallYourApp"></a>
@@ -56,6 +49,9 @@ Ex)
 target 'TargetName' do
 pod 'ChatCenterSDK', :git => "https://github.com/chatcenter/ios.git"
 pod 'OpenTok'
+pod 'GoogleMaps'
+pod 'GooglePlaces'
+pod 'GooglePlacePicker'
 end
 ```
 
@@ -93,7 +89,7 @@ Since there is a PCH file in ChatCenterSDK please go through the path.
 As shown below, specify "Project (path below project) / ChatCenterSDK / ChatCenter.pch" in Project> Build Settings> Apple LLVM 7.0 - Language> Prefix Header.
 <p align="center"><img src="InstallationImages/pch.png" width="640"></p>
 
-**Add OpenTok library**  
+**Add OpenTok/Google Maps library**  
 OpenTok is a library of voice / video chats used within ChatCenterSDK.
 Please add the following to your Podfile.
 
@@ -101,6 +97,9 @@ Please add the following to your Podfile.
 Ex)
 target 'TargetName' do
 pod 'OpenTok'
+pod 'GoogleMaps'
+pod 'GooglePlaces'
+pod 'GooglePlacePicker'
 end
 ```
 

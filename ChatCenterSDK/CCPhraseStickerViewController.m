@@ -56,9 +56,6 @@
              //Received list of phrases, show them on tableview             
              fixedPhrases = [[NSMutableArray alloc] initWithArray:[result objectForKey:@"org"]];
              editablePhrases = nil;
-             ///Invisible til completing editable fixed phrase
-//             editablePhrases = [[NSMutableArray alloc] initWithArray:[result objectForKey:@"user"]];
-             
              [self.phraseListView reloadData];
          }else{
              NSLog(@"Can not Get Fixed Phrases");

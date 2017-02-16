@@ -21,15 +21,6 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
-    /*
-    self.stickerContainer.layer.borderWidth = 0.8f;
-    self.stickerContainer.backgroundColor = [UIColor whiteColor];
-    
-    self.stickerContainer.backgroundColor = [[CCConstants sharedInstance] baseColor];
-    stickerActionsContainer.backgroundColor = [UIColor whiteColor];
-    stickerActionsContainer.backgroundColor = [UIColor whiteColor];
-     */
 }
 
 - (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)inDelegate options:(CCStickerCollectionViewCellOptions)options {

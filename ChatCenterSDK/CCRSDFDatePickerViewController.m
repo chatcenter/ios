@@ -41,23 +41,6 @@
     self.navigationItem.leftBarButtonItem = button;
     self.markedDates = [[NSMutableDictionary alloc] init];
     [UINavigationBar appearance].tintColor    = [UIColor blackColor];
-//    NSCalendar *calendar = [NSCalendar currentCalendar];
-//    NSDateComponents *todayComponents = [calendar components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];
-//    NSDate *today = [calendar dateFromComponents:todayComponents];
-//    
-//    NSArray *numberOfDaysFromToday = @[@(-8), @(-2), @(-1), @(0), @(2), @(4), @(8), @(13), @(22)];
-//    
-//    NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
-//    self.markedDates = [[NSMutableDictionary alloc] initWithCapacity:[numberOfDaysFromToday count]];
-//    [numberOfDaysFromToday enumerateObjectsUsingBlock:^(NSNumber *numberOfDays, NSUInteger idx, BOOL *stop) {
-//        dateComponents.day = [numberOfDays integerValue];
-//        NSDate *date = [calendar dateByAddingComponents:dateComponents toDate:today options:0];
-//        if ([date compare:today] == NSOrderedAscending) {
-//            self.markedDates[date] = @YES;
-//        } else {
-//            self.markedDates[date] = @NO;
-//        }
-//    }];
 }
 
 #pragma mark - Custom Accessors
@@ -78,7 +61,6 @@
 
 - (void)datePickerView:(CCRSDFDatePickerView *)view didSelectDate:(NSDate *)date
 {
-//    [[[UIAlertView alloc] initWithTitle:@"Picked Date" message:[date description] delegate:nil cancelButtonTitle:@":D" otherButtonTitles:nil] show];
     [self.markedDates setObject:@"1" forKey:date];
     [_datePickerView reloadData];
 }
@@ -93,24 +75,6 @@
 
 - (NSDictionary *)datePickerViewMarkedDates:(CCRSDFDatePickerView *)view
 {
-//	NSCalendar *calendar = [NSCalendar currentCalendar];
-//    NSDateComponents *todayComponents = [calendar components:(NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit) fromDate:[NSDate date]];
-//    NSDate *today = [calendar dateFromComponents:todayComponents];
-//    
-//    NSArray *numberOfDaysFromToday = @[@(-8), @(-2), @(-1), @(0), @(2), @(4), @(8), @(13), @(22)];
-//    
-//    NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
-//    self.markedDates = [[NSMutableDictionary alloc] initWithCapacity:[numberOfDaysFromToday count]];
-//    [numberOfDaysFromToday enumerateObjectsUsingBlock:^(NSNumber *numberOfDays, NSUInteger idx, BOOL *stop) {
-//        dateComponents.day = [numberOfDays integerValue];
-//        NSDate *date = [calendar dateByAddingComponents:dateComponents toDate:today options:0];
-//        if ([date compare:today] == NSOrderedAscending) {
-//            self.markedDates[date] = @YES;
-//        } else {
-//            self.markedDates[date] = @NO;
-//        }
-//    }];
-    
     return [self.markedDates copy];
 }
 
@@ -125,7 +89,7 @@
 
 
 /**
- * 次へボタンがタップされたとき
+ * When clicked on Done button
  */
 - (void)pressDone:(id)sender
 {
@@ -140,12 +104,6 @@
     }
     [[CCConnectionHelper sharedClient] setDatepicker:str];
     [self dismissViewControllerAnimated:YES completion:nil];
-    
-//    [[[UIAlertView alloc] initWithTitle:@"Picked Date"
-//                                message:str
-//                               delegate:nil
-//                      cancelButtonTitle:@":D"
-//                      otherButtonTitles:nil] show];
 }
 
 @end

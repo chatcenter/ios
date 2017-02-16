@@ -34,9 +34,6 @@
     self.stickerContainer.layer.borderWidth = 0.5f;
     self.stickerContainer.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     self.stickerContainer.layer.cornerRadius = 8.0f;
-
-//    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(detectedTapGesture:)];
-//    [self addGestureRecognizer:tapGestureRecognizer];
     
     UILongPressGestureRecognizer *longTapGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(detectedLongTapGesture:)];
     [self.contentView addGestureRecognizer:longTapGestureRecognizer];

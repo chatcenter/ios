@@ -10,8 +10,9 @@
 #import "CCQuestionEditorCellDelegate.h"
 #import "CCQuestionWidgetEditorViewController.h"
 #import "CCBaseQuestionWidgetPaneViewController.h"
+#import "CCConstants.h"
 
-@interface CCSingleSelectionPaneController : CCBaseQuestionWidgetPaneViewController<UITableViewDelegate, UITableViewDataSource, CCQuestionEditorCellDelegate>
+@interface CCSingleSelectionPaneController : CCBaseQuestionWidgetPaneViewController<UITableViewDelegate, UITableViewDataSource, CCQuestionEditorCellDelegate, UITextFieldDelegate>
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) IBOutlet NSLayoutConstraint *tableViewHeightConstraint;
 - (BOOL) validInput;

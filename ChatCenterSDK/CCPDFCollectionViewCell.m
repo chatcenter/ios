@@ -105,11 +105,8 @@
 {
     [super awakeFromNib];
     self.stickerContainer.layer.borderWidth = 0.8f;
-//    self.stickerContainer.backgroundColor = [CCConstants defaultBaseColor];
     self.stickerContainer.backgroundColor = [UIColor whiteColor];
     self.stickerContainer.layer.cornerRadius = 14.0f;
-//    self.stickerContainer.backgroundColor = [UIColor colorWithHue:0 saturation:0 brightness:0.83 alpha:0.5];
-//    self.stickerContainer.backgroundColor = [UIColor colorWithHue:146/360 saturation:0.67 brightness:0.55 alpha:0.5];
 }
 
 @end

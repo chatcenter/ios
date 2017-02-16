@@ -276,7 +276,7 @@
         if (self.didReceiveInviteCallCallback && [messageType isEqualToString:CC_RESPONSETYPECALLINVITE])
         {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.didReceiveInviteCallCallback(uid, content);
+                self.didReceiveInviteCallCallback(uid, channelUid, content);
             });
             return;
         }
@@ -599,51 +599,7 @@
                 self.didReceiveReceiptCallback(channelUid, messages, userUid, userAdmin);
             });
         }
-    }else if([arguments[0] isEqualToString:@"message:link"]) {  ///TODO: This may not be used but I remain just incase 
-        ///null/type check
-//        if (![arguments[1] isKindOfClass:[NSDictionary class]] || [arguments[1] isEqual:[NSNull null]])
-//        {
-//            return;
-//        }
-//        NSLog(@"message: %@", arguments[1]);
-//        NSDictionary *argument = arguments[1];
-//        
-//        ///null check
-//        if ([[argument valueForKeyPath:@"content"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"channel_uid"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"created"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"id"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"user"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"user.display_name"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"user.id"] isEqual:[NSNull null]] || [[argument valueForKeyPath:@"content.link"] isEqual:[NSNull null]]){
-//            return;
-//        }
-//        id content      = [argument valueForKeyPath:@"content"];
-//        id channelId    = [argument valueForKeyPath:@"channel_uid"];
-//        id created      = [argument valueForKeyPath:@"created"];
-//        id uid          = [argument valueForKeyPath:@"id"];
-//        id user         = [argument valueForKeyPath:@"user"];
-//        id displayName  = [argument valueForKeyPath:@"user.display_name"];
-//        id userUid      = [argument valueForKeyPath:@"user.id"];
-//        id userIconUrl  = [argument valueForKeyPath:@"user.icon_url"];
-//        
-//        //type check
-//        if (![channelId isKindOfClass:[NSString class]] || ![message isKindOfClass:[NSString class]] || ![created isKindOfClass:[NSNumber class]] || ![uid isKindOfClass:[NSNumber class]] || ![user isKindOfClass:[NSDictionary class]] || ![displayName isKindOfClass:[NSString class]] || ![userUid isKindOfClass:[NSNumber class]])
-//        {
-//            return;
-//        }
-//        NSTimeInterval interval = [created doubleValue];
-//        NSDate *date = [NSDate dateWithTimeIntervalSince1970:interval];
-//        NSNumber *uidNum = uid;
-//        NSString *userUidStr = [userUid stringValue];
-//        if([[CCCoredataBase sharedClient] insertMessage:uidNum content:content date:[NSDate date] channelUid:channelId user:user usersReadMessage:[[NSArray alloc]init]]){
-//            NSLog(@"insertMessage Success!");
-//        }else{
-//            NSLog(@"insertMessage Error!");
-//        }
-//        if (self.didReceiveMessageCallback)
-//        {
-//            dispatch_async(dispatch_get_main_queue(), ^{
-//                
-//                self.didReceiveMessageCallback(uidNum, content, channelId, userUidStr, date, displayName, userIconUrl);
-//                
-//            });
-//        }
-    }else if([arguments[0] isEqualToString:@"channel:assigned"]) {
+    } else if([arguments[0] isEqualToString:@"channel:assigned"]) {
         ///null/type check
         if (![arguments[1] isKindOfClass:[NSDictionary class]] || [arguments[1] isEqual:[NSNull null]])
         {
@@ -916,7 +872,6 @@
 - (void)webSocket:(CCSRWebSocketOriginal *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;
 {
     NSLog(@"WebSocket closed");
-//    self.title = @"Connection Closed! (see logs)";
     if (self.didFailWithErrorOrClosedCallback)
     {
         dispatch_async(dispatch_get_main_queue(), ^{

@@ -454,7 +454,6 @@ typedef NS_ENUM(NSUInteger, CCHistoryFilterViewSectionType) {
 - (void)updateMessageStatusCount {
     [[ChatCenterClient sharedClient]
      getChannelCount:nil
-//     funnelId:[_selectFunnel objectForKey:@"id"]
      funnelId:nil
      completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
          if (result) {

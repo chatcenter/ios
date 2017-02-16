@@ -81,10 +81,6 @@
     
     for(NSDictionary *anAvailableAction in actionData) {
         for(NSDictionary *aSelectedAction in selectedValues) {
-            
-//            NSDictionary *v = [aSelectedAction objectForKey:@"action"];
-//            if(!v){ continue; }
-            
             if ([self compareAction:anAvailableAction withAction:aSelectedAction]) {
                 [retArray addObject:@(i)];
             }

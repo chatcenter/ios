@@ -19,8 +19,8 @@
 @implementation CCLinearScalePaneController
 @synthesize fromValue, toValue;
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     self.fromButton.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     self.fromButton.layer.borderWidth = 1.0;
     self.fromButton.layer.cornerRadius = 5.0f;
@@ -34,6 +34,10 @@
     self.toButton.imageEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 5);
     [self setDefautStyleForTextfield:self.toLabelTextfield];
     self.toValue = LINEAR_MAX_VALUE;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [self updateView];
 }
 
@@ -45,6 +49,7 @@
     UIView *paddingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 5, 30)];
     textField.leftView = paddingView;
     textField.leftViewMode = UITextFieldViewModeAlways;
+    textField.delegate = self;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -142,4 +147,14 @@
     return stickerAction;
 }
 
+#pragma mark - Textview delegate
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if(range.length + range.location > textField.text.length)
+    {
+        return NO;
+    }
+    
+    NSUInteger newLength = [textField.text length] + [string length] - range.length;
+    return newLength <= CCWidgetInputChoiceTextLimit;
+}
 @end

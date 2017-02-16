@@ -1,5 +1,5 @@
 /*
-  ChatCenterSDK.strings Version 1.0.9
+  ChatCenterSDK.strings Version 1.1.0
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -35,7 +35,7 @@
 "Sent a sticker."       = "ウィジェットを送信しました。";
 "Sent a question sticker." = "質問ウィジェットを送信しました。";
 "Tap dates and time you are available" = "日付と時刻をタップして選択してください";
-"Choose the dates and times you are available" = "都合の良い日時を選択してください";
+"Choose dates and times you are available" = "都合の良い日時を選択してください";
 "Availability" = "候補日時";
 "Schedule" = "スケジュール";
 "Next" = "次へ";
@@ -93,14 +93,14 @@
 "Please try after a while"   = "しばらくしてからお試しください。";
 "Can not load data"          = "データロードに失敗しました。";
 "Can not make connection"    = "オフラインです";
-"Come online"                = "オンラインになりました";
+"Came online"                = "オンラインになりました";
 "Finished data load"         = "データロードが完了しました。";
 "Please select chat"         = "チャットを選択してください。";
 "Connection Failed"          = "サーバと通信が行えませんでした。\n通信状況を確認して下さい。";
 "Inquired information"       = "問い合わせ情報";
 "Inquired property"          = "問い合せ物件";
 "Failed uploading"           = "アップロードに失敗しました。";
-"Please select the time"     = "日時を選択してください";
+"Please select at least 1 time slot."     = "最低1つ以上は日時を選択してください";
 "Invalid URL"                = "URLは無効です。";
 
 "Load Earlier Messages" = "以前のメッセージをロードする";
@@ -177,7 +177,7 @@
 "Address" = "アドレス";
 
 // calendar sticker
-//"calendar_sticker_time_format" = "M月d日(EEE) H:mm"; // 1月8日(金) 23:00
+"calendar_sticker_time_format" = "M月d日(EEE) H:mm"; // 1月8日(金) 23:00
 "calendar_sticker_time_format_from" = "M月d日(EEE) H:mm"; // 1月8日(金) 23:00
 "calendar_sticker_time_format_to" = "H:mm"; // 23:00
 "Please select your available time." = "以下から都合の良い日時を選択してください。";
@@ -245,6 +245,9 @@
 "Log out" = "ログアウト";
 "Change apps" = "アプリを選択してください";
 "Please input 2000 characters or less." = "2000文字以内で入力してください。";
+"Please input %d characters or less for question title." = "タイトルは%d文字以内にしてください。";
+"Please input %d characters or less for question text." = "質問文は%d文字以内にしてください。";
+"Please select up to %d choices" = "選択肢は%d個までにしてください";
 "Option" = "オプション";
 
 // Question Widget Editor
@@ -265,10 +268,23 @@
 "Settings" = "設定";
 
 // Co-location
-"What kind of Location you want to share?" = "どの位置情報を共有しますか？";
+"What kind of Location do you want to share?" = "どの位置情報を共有しますか？";
 "Send Venue" = "地図から選択";
 "Share Live Location" = "ライブ位置情報";
 "For how long do you want to share it?" = "シェアする時間を設定してください";
 "Share my Live Location" = "自分の位置情報を共有";
 "Live Location" = "ライブ位置情報";
 "Stop" = "ストップ";
+
+// Login
+"Log In" = "ログイン";
+"Log in with Facebook" = "Facebookでログイン";
+"Log in with Google" = "Googleでログイン";
+"Log in with Yahoo!Japan" = "Yahoo!Japanでログイン";
+"Log in with Twitter" = "Twitterでログイン";
+"Log in with Email" = "Emailでログイン";
+
+"Do you want to switch app?(Data will be initialized)" = "アプリを切り替えますか?(データは初期化されます)";
+"ChatCenter iO for iOS" = "ChatCenter iO for iOS";
+"Version" = "バージョン";
+"Open Dashboard" = "ダッシュボードを開く";

@@ -93,7 +93,7 @@
     NSArray *messageStatus = [CCUserDefaultsUtil filterMessageStatus];
     if (messageStatus.count > 0) {
         for (NSString *status in messageStatus) {
-            // Allは弾く
+            // Skip is status is All
             if ([status isEqualToString:CCHistoryFilterMessagesStatusTypeAll]) {
                 continue;
             }

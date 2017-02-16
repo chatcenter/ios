@@ -15,7 +15,6 @@
 - (void)displayModalList{
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter-iPad" bundle:SDK_BUNDLE];
     UIViewController *historyView = [storyboard  instantiateViewControllerWithIdentifier:@"CCModalListViewController"];;
-    //    historyView.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     historyView.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     historyView.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     [self presentViewController:historyView animated:YES completion:nil];

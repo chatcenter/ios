@@ -18,7 +18,6 @@
     if(self =[super initWithFrame:frame]) {
         UIScreen *screen = [UIScreen mainScreen];
         
-//        CGRect stickersMenuFrame = CGRectMake(0.0, 0.0, screen.bounds.size.width, keyboardHeight);
         self.backgroundColor = [UIColor colorWithRed:242.0/256 green:242.0/256 blue:242.0/256 alpha:1];
         
         NSMutableArray *stickers = [[CCConstants sharedInstance].stickers mutableCopy];
@@ -41,13 +40,24 @@
                 [stickers removeObject:stickers[i]];
                 continue;
             }
-            /* hide video chat sticker if:
-             1. user me can't video chat or
-             2. user me can video chat but all other users in channel can't video chat
-             */
-//            NSLog(@"meCanUseVideoChat: %d - channelUserCanVideoChat: %d", [self processUserMeVideoChatInfo], [self processChannelUserVideoChatInfo]);
+        }
+        
+        ///
+        /// Remove video chat sticker
+        ///
+        for (int i = 0; i < stickers.count; i++) {
             if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
                 [stickers removeObject:stickers[i]];
+                break;
+            }
+        }
+        ///
+        /// Remove voice chat sticker
+        ///
+        for (int i = 0; i < stickers.count; i++) {
+            if([stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]) {
+                [stickers removeObject:stickers[i]];
+                break;
             }
         }
         
@@ -98,12 +108,12 @@
             UIImage *iconImage;
             if ([stickers[i] isEqualToString:CC_STICKERTYPEDATETIMEAVAILABILITY]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_calendar"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Availability");
+                label.text = CCLocalizedString(@"Schedule");
                 [stickerButton addTarget:_owner action:@selector(pressCalendar) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPELOCATION]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_location"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 label.text = CCLocalizedString(@"Location");
-                [stickerButton addTarget:_owner action:@selector(pressLocation) forControlEvents:UIControlEventTouchUpInside];
+                [stickerButton addTarget:_owner action:@selector(pressLocationWidget) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPETHUMB]) {
                 iconImage = [[UIImage SDKImageNamed:@"questionBubbleIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 label.text = CCLocalizedString(@"Question");

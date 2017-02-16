@@ -41,6 +41,13 @@
     rightSpacer.width = 10;
     
     self.navigationItem.rightBarButtonItems = @[rightSpacer, rightMenuButton];
+    
+    UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCBackArrow"] style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
+    self.navigationItem.leftBarButtonItem = closeBtn;
+}
+
+-(void)closeModal {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -113,8 +120,6 @@
     NSArray *channelArray = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:channelId];
     if(channelArray != nil && channelArray.count > 0){
         NSManagedObject *object   = [channelArray objectAtIndex:0];
-//        NSData *usersData         = [object valueForKey:@"users"];
-//        NSArray *users            = [NSKeyedUnarchiver unarchiveObjectWithData:usersData];
         NSData *assigneeData      = [object valueForKey:@"assignee"];
         NSDictionary *assignee    = [NSKeyedUnarchiver unarchiveObjectWithData:assigneeData];
         NSMutableArray *channelUsers = [self.agents mutableCopy];
@@ -250,6 +255,7 @@
             NSString *iconUrl           = [result valueForKey:@"icon_url"];
             NSNumber *read              = [result valueForKey:@"read"];
             NSDictionary *channelInformations = result[@"channel_informations"];
+            NSDictionary *displayName = result[@"display_name"];
             ///name and directmessage are only used for team now
             NSString *name = @"";
             BOOL directMessage = NO;
@@ -274,7 +280,8 @@
                                                             lastUpdatedAt:lastUpdatedAt
                                                                      name:name
                                                            direct_message:directMessage
-                                                                 assignee:assignee])
+                                                                 assignee:assignee
+                                                             display_name:displayName])
             {
                 NSLog(@"updateChannel Success!");
             }else{

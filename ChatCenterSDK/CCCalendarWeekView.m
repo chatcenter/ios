@@ -20,14 +20,6 @@
 
 @implementation CCCalendarWeekView
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 -(void)setUp:(NSArray *)dayArray dayOfWeek:(NSInteger)dayOfWeek{
     dayBottomViews = [NSMutableArray array];
     dayBottomCircles = [NSMutableArray array];
@@ -46,9 +38,6 @@
         CALayer *topBorder = [CALayer layer];
         topBorder.frame = CGRectMake(0, 0, dayTopView.frame.size.width, 1.0f);
         topBorder.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0].CGColor;
-//        CALayer *bottomBorder = [CALayer layer];
-//        bottomBorder.frame = CGRectMake(0, 32, dayTopView.frame.size.width, 0.4f);
-//        bottomBorder.backgroundColor = [[UIColor lightGrayColor] colorWithAlphaComponent:0.5].CGColor;
         ///label
         UILabel *dayToplabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,width,40)];
         dayToplabel.text = weekDayArrray[i];
@@ -57,7 +46,6 @@
         dayToplabel.textAlignment = NSTextAlignmentCenter;
         ///Add
         [dayTopView.layer addSublayer:topBorder];
-//        [dayTopView.layer addSublayer:bottomBorder];
         [dayTopView addSubview:dayToplabel];
         [self addSubview:dayTopView];
         UIView *dayBottomView =  [[UIView alloc] initWithFrame:CGRectMake(width*i,40,width,40)];

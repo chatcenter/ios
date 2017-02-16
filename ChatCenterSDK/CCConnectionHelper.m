@@ -23,6 +23,11 @@
 #import "CCAFNetworkActivityLogger.h"
 #import "CCHistoryFilterUtil.h"
 
+#ifndef EXIST_GOOGLEMAPS_API_KEY
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+#endif
+
 BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing with local server
 
 @interface CCConnectionHelper (){
@@ -69,7 +74,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     [[CCSRWebSocket sharedInstance] setWebSocketDidOpenCallback:^(void) {
         self.webSocketStatus = CCCWebSocketOpened;
         [self hideToast];
-        [self makeToast:@"Make connection" message:CCLocalizedString(@"Come online") duration:1.5 backgroundColor:[UIColor greenColor]];
+        [self makeToast:@"Make connection" message:CCLocalizedString(@"Came online") duration:1.5 backgroundColor:[UIColor greenColor]];
     }];
     [[CCSRWebSocket sharedInstance] setDidFailWithErrorOrClosedCallback:^(NSError *error, NSString *reason) {
         if (error || reason){
@@ -141,9 +146,9 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             [self.delegate receiveUnfollowFromWebSocket:channelUid];
         }
     }];
-    [[CCSRWebSocket sharedInstance] setDidReceiveInviteCallCallback:^(NSString *messageId, NSDictionary *content) {
-        if ([self.delegate respondsToSelector:@selector(receiveInviteCall:content:)]){
-            [self.delegate receiveInviteCall:messageId content:content];
+    [[CCSRWebSocket sharedInstance] setDidReceiveInviteCallCallback:^(NSString *messageId, NSString *channelId, NSDictionary *content) {
+        if ([self.delegate respondsToSelector:@selector(receiveInviteCall:channelId:content:)]){
+            [self.delegate receiveInviteCall:messageId channelId:channelId content:content];
         }
     }];
     [[CCSRWebSocket sharedInstance] setDidReceiveCallEventCallback:^(NSString *messageId, NSDictionary *content) {
@@ -158,6 +163,14 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     }];
     
     self.shareLocationTasks = [[NSMutableDictionary alloc] init];
+    // ------------------------------------------------------
+    // Google map configuration
+    // ------------------------------------------------------
+#ifndef EXIST_GOOGLEMAPS_API_KEY
+    [GMSServices provideAPIKey:CC_GOOGLEMAPS_API_KEY];
+    [GMSPlacesClient provideAPIKey:CC_GOOGLEMAPS_API_KEY];
+#endif
+
 }
 
 # pragma mark - Load Data
@@ -235,6 +248,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                     NSString *iconUrl           = [result[i] valueForKey:@"icon_url"];
                     NSNumber *read              = [result[i] valueForKey:@"read"];
                     NSDictionary *channelInformations = result[i][@"channel_informations"];
+                    NSDictionary *displayName = result[i][@"display_name"];
                     ///name and directmessage are only used for team now
                     NSString *name = @"";
                     BOOL directMessage = NO;
@@ -261,7 +275,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                                           lastUpdatedAt:lastUpdatedAt
                                                                    name:name
                                                          direct_message:directMessage
-                                                               assignee:assignee])
+                                                               assignee:assignee
+                                                           display_name:displayName])
                         {
                             NSLog(@"insertChannel Success!");
                         }else{
@@ -345,6 +360,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                  NSString *iconUrl           = [result valueForKey:@"icon_url"];
                  NSNumber *read              = [result valueForKey:@"read"];
                  NSDictionary *channelInformations = result[@"channel_informations"];
+                 NSDictionary *displayName = result[@"display_name"];
                  ///name and directmessage are only used for team now
                  NSString *name = @"";
                  BOOL directMessage = NO;
@@ -372,7 +388,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                                        lastUpdatedAt:lastUpdatedAt
                                                                 name:name
                                                       direct_message:directMessage
-                                                            assignee:assignee])
+                                                            assignee:assignee
+                                                        display_name:displayName])
                      {
                          NSLog(@"insertChannel Success!");
                      }else{
@@ -455,6 +472,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                  NSString *iconUrl           = [result valueForKey:@"icon_url"];
                  NSNumber *read              = [result valueForKey:@"read"];
                  NSDictionary *channelInformations = result[@"channel_informations"];
+                 NSDictionary *displayName = result[@"display_name"];
                  ///name and directmessage are only used for team now
                  NSString *name = @"";
                  BOOL directMessage = NO;
@@ -478,7 +496,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                                                  lastUpdatedAt:lastUpdatedAt
                                                                           name:name
                                                                 direct_message:directMessage
-                                                                      assignee:assignee])
+                                                                      assignee:assignee
+                                                                  display_name:displayName])
                  {
                      NSLog(@"updateChannel Success!");
                  }else{
@@ -613,78 +632,6 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     }];
 }
 
-//- (void)loadChannelsAndConnectWebSocket:(BOOL)showProgress getChennelType:(int)getChennelType isOrgChange:(BOOL)isOrgChange org_uid:(NSString *)org_uid completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
-//    if ([[CCConstants sharedInstance] getKeychainToken] == nil) {
-//        self.isRefreshingData = NO;
-//        return;
-//    }
-//    ///get channels from server, store channels to local, connect channels, get messages from server, store messages to local
-//    if(showProgress == YES && self.currentView != nil){
-//        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
-//    }
-//    [self loadChannels:NO
-//        getChennelType:getChennelType
-//               org_uid:org_uid
-//                 limit:CCloadChannelFirstLimit
-//         lastUpdatedAt:nil
-//     completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation)
-//    {
-//        [self hideToast];
-//        if (result != nil) {
-//            NSLog(@"Load channels Success");
-//            [self connectWebSocket];
-//            if (self.ChatChannelIds.count > 0) {
-//                __block int loadMessageSuccessCount = 0;
-//                int maxLoadMessages = CCloadChannelFirstLimit < self.ChatChannelIds.count ? CCloadChannelFirstLimit : (int)self.ChatChannelIds.count;
-//                for (int i=0; i < maxLoadMessages; i++) {
-//                    [self loadMessages:self.ChatChannelIds[i] showProgress:NO limit:CCloadMessageFirstLimit lastId:nil completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-//                        if (result != nil) {
-//                            NSLog(@"Load previous message Success");
-//                            loadMessageSuccessCount++;
-//                            if (loadMessageSuccessCount == maxLoadMessages) {
-//                                if(showProgress == YES && self.currentView != nil){
-//                                    [CCSVProgressHUD dismiss];
-//                                }
-//                                [self setIsDataSynchronized:YES];
-//                                if(completionHandler != nil) completionHandler(@"Success",nil, operation);
-//                                [self hideToast];
-//                                [self makeToast:@"Finished data load" message:CCLocalizedString(@"Finished data load") duration:1.5 backgroundColor:[UIColor greenColor]];
-//                                if ([self.delegate respondsToSelector:@selector(loadLocalData:)]){
-//                                    [self.delegate loadLocalData:isOrgChange];
-//                                }
-//                            }
-//                        }else{
-//                            [self setIsDataSynchronized:NO];
-//                            if(showProgress == YES && self.currentView != nil){
-//                                [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
-//                            }
-//                            [self makeToast:@"Can not load data" message:CCLocalizedString(@"Can not load data") duration:99999 backgroundColor:[UIColor redColor]];
-//                            NSLog(@"Load channel Error");
-//                            if(completionHandler != nil) completionHandler(nil, error, operation);
-//                        }
-//                    }];
-//                }
-//            }else{
-//                if(showProgress == YES && self.currentView != nil){
-//                    [CCSVProgressHUD showSuccessWithStatus:CCLocalizedString(@"No Message yet")];
-//                }
-//                if(completionHandler != nil) completionHandler(@"No Message yet",nil, operation);
-//                if ([self.delegate respondsToSelector:@selector(loadLocalData:)]){
-//                    [self.delegate loadLocalData:isOrgChange];
-//                }
-//            }
-//        }else{
-//            [self setIsDataSynchronized:NO];
-//            if(showProgress == YES && self.currentView != nil){
-//                [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
-//            }
-//            [self makeToast:@"Can not load data" message:CCLocalizedString(@"Can not load data") duration:99999 backgroundColor:[UIColor redColor]];
-//            NSLog(@"Load channel Error");
-//            if(completionHandler != nil) completionHandler(nil, error, operation);
-//        }
-//    }];
-//}
-
 - (void)loadChannelsAndConnectWebSocket:(BOOL)showProgress getChennelType:(int)getChennelType isOrgChange:(BOOL)isOrgChange org_uid:(NSString *)org_uid completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
     if ([[CCConstants sharedInstance] getKeychainToken] == nil) {
         self.isRefreshingData = NO;
@@ -766,11 +713,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
         if(error == nil && result[@"token"] != nil
            && ![result[@"token"] isEqual:[NSNull null]]
            && result[@"id"] != nil
-           && ![result[@"id"] isEqual:[NSNull null]]
-           && result[@"apps"] != nil
-           && ![result[@"apps"] isEqual:[NSNull null]])
+           && ![result[@"id"] isEqual:[NSNull null]])
         {
-            [CCConstants sharedInstance].apps = result[@"apps"];
             [[CCConstants sharedInstance] setKeychainToken:result[@"token"]];
             NSString *userUid = [result[@"id"] stringValue];
             [[CCConstants sharedInstance] setKeychainUid:userUid];
@@ -844,11 +788,8 @@ providerRefreshToken:(NSString *)providerRefreshToken
         if(error == nil && result[@"token"] != nil
            && ![result[@"token"] isEqual:[NSNull null]]
            && result[@"id"] != nil
-           && ![result[@"id"] isEqual:[NSNull null]]
-           && result[@"apps"] != nil
-           && ![result[@"apps"] isEqual:[NSNull null]])
+           && ![result[@"id"] isEqual:[NSNull null]])
         {
-            [CCConstants sharedInstance].apps = result[@"apps"];
             if (showProgress == YES) {
                 [CCSVProgressHUD dismiss];
             }
@@ -1169,50 +1110,61 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 }
 
 - (void)setCurrentApp:(void (^)(BOOL success))completionHandler{
-    NSArray *apps = [CCConstants sharedInstance].apps;
-    if(apps != nil && apps.count > 0){
-        [self setAppToken:apps completionHandler:^{
-            if(completionHandler != nil) completionHandler(YES);
-        }];
-    }else{
-        [self getApps:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-            if(result != nil && result.count > 0){
-                [self setAppToken:result completionHandler:^{
-                    if(completionHandler != nil) completionHandler(YES);
-                }];
-            }else{
-                if(completionHandler != nil) completionHandler(NO);
-            }
-        }];
-    }
+    [self getApps:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+        if(result != nil && result.count > 0){
+            [self setAppToken:result completionHandler:^{
+                if(completionHandler != nil) completionHandler(YES);
+            }];
+        }else{
+            if(completionHandler != nil) completionHandler(NO);
+        }
+    }];
 }
 
 - (void)setAppToken:(NSArray *)apps completionHandler:(void (^)(void))completionHandler{
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    NSString *previousAppUid = @"";
-    if ([ud stringForKey:@"ChatCenterUserdefaults_currentAppUid"]) { ///set previous chosen orgUid
-        previousAppUid = [ud stringForKey:@"ChatCenterUserdefaults_currentAppUid"];
-        [ud removeObjectForKey:@"ChatCenterUserdefaults_currentAppUid"];
+    NSNumber *previousAppId = [[NSNumber alloc] initWithInt:0];
+    if ([ud objectForKey:@"ChatCenterUserdefaults_currentAppId"]) { ///set previous chosen orgUid
+        previousAppId = [ud objectForKey:@"ChatCenterUserdefaults_currentAppId"];
+        [ud removeObjectForKey:@"ChatCenterUserdefaults_currentAppId"];
     }
     NSString *token;
+    BOOL isSetApp = NO;
     for (int i = 0; i<(int)apps.count; i++) {
         NSDictionary *app = apps[i];
-        NSString *uid = app[@"uid"];
-        if (i == 0 || [uid isEqualToString:previousAppUid]) {
+        if ([app valueForKey:@"id"] == nil
+            || [app[@"id"] isEqual:[NSNull null]]
+            || ![app[@"id"] isKindOfClass:[NSNumber class]]
+            || [app valueForKey:@"token"] == nil
+            || [app[@"token"] isEqual:[NSNull null]]
+            || ![app[@"token"] isKindOfClass:[NSString class]]
+            || [app valueForKey:@"name"] == nil
+            || [app[@"name"] isEqual:[NSNull null]]
+            || ![app[@"name"] isKindOfClass:[NSString class]]
+            || [app valueForKey:@"stickers"] == nil
+            || [app[@"stickers"] isEqual:[NSNull null]]
+            || ![app[@"stickers"] isKindOfClass:[NSArray class]]
+            || [app valueForKey:@"business_type"] == nil
+            || [app[@"business_type"] isEqual:[NSNull null]]
+            || ![app[@"business_type"] isKindOfClass:[NSString class]]){
+            continue;
+        }
+        NSNumber *appId = app[@"id"];
+        if (isSetApp == NO || appId == previousAppId) {
             token = app[@"token"];
             [CCConstants sharedInstance].appName = app[@"name"];
             [CCConstants sharedInstance].stickers = app[@"stickers"];
             [CCConstants sharedInstance].businessType = app[@"business_type"];
-            [ud setObject:uid forKey:@"ChatCenterUserdefaults_currentAppUid"];
+            [ud setObject:appId forKey:@"ChatCenterUserdefaults_currentAppId"];
             [ud synchronize];
-            
-            if([uid isEqualToString:previousAppUid]) break;
+            isSetApp = YES;
+
+            if(appId == previousAppId) break;
         }
     }
     [ChatCenter setAppToken:token completionHandler:^{
         if(completionHandler != nil) completionHandler();
     }];
-    NSLog(@"ChatCenterUserdefaults_currentAppUid: %@", [ud stringForKey:@"ChatCenterUserdefaults_currentAppUid"]);
 }
 
 - (NSString *)addAuthToUrl:(NSString *)url{
@@ -1315,6 +1267,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             NSArray *users                     = result[@"users"];
             NSString *orgName                  = result[@"org_name"];
             NSDictionary *channelInformations  = result[@"channel_informations"];
+            NSDictionary *displayName = result[@"display_name"];
             ///name and directmessage are only used for team now
             NSString *name = @"";
             BOOL directMessage = NO;
@@ -1322,9 +1275,6 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             if (result[@"direct_message"] != nil && ![result[@"direct_message"] isEqual:[NSNull null]]){
                 directMessage = [result[@"direct_message"] boolValue];;
             }
-//            NSString *icon_url                 = result[@"icon_url"];
-//            NSNumber *read                     = result[@"read"];
-            
             // Filtering.
             if (![CCHistoryFilterUtil isFilteringWithConnectionData:result]) {
                 if([[CCCoredataBase sharedClient] insertChannel:channelUid
@@ -1342,7 +1292,8 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                                   lastUpdatedAt:lastUpdatedAt
                                                            name:name
                                                  direct_message:directMessage
-                                                       assignee:assignee])
+                                                       assignee:assignee
+                                                   display_name:displayName])
                 {
                     NSLog(@"insertChannel Success!");
                 }else{
@@ -1441,7 +1392,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             NSArray *users                    = [result valueForKey:@"users"];
             NSString *orgName                 = result[@"org_name"];
             NSDictionary *channelInformations = result[@"channel_informations"];
-//            NSString *icon_url                = result[@"icon_url"];
+            NSDictionary *displayName = result[@"display_name"];
             ///name and directmessage are only used for team now
             NSString *name = @"";
             BOOL directMessage = NO;
@@ -1468,7 +1419,8 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                                   lastUpdatedAt:lastUpdatedAt
                                                            name:name
                                                  direct_message:directMessage
-                                                       assignee:assignee])
+                                                       assignee:assignee
+                                                   display_name:displayName])
                 {
                     NSLog(@"insertChannel Success!");
                     [[CCSRWebSocket sharedInstance] reconnect];
@@ -1528,7 +1480,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
              NSArray *users                    = [result valueForKey:@"users"];
              NSString *orgName                 = result[@"org_name"];
              NSDictionary *channelInformations = result[@"channel_informations"];
-             //            NSString *icon_url                = result[@"icon_url"];
+             NSDictionary *displayName = result[@"display_name"];
              ///name and directmessage are only used for team now
              NSString *name = @"";
              BOOL directMessage = NO;
@@ -1555,7 +1507,8 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                                    lastUpdatedAt:lastUpdatedAt
                                                             name:name
                                                   direct_message:directMessage
-                                                        assignee:assignee])
+                                                        assignee:assignee
+                                                    display_name:displayName])
                  {
                      NSLog(@"insertChannel Success!");
                  }else{
@@ -1850,7 +1803,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
         
         NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
         [ud removeObjectForKey:@"ChatCenterUserdefaults_currentOrgUid"];
-        [ud removeObjectForKey:@"ChatCenterUserdefaults_currentAppUid"];
+        [ud removeObjectForKey:@"ChatCenterUserdefaults_currentAppId"];
         [ud removeObjectForKey:kCCUserDefaults_userId];
     }
     
@@ -1969,34 +1922,6 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
     }
     return NO;
 }
-
-//- (void)reAuthentication:(NSError *)error completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
-//    if ([self isAuthenticationError:operation] == YES){
-//        [self loadUserToken:[CCSSKeychain passwordForService:@"ChatCenter" account:@"email"]
-//                   password:[CCSSKeychain passwordForService:@"ChatCenter" account:@"password"]
-//                   provider:self.provider
-//              providerToken:self.providerToken
-//          providerCreatedAt:self.providerCreatedAt
-//               showProgress:NO
-//          completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-//            if(error == nil){
-//                completionHandler(result, nil, operation);
-//            }else{
-//                completionHandler(nil, error, operation);
-//                [[CCConstants sharedInstance] setKeychainToken:nil];
-//                [[CCConstants sharedInstance] setKeychainUid:nil];
-//                [CCSSKeychain deletePasswordForService:@"ChatCenter" account:@"firstName"];
-//                [CCSSKeychain deletePasswordForService:@"ChatCenter" account:@"familyName"];
-//                [CCSSKeychain deletePasswordForService:@"ChatCenter" account:@"email"];
-//                if ([self.delegate respondsToSelector:@selector(pressClose:)]){
-//                    [self.delegate pressClose:nil];
-//                }
-//            }
-//        }];
-//    }else{
-//        completionHandler(nil, error, nil);
-//    }
-//}
 
 -(BOOL)isUpdatedProviderCreatedAt{
     if (self.providerOldCreatedAt != nil && [self.providerCreatedAt isEqualToString:self.providerOldCreatedAt] == NO){
@@ -2166,7 +2091,6 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
 }
 
 -(void)displayAuthenticationErrorAlert{
-//    [self displyAlert:nil message:CCLocalizedString(@"You are logout, please login") alertType:SingleButtonAlert];
     if (self.currentView == nil) return;
     
     float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
@@ -2413,5 +2337,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
             if(completionHandler != nil) completionHandler(nil, error, operation);
         }
     }];
+}
+
+- (BOOL)isSupportVideoChat{
+    return [[ChatCenterClient sharedClient] isSupportVideoChat];
 }
 @end

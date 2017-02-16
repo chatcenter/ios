@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <MapKit/MapKit.h>
 #import "CCCommonWidgetEditorDelegate.h"
 #import "CCChatViewController.h"
+#import <GoogleMaps/GoogleMaps.h>
 
 @interface CCLiveLocationStickerViewController : UIViewController<CLLocationManagerDelegate>
 @property (nonatomic, strong) CLLocationManager *locationManager;
-@property (weak, nonatomic) IBOutlet MKMapView *mapView;
+@property (strong, nonatomic) IBOutlet GMSMapView *mapView;
 @property (strong, nonatomic) IBOutlet UILabel *changeTimeTitle;
 @property (strong, nonatomic) IBOutlet UILabel *durationTitle;
 ///

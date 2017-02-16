@@ -193,7 +193,6 @@ providerRefreshToken:(NSString *)providerRefreshToken
             completionHandler:(void (^)(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
 - (void)reloadChannelsAndConnectWebSocket;
 - (void)reloadOrgsAndChannelsAndConnectWebSocket;
-//- (void)reAuthentication:(NSError *)error completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
 - (BOOL)isAuthenticationError:(CCAFHTTPRequestOperation *)operation;
 - (BOOL)isAuthenticationErrorWithEmptyuser:(CCAFHTTPRequestOperation *)operation;
 - (CCNetworkStatusType)getNetworkStatus;
@@ -248,4 +247,5 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
             reason:(NSDictionary *)reason
               user:(NSDictionary *)user
  completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler;
+- (BOOL)isSupportVideoChat;
 @end

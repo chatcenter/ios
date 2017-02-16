@@ -41,14 +41,6 @@ NSString *THContactPickerContactCellReuseID = @"THContactPickerContactCell";
     return self;
 }
 
-//- (id)init
-//{
-//    THContactPickerViewControllerDemo *instance;
-//    instance = [self init];
-//    return instance;
-//}
-
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -409,16 +401,6 @@ NSString *THContactPickerContactCellReuseID = @"THContactPickerContactCell";
         }else{
             [self displayAlert:CCLocalizedString(@"Please select one contact")];
         }
-//		
-//		UIColor *color = [UIColor blueColor];
-//		if (self.privateSelectedContacts.count % 2 == 0){
-//			color = [UIColor orangeColor];
-//		} else if (self.privateSelectedContacts.count % 3 == 0){
-//			color = [UIColor purpleColor];
-//		}
-//		THContactViewStyle *style = [[THContactViewStyle alloc] initWithTextColor:[UIColor whiteColor] backgroundColor:color cornerRadiusFactor:2.0];
-//		THContactViewStyle *selectedStyle = [[THContactViewStyle alloc] initWithTextColor:[UIColor whiteColor] backgroundColor:[UIColor greenColor] cornerRadiusFactor:2.0];
-//		[self.contactPickerView addContact:contact withName:contactTilte withStyle:style andSelectedStyle:selectedStyle];
     }
     if(self.privateSelectedContacts.count > 0) {
         self.navigationItem.rightBarButtonItem = self.createBtn;

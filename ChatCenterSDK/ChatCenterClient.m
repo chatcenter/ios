@@ -115,10 +115,10 @@
 }
 
 - (BOOL)isSupportVideoChat {
-    // OS version >= 8.1
+    // OS version >= 9.0
     float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if(osVersion < 8.1) {
-        NSLog(@"Not support video chat: OS version < 8.1");
+    if(osVersion < 9.0) {
+        NSLog(@"Not support video chat: OS version < 9.0");
         return NO;
     }
     // ChatCenterSDK > 1.0.5

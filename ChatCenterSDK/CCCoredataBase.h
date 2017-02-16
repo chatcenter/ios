@@ -71,7 +71,8 @@
         lastUpdatedAt:(NSDate *)lastUpdatedAt
                  name:(NSString *)name
        direct_message:(BOOL)direct_message
-             assignee:(NSDictionary *)assignee;
+             assignee:(NSDictionary *)assignee
+         display_name:(NSDictionary *)display_name;
 - (NSArray *)selectAllChannel:(int)limit channelType:(CCChannelType)channelType;
 - (NSArray *)selectChannels:(int)limit
               lastUpdatedAt:(NSDate *)lastUpdatedAt
@@ -94,7 +95,8 @@
                      lastUpdatedAt:(NSDate *)lastUpdatedAt
                               name:(NSString *)name
                     direct_message:(BOOL)direct_message
-                          assignee:(NSDictionary *)assignee;
+                          assignee:(NSDictionary *)assignee
+                      display_name:(NSDictionary *)display_name;
 - (BOOL)updateChannelUpdatedWithUid:(NSString *)uid updateAt:(NSDate *)updateAt;
 - (BOOL)updateChannelUpdateAtAndStatusWithUid:(NSString *)uid updateAt:(NSDate *)updateAt status:(NSString *)status;
 - (BOOL)updateChannelWithUidAndLatestmessage:(NSString *)uid updateAt:(NSDate *)updateAt latestMessage:(NSDictionary *)latestMessage;

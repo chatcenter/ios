@@ -37,6 +37,8 @@
     UIImage *microphoneOffImage;
     UIImage *cameraOnImage;
     UIImage *cameraOffImage;
+    
+    BOOL isClosed;
 }
 
 #define LOCAL_CAMERA_VIEW_WIDTH     128.0
@@ -92,11 +94,6 @@ static bool subscribeToSelf = NO;
         [_cameraButton setImage:cameraOnImage forState:UIControlStateNormal];
     } else {
         [_cameraButton setImage:cameraOffImage forState:UIControlStateNormal];
-    }
-    
-    if ([self.videoAction isEqualToString:CC_ACTIONTYPE_VOICECALL]) {
-        self.cameraButton.hidden = YES;
-        self.switchCameraButton.hidden = YES;
     }
 }
 
@@ -300,10 +297,6 @@ static bool subscribeToSelf = NO;
         self.otherVideoInfoContainer.hidden = NO;
         self.otherVideoDisabledLabel.text = CCLocalizedString(@"Video is disabled");
     }
-    if ([self.videoAction isEqualToString:CC_ACTIONTYPE_VOICECALL]) {
-        _subscriber.view.hidden = YES;
-        self.cameraButton.hidden = YES;
-    }
 }
     
 - (void)subscriber:(OTSubscriberKit*)subscriber didFailWithError:(OTError*)error
@@ -434,24 +427,34 @@ static bool subscribeToSelf = NO;
 - (void) doHangup {
     NSLog(@"doHangup channelid = %@", self.channelUid);
     [[CCConnectionHelper sharedClient] hangupCall:self.channelUid messageId:self.messageId user:@{@"user_id": _publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        if(!isClosed) {
+            isClosed = YES;
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
     }];
 }
 
 - (void) doReject {
     NSLog(@"doReject channelid = %@", self.channelUid);
     [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id": self.publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        if(!isClosed) {
+            isClosed = YES;
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
     }];
 }
 
 #pragma mark - CCVideoCallEventHandlerDelegate
 - (void)handleCallEvent:(NSString *)messageId content:(NSDictionary *)content {
     NSArray *events = content[@"events"];
+    NSArray *receivers = content[@"receivers"];
+    NSDictionary *caller = content[@"caller"];
     NSLog(@"Events = %@", events);
     if (events == nil) {
         return;
     }
+    
+    BOOL needHandleReject = NO;
     for (int i = 0; i < events.count; i++) {
         NSDictionary *eventContent = events[i][@"content"];
         if(eventContent == nil ) {
@@ -463,21 +466,110 @@ static bool subscribeToSelf = NO;
         }
         
         if ([action isEqualToString:@"reject"]) {
-            [self handleReject];
+            needHandleReject = YES;
         }
         
         if ([action isEqualToString:@"hangup"]) {
             [self handleHangup];
         }
     }
+    if (needHandleReject) {
+        [self handleReject:receivers caller:caller events:events];
+    }
 }
 
-- (void) handleReject {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+- (void) handleReject:(NSArray *)receivers caller:caller events:(NSArray *)events {
+    BOOL needCloseView = NO;
+    
+    if (events == nil) {
+        return;
+    }
+    ///
+    /// 1. Filter reject events
+    ///
+    NSMutableArray *rejectEvents = [NSMutableArray array];
+    for(NSDictionary *event in events) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            return;
+        }
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            return;
+        }
+        if ([action isEqualToString:@"reject"]) {
+            [rejectEvents addObject:event];
+        }
+    }
+    
+    ///
+    /// Case-1: If rejected user in receivers and the user's id is same with the current user's id
+    /// Or rejected user is caller then dismiss incoming view.
+    ///
+    for (NSDictionary *event in rejectEvents) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            continue;
+        }
+        
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            continue;
+        }
+        
+        NSString *rejectedUserId = [[[eventContent objectForKey:@"user"] objectForKey:@"user_id"] stringValue];
+        BOOL rejectedUserInReceivers = NO;
+        for(NSDictionary *user in receivers) {
+            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            if (userID != nil && [userID isEqualToString:rejectedUserId]) {
+                rejectedUserInReceivers = YES;
+                break;
+            }
+        }
+        NSString *callerId = [[caller objectForKey:@"user_id"] stringValue];
+        if (!rejectedUserInReceivers && [callerId isEqualToString:rejectedUserId]) {
+            needCloseView = YES;
+            break;
+        }
+    }
+    NSMutableArray *tempReceivers = [receivers mutableCopy];
+    for (NSDictionary *event in rejectEvents) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            continue;
+        }
+        
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            continue;
+        }
+        NSString *rejectedUserId = [[[eventContent objectForKey:@"user"] objectForKey:@"user_id"] stringValue];
+        for(NSDictionary *user in tempReceivers) {
+            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            if (userID != nil && [userID isEqualToString:rejectedUserId]) {
+                [tempReceivers removeObject:user];
+                break;
+            }
+        }
+    }
+    
+    if ([tempReceivers count] == 0) {
+        needCloseView = YES;
+    }
+    
+    if (needCloseView) {
+        if (!isClosed) {
+            isClosed = YES;
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
+    }
 }
 
 - (void) handleHangup {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    if (!isClosed) {
+        isClosed = YES;
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 @end
 

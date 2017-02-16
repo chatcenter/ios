@@ -104,6 +104,9 @@
         }
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:leftButton];
         self.navigationItem.backBarButtonItem = nil;
+    } else {
+        UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCBackArrow"] style:UIBarButtonItemStylePlain target:self action:@selector(pressBack:)];
+        self.navigationItem.leftBarButtonItem = closeBtn;
     }
 }
 
@@ -172,6 +175,8 @@
         } else {
             [self setOrgProfile:self.orgUid];
         }
+        self.emailHeightConstraint.constant = 0;
+        self.socalIconHeightConstraint.constant = 0;
         return;
     }
     //
@@ -185,15 +190,26 @@
         self.emailHeightConstraint.constant = 19.0f;
         self.socalIconHeightConstraint.constant = 19.0f;
         self.socialIconTapAreaHeightConstraint.constant = 40.0f;
+        ///
+        /// Email
+        ///
         if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]]) {
             self.emailProfileInfo.text = [self.profileUser[@"email"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             [self.imageProfileInfor setUserInteractionEnabled:NO];
-            [self.imageProfileTapAreaView setUserInteractionEnabled:NO];
-        } else if(self.profileUser[@"facebook_id"] != nil && ![self.profileUser[@"facebook_id"] isEqual:[NSNull null]]) {
+            [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
+            self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-mail"];
+        }
+        ///
+        /// Facebook
+        ///
+        if(self.profileUser[@"facebook_id"] != nil && ![self.profileUser[@"facebook_id"] isEqual:[NSNull null]]) {
             self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-facebook"];
             [self.imageProfileInfor setUserInteractionEnabled:YES];
             [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
         }
+        ///
+        /// Twitter
+        ///
         if (self.profileUser[@"twitter_id"] != nil && ![self.profileUser[@"twitter_id"] isEqual:[NSNull null]]) {
             self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-twitter"];
             [self.imageProfileInfor setUserInteractionEnabled:YES];
@@ -362,7 +378,11 @@
             return 0;
         }
         if (section == CC_MENU_PROFILE_SECTION) {
-            return 81;
+            return 105;
+        }
+    } else {
+        if (section == CC_MENU_INFORMATION_SECTION) {
+            return 0;
         }
     }
     

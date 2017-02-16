@@ -20,8 +20,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // cancel button
-    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
-    cancelButton.tintColor = [UIColor blackColor];
+    UIBarButtonItem *cancelButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCcancel_btn"] style:UIBarButtonItemStylePlain target:self action:@selector(cancel)];
+    cancelButton.tintColor = [[CCConstants sharedInstance] baseColor];
     [self.navigationItem setLeftBarButtonItem:cancelButton];
     self.navigationItem.rightBarButtonItem.tintColor = [[CCConstants sharedInstance] baseColor];
     
@@ -52,7 +52,6 @@
 - (void)preview {
     if ([self validInput]) {
         [self showPreviewView];
-//        [self.navigationController performSegueWithIdentifier:@"preview" sender:self];
     }
 }
 

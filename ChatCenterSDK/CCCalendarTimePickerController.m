@@ -46,8 +46,9 @@ const int VIEW_COUNT = 3;
     [super viewDidLoad];
     self.navigationController.navigationBarHidden = YES;
     self.titleLabel.text = CCLocalizedString(@"Schedule");
-    self.titleDiscriptionLabel.text = CCLocalizedString(@"Choose the dates and times you are available");
-    [self.cancelButton setTitle:CCLocalizedString(@"Cancel") forState:UIControlStateNormal];
+    self.titleDiscriptionLabel.text = CCLocalizedString(@"Choose dates and times you are available");
+    [self.cancelButton setImage:[[UIImage imageNamed:@"CCcancel_btn"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    self.cancelButton.tintColor = [[CCConstants sharedInstance] baseColor];
     [self.doneButton setTitle:CCLocalizedString(@"Next") forState:UIControlStateNormal];
     [self.doneButton setTitleColor:[[CCConstants sharedInstance] baseColor] forState:UIControlStateNormal];
     CALayer *topBorderDate = [CALayer layer];
@@ -108,14 +109,6 @@ const int VIEW_COUNT = 3;
     }
     isRotating = NO;
 }
-
-//- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView{
-//    if (scrollView.tag == 0) {
-//        NSLog(@"scrollViewWillBeginDragging tag==0");
-//    }else{
-//        NSLog(@"scrollViewWillBeginDragging tag==1");
-//    }
-//}
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     if (scrollView.tag == 0) {
@@ -877,12 +870,12 @@ const int VIEW_COUNT = 3;
     if (aggregatedDateTimes.count == 0) {
         float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
         if(osVersion >= 8.0f)  { ///iOS8
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Please select the time") message:nil preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Please select at least 1 time slot.") message:nil preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction:[UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:nil]];
             [self presentViewController:alertController animated:YES completion:nil];
         }else{ ///iOS7
             UIAlertView *alertView;
-                    alertView = [[UIAlertView alloc] initWithTitle:CCLocalizedString(@"Please select the time")
+                    alertView = [[UIAlertView alloc] initWithTitle:CCLocalizedString(@"Please select at least 1 time slot.")
                                                            message:nil
                                                           delegate:self
                                                  cancelButtonTitle:CCLocalizedString(@"OK")
@@ -908,24 +901,7 @@ const int VIEW_COUNT = 3;
     previewController.delegate = self.delegate;
     [self.navigationController pushViewController:previewController animated:YES];
     isShowingPreview = YES;
-
-    
-    
-    
-/*
-    preview = [[CCCalendarPreview alloc] initWithFrameAndData:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) selectedDateTimes:aggregatedDateTimes];
-    preview.delegate = self;
-    [self.view addSubview:preview];
-    isShowingPreview = YES;
- */
 }
-
-
-
-
-
-
-
 
 - (CCJSQMessage *)createMessageStickerFromDateTimes:(NSArray *)selectedDateTimes {
     NSMutableArray *actionsDatas = [NSMutableArray array];
@@ -937,6 +913,10 @@ const int VIEW_COUNT = 3;
         [formaterFrom setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_from")];
         [formaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
         
+        NSDateFormatter *formaterWithDate = [[NSDateFormatter alloc] init];
+        [formaterWithDate setDateFormat:CCLocalizedString(@"calendar_sticker_time_format")];
+        [formaterWithDate setTimeZone:[NSTimeZone defaultTimeZone]];
+        
         NSDateFormatter *formaterTo = [[NSDateFormatter alloc] init];
         [formaterTo setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_to")];
         [formaterTo setTimeZone:[NSTimeZone defaultTimeZone]];
@@ -944,15 +924,24 @@ const int VIEW_COUNT = 3;
         ///Choice time button
         NSArray *times = datetimes.times;
         for (int j = 0; j < times.count; j++) {
-            NSString *from = [formaterFrom stringFromDate:times[j][@"from"]];
-            NSString *to = [formaterTo stringFromDate:times[j][@"to"]];
-            NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), from, to, [[NSTimeZone defaultTimeZone] abbreviation]];
-            
-            // set data
             NSDate *startDate = times[j][@"from"];
             NSDate *endDate = times[j][@"to"];
+            // set data
             double start = [startDate timeIntervalSince1970];
             double end = [endDate timeIntervalSince1970];
+            NSCalendar *calendar = [NSCalendar currentCalendar];
+            NSDateComponents *endDateComponents = [calendar components:NSCalendarUnitHour|NSCalendarUnitMinute fromDate:endDate];
+            NSString *from;
+            NSString *to;
+            if (endDateComponents.hour == 0 && endDateComponents.minute == 0) {
+                from = [formaterWithDate stringFromDate:startDate];
+                to = [formaterWithDate stringFromDate:endDate];
+            } else {
+                to = [formaterTo stringFromDate:endDate];
+                from = [formaterFrom stringFromDate:startDate];
+            }
+            NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), from, to, [[NSTimeZone defaultTimeZone] abbreviation]];
+            
             [actionsDatas addObject:@{@"label":label,
                                       @"value":@{@"start":[NSNumber numberWithDouble:start],
                                                  @"end":[NSNumber numberWithDouble:end]}}];
@@ -977,14 +966,6 @@ const int VIEW_COUNT = 3;
     msg.content = content;
     return msg;
 }
-
-
-
-
-
-
-
-
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -1012,38 +993,8 @@ const int VIEW_COUNT = 3;
                 [times removeObject:hourTime];
             }
             BOOL aggregated = YES;
-            
-            ///
-            /// Stopped Aggregate dates temporary
-            ///
-            /// Aggregate dates start
-            
-//            ///Search same startHour and startTime
-//            NSPredicate *predicateStart = [NSPredicate predicateWithFormat:@"endHour == %@ AND endTime == %@", startHour , startTime];
-//            NSArray *resultStart = [times filteredArrayUsingPredicate:predicateStart];
-//            if (resultStart.count > 0) {
-//                ///Expand time
-//                aggregated = NO;
-//                CCHourTime *resultHourTime = [resultStart firstObject];
-//                startHour = resultHourTime.startHour;
-//                startTime = resultHourTime.startTime;
-//                [times removeObject:resultHourTime];
-//            }
-//            ///Search same endHour and endTime
-//            NSPredicate *predicateEnd = [NSPredicate predicateWithFormat:@"startHour == %@ AND startTime == %@", endHour, endTime];
-//            NSArray *resultEnd = [times filteredArrayUsingPredicate:predicateEnd];
-//            if (resultEnd.count > 0) {
-//                ///Expand time
-//                aggregated = NO;
-//                CCHourTime *resultHourTime = [resultEnd firstObject];
-//                endHour = resultHourTime.endHour;
-//                endTime = resultHourTime.endTime;
-//                [times removeObject:resultHourTime];
-//            }
-            
+
             /// Aggregate dates finish
-            
-            
             if (aggregated == YES || times.count == 0) {
                 ///Aggregated Add fromTo to newTimes
                 NSDateComponents* components = [[NSDateComponents alloc] init];
@@ -1079,15 +1030,4 @@ const int VIEW_COUNT = 3;
     }
     self.CCCalendarDateLabel.text = dateLabelText;
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

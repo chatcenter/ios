@@ -1,11 +1,10 @@
-# ChatCenteriO iOS SDKインストールガイド Ver. 1.0.8
+# ChatCenteriO iOS SDKインストールガイド Ver. 1.1.0
 
 ## 目次
 * [Getting Started](#GettingStarted)
 	* [1. サンプルプロジェクトをダウンロード](#DLSample)
 	* [2. Pod install](#PodInstall)
-	* [3. アプリトークンとチームIDを設定](#SetAppOrg)
-	* [4. アプリケーションを起動](#LaunchApp)
+	* [3. アプリケーションを起動](#LaunchApp)
 * [SDKをアプリに組み込む](#InstallYourApp)
 	* [1. Xcodeでの設定](#SettingOfXcode)
 	* [2. App Tokenのセット](#SetAppToken)
@@ -17,6 +16,7 @@
     * [2. デザインのカスタマイズ](#DesignCustom)
     * [3. 未読メッセージ数の取得](#ConfirmMessage)
     * [4. Orgのオンライン/オフラインの取得](#GetOnline/Offline)
+    * [5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)
 
 <a id="GettingStarted"></a>
 ## Getting Started
@@ -30,14 +30,8 @@ Exampleプロジェクトが含まれています。
 #### 2. Pod install
 Exampleフォルダにてpod installを実行してください
 
-<a id="SetAppOrg"></a>
-#### 3. アプリトークンとチームIDを設定
-<p align="center"><img src="InstallationImages/sample1.png"></p>
-サンプルプロジェクトを開き、ViewController.m内のアプリトークンとチームIDを設定してください。
-アプリトークンとチームIDはダッシュボードから確認できます。
-
 <a id="LaunchApp"></a>
-#### 4. アプリケーションを起動
+#### 3. アプリケーションを起動
 <p align="center"><img src="InstallationImages/sample2.png" width="320"></p>
 
 <a id="InstallYourApp"></a>
@@ -56,6 +50,9 @@ Exampleフォルダにてpod installを実行してください
 target 'TargetName' do
 pod 'ChatCenterSDK', :git => "https://github.com/chatcenter/ios.git"
 pod 'OpenTok'
+pod 'GoogleMaps'
+pod 'GooglePlaces'
+pod 'GooglePlacePicker'
 end
 ```
 
@@ -64,6 +61,7 @@ end
 例)
 pod install
 ```
+
 #### (b)ソースからインストール
 **ソースのダウンロード**  
 [こちら](https://github.com/chatcenter/ios/releases)よりChatCenterSDKをダウンロードします。  
@@ -92,7 +90,7 @@ ChatCenterSDK内にPCHファイルがありますのでパスを通してくだ�
 下図のように、プロジェクト > Build Settings > Apple LLVM 7.0 - Language > Prefix Headerに”(プロジェクト以下のパス)/ChatCenterSDK/ChatCenter.pch”と指定してください。
 <p align="center"><img src="InstallationImages/pch.png" width="640"></p>
 
-**OpenTokライブラリの追加**  
+**OpenTok/Google Mapsライブラリの追加**  
 OpenTokはChatCenterSDK内で使用しているボイス/ビデオチャットのライブラリです。  
 ご使用のPodfileに以下を追加してください。  
 
@@ -100,8 +98,13 @@ OpenTokはChatCenterSDK内で使用しているボイス/ビデオチャット�
 例)
 target 'TargetName' do
 pod 'OpenTok'
+pod 'GoogleMaps'
+pod 'GooglePlaces'
+pod 'GooglePlacePicker'
 end
 ```
+
+既にGoogle Maps SDKをご使用の場合はAPIキーの重複を防ぐため、[5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)をご確認ください。
 
 該当のフォルダにてpod installを実施してください。
 ```
@@ -908,3 +911,36 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
 
 …
 ```
+***
+
+<a id="DuplicateGoogleMapSDK"></a>
+### 5. Google Maps SDKを既に使用している場合
+ChatCenterSDKでは、ロケーションウィジェットでGoogle Maps SDKを使用しています。
+もし導入されるアプリで既にGoogle Maps SDKを使用している場合は、APIキーの重複が生じる可能性があるため、以下の設定をお願いします。
+#### 5-1. Preprocessor Macrosの登録
+下図のように、プロジェクト > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macrosに"EXIST_GOOGLEMAPS_API_KEY=1"を追加してください。<br>
+この設定により、ChatCenterSDK内でAPIキーのセットが実施されないようになります。
+<p align="center"><img src="InstallationImages/googlemapssdk1.png"></p>
+
+#### 5-2. Google APIキーのセット
+既存のGoogle APIキーが、以下のようにdidFinishLaunchingWithOptionsにてセットされていることをご確認ください。
+
+```
+例)
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+…
+
+[GMSServices provideAPIKey:"既存のAPIキーをセットください"];
+[GMSPlacesClient provideAPIKey:"既存のAPIキーをセットください"];
+
+…
+}
+```
+
+#### 5-3. APIの有効化
+[Google APIのダッシュボード](#https://console.developers.google.com/apis/dashboard)にて、Google Maps SDK for iOSおよびGoogle Places API for iOSが有効になっていることをご確認ください。
+<p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>

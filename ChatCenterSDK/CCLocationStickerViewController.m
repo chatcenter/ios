@@ -11,13 +11,17 @@
 #import "CCConstants.h"
 #import "CCCommonWidgetPreviewViewController.h"
 #import "UIImage+CCSDKImage.h"
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+#import <GooglePlacePicker/GooglePlacePicker.h>
 
-
-@interface CCLocationStickerViewController () <MKMapViewDelegate, UIGestureRecognizerDelegate> {
-    MKPointAnnotation *currentAnnotation;
-    BOOL shouldAutoShowUserLocation;
+@interface CCLocationStickerViewController () {
+    GMSPlace *selectedPlace;
+    BOOL returnFromPreview;
+    BOOL isShowingPicker;
 }
-@property (nonatomic, strong) MKLocalSearch *localSearch;
+@property (nonatomic, strong) GMSPlacePicker *placePicker;
+@property (nonatomic, strong) CLLocation *currentLocation;
 @end
 
 @implementation CCLocationStickerViewController
@@ -26,43 +30,20 @@ int mapTapCount = 0; // Count times tap on the MapView
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.mapView setDelegate:self];
-    [self.mapView setShowsUserLocation:YES];
-    shouldAutoShowUserLocation = YES;
-    
-    self.navigationItem.title = CCLocalizedString(@"Location");
-    
-    UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Cancel") style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
-    self.navigationItem.leftBarButtonItem = closeBtn;
-
-    
-    UIBarButtonItem *sendBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Preview") style:UIBarButtonItemStylePlain target:self action:@selector(selectLocationSticker:)];
-    self.navigationItem.rightBarButtonItem = sendBtn;
-
-    
-    // Map single tap handle
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:nil];
-    doubleTap.numberOfTapsRequired = 2;
-    doubleTap.numberOfTouchesRequired = 1;
-    [self.mapView addGestureRecognizer:doubleTap];
-    
-    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleGesture:)];
-    singleTap.numberOfTapsRequired = 1;
-    singleTap.numberOfTouchesRequired = 1;
-    [singleTap requireGestureRecognizerToFail: doubleTap];
-    [self.mapView addGestureRecognizer:singleTap];
-    
-    mapTapCount = 0;
-    
+    isShowingPicker = NO;
+    returnFromPreview = NO;
     // setup location
     [self locationSetup];
+    self.navigationController.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    NSArray *anotations = self.mapView.annotations;
-    [self.mapView removeAnnotations:anotations];
+- (void)viewWillAppear:(BOOL)animated {
+    if (returnFromPreview) {
+        [self showPlacePicker];
+        returnFromPreview = NO;
+    }
 }
+
 - (void)closeModal {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -107,6 +88,8 @@ int mapTapCount = 0; // Count times tap on the MapView
                 
             case kCLAuthorizationStatusDenied:
             case kCLAuthorizationStatusRestricted: {
+                NSLog(@"Location is denied");
+                [self closeModal];
                 // Display alert to the user.
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Location services")
                                                                                message:CCLocalizedString(@"Location services are not enabled on this device. Please enable location services in settings.")
@@ -116,7 +99,6 @@ int mapTapCount = 0; // Count times tap on the MapView
                 
                 [alert addAction:defaultAction];
                 [self presentViewController:alert animated:YES completion:nil];
-                NSLog(@"Location is denied");
                 return NO;
             }
         }
@@ -125,90 +107,11 @@ int mapTapCount = 0; // Count times tap on the MapView
     return YES;
 }
 
-#pragma mark - MKMapViewDelegate
-
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
-    if (shouldAutoShowUserLocation) {
-        shouldAutoShowUserLocation = NO;
-        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(self.mapView.userLocation.coordinate, 1500, 1500);
-        MKCoordinateRegion newRegion = [self.mapView regionThatFits:viewRegion];
-        [self.mapView setRegion:newRegion animated:YES];
-    }
-}
-
-- (void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated {
-    // don't hide anotations when move map or zoom map
-//    NSArray *anotations = self.mapView.annotations;
-//    [self.mapView removeAnnotations:anotations];
-//    currentAnnotation = nil;
+- (void)sendLocationMessage {
+# ifdef CC_GOOGLEMAPS_API_KEY
+    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude,selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
     
-    if (self.isLocalLocationActive) {
-        // First time of region change when isLocalLocationActive, is moved automatically to current location
-        // Next time of region change, is moved by user interaction
-        self.isLocalLocationActive = NO;
-    } else {
-        [self.localLocation setImage:[UIImage SDKImageNamed:@"CCcurrent-location"] forState:UIControlStateNormal];
-    }
-}
-
-- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    
-    mapTapCount = 0; // reset count
-    
-    CLGeocoder *geo = [[CLGeocoder alloc] init];
-    CLLocation *loc = [[CLLocation alloc] initWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude];
-    
-    [geo reverseGeocodeLocation:loc
-              completionHandler:^(NSArray *placemarks, NSError *error) {
-                  if (!error){
-                      CLPlacemark *placemark = [placemarks objectAtIndex:0];
-                      NSString *address = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
-                      
-                      NSArray *anotations = self.mapView.annotations;
-                      [self.mapView removeAnnotations:anotations];
-                      
-                      MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-                      annotation.coordinate = self.mapView.centerCoordinate;
-                      annotation.title = CCLocalizedString(@"Tap here");
-                      annotation.subtitle = address;
-                      [self.mapView addAnnotation:annotation];
-                      [self.mapView selectAnnotation:annotation animated:NO];
-                      currentAnnotation = annotation;
-                  }
-                  else {
-                      NSLog(@"Could not locate");
-                  }
-              }];
-}
-
-- (void)handleGesture:(UIGestureRecognizer *)gestureRecognizer
-{
-    if (gestureRecognizer.state != UIGestureRecognizerStateEnded)
-        return;
-    
-    mapTapCount += 1;
-    
-    if (mapTapCount % 2 == 0) {
-        // Remove all anotations and add new one
-        NSArray *anotations = self.mapView.annotations;
-        [self.mapView removeAnnotations:anotations];
-        
-        [self.mapView addAnnotation:currentAnnotation];
-        [self.mapView selectAnnotation:currentAnnotation animated:NO];
-    }
-    
-}
-
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-//    UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectLocationSticker:)];
-//    [view addGestureRecognizer:tapGes];
-}
-
-- (void)selectLocationSticker:(id)sender {
-    
-    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",currentAnnotation.coordinate.latitude,currentAnnotation.coordinate.longitude,currentAnnotation.coordinate.latitude,currentAnnotation.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
-    
-    NSString *text = currentAnnotation.subtitle;
+    NSString *text = selectedPlace.name;
     if (!text) {
         text = @"";
     }
@@ -218,8 +121,8 @@ int mapTapCount = 0; // Count times tap on the MapView
                                       CC_RESPONSETYPESTICKERCONTENT:
                                           @{@"sticker-data" :
                                                 @{@"location" :
-                                                      @{@"lat":[NSString stringWithFormat:@"%f", currentAnnotation.coordinate.latitude],
-                                                        @"lng":[NSString stringWithFormat:@"%f", currentAnnotation.coordinate.longitude]}
+                                                      @{@"lat":[NSString stringWithFormat:@"%f", selectedPlace.coordinate.latitude],
+                                                        @"lng":[NSString stringWithFormat:@"%f", selectedPlace.coordinate.longitude]}
                                                   },
                                             @"thumbnail-url" : mapThumbURLStr
                                             }
@@ -232,97 +135,43 @@ int mapTapCount = 0; // Count times tap on the MapView
     CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
     [vc setDelegate:self.delegate];
     [vc setMessage:msg];
-    
+    returnFromPreview = YES;
     [self.navigationController pushViewController:vc animated:YES];
-    
-    /*
-    
-    if ([self.delegate respondsToSelector:@selector(didSelectLocationWithLatitude:longitude:address:)]){
-        [self.delegate didSelectLocationWithLatitude:currentAnnotation.coordinate.latitude longitude:currentAnnotation.coordinate.longitude address:currentAnnotation.subtitle];
-    }
-    [self dismissViewControllerAnimated:YES completion:nil];
-     */
+#endif
 }
 
-
-#pragma mark - UISearchBar Delegate
-
-- (void)searchBarCancelButtonClicked:(UISearchBar *) searchBar {
-    [searchBar resignFirstResponder];
-}
-
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
-    [searchBar setShowsCancelButton:YES animated:YES];
-}
-
-- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
-    [searchBar setShowsCancelButton:NO animated:YES];
-}
-
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-    [searchBar setShowsCancelButton:NO animated:YES];
-    [searchBar resignFirstResponder];
-    [self startSearch:searchBar.text];
-}
-
-- (void)startSearch:(NSString *)searchString {
-    if (self.localSearch.searching)
-    {
-        [self.localSearch cancel];
-    }
-    
-    MKLocalSearchRequest *request = [[MKLocalSearchRequest alloc] init];
-    
-    request.naturalLanguageQuery = searchString;
-    request.region = self.mapView.region;
-    
-    MKLocalSearchCompletionHandler completionHandler = ^(MKLocalSearchResponse *response, NSError *error) {
+- (void) showPlacePicker {
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake(_currentLocation.coordinate.latitude, _currentLocation.coordinate.longitude);
+    CLLocationCoordinate2D northEast = CLLocationCoordinate2DMake(center.latitude + 0.001, center.longitude + 0.001);
+    CLLocationCoordinate2D southWest = CLLocationCoordinate2DMake(center.latitude - 0.001, center.longitude - 0.001);
+    GMSCoordinateBounds *viewport = [[GMSCoordinateBounds alloc] initWithCoordinate:northEast
+                                                                         coordinate:southWest];
+    GMSPlacePickerConfig *config = [[GMSPlacePickerConfig alloc] initWithViewport:viewport];
+    _placePicker = [[GMSPlacePicker alloc] initWithConfig:config];
+    [UINavigationBar appearance].tintColor = [[CCConstants sharedInstance] baseColor];
+    isShowingPicker = YES;
+    [_placePicker pickPlaceWithCallback:^(GMSPlace *place, NSError *error) {
+        isShowingPicker = NO;
         if (error != nil) {
-            NSString *errorStr = [[error userInfo] valueForKey:NSLocalizedDescriptionKey];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:CCLocalizedString(@"Could not find places")
-                                                            message:errorStr
-                                                           delegate:nil
-                                                  cancelButtonTitle:CCLocalizedString(@"OK")
-                                                  otherButtonTitles:nil];
-            [alert show];
-        } else {
-            MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance([[response mapItems] firstObject].placemark.coordinate, 1000, 1000);
-            MKCoordinateRegion newRegion = [self.mapView regionThatFits:viewRegion];
-            [self.mapView setRegion:newRegion animated:YES];
+            NSLog(@"Pick Place error %@", [error localizedDescription]);
+            [self closeModal];
+            return;
         }
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    };
-    
-    if (self.localSearch != nil) {
-        self.localSearch = nil;
-    }
-    self.localSearch = [[MKLocalSearch alloc] initWithRequest:request];
-    
-    [self.localSearch startWithCompletionHandler:completionHandler];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+        
+        if (place != nil) {
+            selectedPlace = place;
+            ///
+            /// Goto preview view
+            ///
+            [self sendLocationMessage];
+        } else {
+            NSLog(@"No place selected");
+            [self closeModal];
+        }
+    }];
 }
 
-- (IBAction)showLocalLocation:(id)sender {
-    if (![self checkLocationEnabled]) {
-        return;
-    }
-    
-    self.isLocalLocationActive = YES;
-    [self.localLocation setImage:[UIImage SDKImageNamed:@"CCcurrent-location-active"] forState:UIControlStateNormal];
-    MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(self.mapView.userLocation.coordinate, 1000, 1000);
-    MKCoordinateRegion newRegion = [self.mapView regionThatFits:viewRegion];
-    [self.mapView setRegion:newRegion animated:YES];
-}
-
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    shouldAutoShowUserLocation = NO;
-}
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
-    return YES;
-}
-
-#pragma mark - Location Sticker
-
+#pragma mark - Location Manager delegates
 -(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
     switch (status) {
@@ -336,6 +185,7 @@ int mapTapCount = 0; // Count times tap on the MapView
         case kCLAuthorizationStatusDenied:
         case kCLAuthorizationStatusRestricted:
             NSLog(@"Location is denied");
+            [self closeModal];
             break;
     }
 }
@@ -346,5 +196,12 @@ int mapTapCount = 0; // Count times tap on the MapView
 {
 }
 
-
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    CLLocation *location = locations.firstObject;
+    _currentLocation = location;
+    if ((isShowingPicker || _placePicker != nil) && [self checkLocationEnabled]) {
+        return;
+    }
+    [self showPlacePicker];
+}
 @end

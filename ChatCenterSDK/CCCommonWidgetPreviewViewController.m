@@ -27,12 +27,22 @@
     self.navigationController.navigationBarHidden = NO;
     
     // cancel preview button
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCBackArrow"] style:UIBarButtonItemStylePlain target:self action:@selector(pressBack)];
+    self.navigationItem.leftBarButtonItem = backButton;
     self.navigationController.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
     
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Send")
                                                style:UIBarButtonItemStyleDone target:self action:@selector(sendMessage:)];
     
+}
+
+- (void) pressBack {
+    if (self.navigationController != nil && self.navigationController.viewControllers.count > 1) {
+        [self.navigationController popViewControllerAnimated:YES];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void) viewWillAppear:(BOOL)animated {
@@ -50,7 +60,6 @@
     _sendButton.backgroundColor = [[CCConstants sharedInstance] baseColor];
     _sendButton.layer.cornerRadius = 5.0f;
     [self createPreviewView];
-//    [self.view addSubview:[self createPreviewView]];
 }
 
 - (UIView *)createPreviewView {
@@ -99,6 +108,10 @@
     if (delegate != nil) {
         NSLog(@"send message");
         [delegate sendWidgetWithType:message.type andContent:message.content];
+        if ([message.type isEqualToString:CC_STICKERTYPEIMAGE]) {
+            [self.navigationController popViewControllerAnimated:YES];
+            return;
+        }
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }

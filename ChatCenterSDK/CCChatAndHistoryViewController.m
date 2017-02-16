@@ -169,18 +169,17 @@
 }
 - (void)displayContentController:(UIViewController *)content cgrect:(CGRect)cgrect
 {
-    // 自身のビューコントローラ階層に追加
-    // 自動的に子ViewControllerの`willMoveToParentViewController:`メソッドが呼ばれる
+    // Add to own view controller hierarchy
+    // The method of the child ViewController `willMoveToParentViewController` is automatically called
     [self addChildViewController:content];
     
-    // 子ViewControllerの表示領域を設定
-//    content.view.frame = self.view.bounds;
+    // Set display area of child view controller
     content.view.frame = cgrect;
     
-    // 子ViewControllerのviewを、自身のview階層に追加
+    // Add view of child view controller to its view hierarchy
     [self.view addSubview:content.view];
     
-    // 子ViewControllerに追加されたことを通知
+    // Notify that it has been added to child view controller
     [content didMoveToParentViewController:self];
     
     if([borderLine isDescendantOfView:self.view]) {
@@ -222,17 +221,16 @@
 }
 
 
-// 指定したViewControllerを削除
+// Delete specified ViewController
 - (void)hideContentController:(UIViewController *)content
 {
-    // これから取り除かれようとしていることを通知する
     [content willMoveToParentViewController:nil];
     
-    // 子ViewControllerの`view`を取り除く
+    // Remove view from super view
     [content.view removeFromSuperview];
     
-    // 子ViewControllerを取り除く
-    // 自動的に`didMoveToParentViewController:`が呼ばれる
+    // Remove child view controller
+    // `didMoveToParentViewController:` is automatically called
     [content removeFromParentViewController];
 }
 
@@ -242,15 +240,4 @@
     [[CCConnectionHelper sharedClient] setCurrentView:nil];
     [[CCConnectionHelper sharedClient] setDelegate:nil];
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
 @end

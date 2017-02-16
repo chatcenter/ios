@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.0.9"
+#define CC_SDK_VERSION                    @"1.1.0"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_VIDEO 1
@@ -33,10 +33,9 @@
     #define CC_WEB_DASHBOARD_URL        @"https://app.chatcenter.io"
 #endif
 
-#define kBundleResourceName         @"ChatCenter"
-//#define SDK_BUNDLE  [NSBundle bundleWithPath:[[NSBundle bundleForClass:[CCConstants class]] pathForResource:@"ChatCenter" ofType:@"bundle"]]
-#define SDK_BUNDLE  [NSBundle bundleForClass:[CCConstants class]]
 
+#define kBundleResourceName         @"ChatCenter"
+#define SDK_BUNDLE  [NSBundle bundleForClass:[CCConstants class]]
 
 #define CC_AVATAR_SATURATION 0.6
 #define CC_AVATAR_BRIGHTNESS 0.71
@@ -117,9 +116,6 @@ extern NSString *const kCCUserDefaults_userIconUrl;
 extern NSString *const kCCUserDefaults_userId;
 extern NSString *const kCCUserDefaults_userEmail;
 extern NSString *const kCCUserDefaults_liveLocationDuration;
-
-// Google Maps API key
-#define CC_GOOGLEMAPS_API_KEY @"AIzaSyClywESBIw6gxHBQiz12wtC7DZ9hjGdyQI"
 
 typedef enum {
     CCGetChannels,
@@ -207,6 +203,9 @@ extern const int CCloadLoacalOrgLimit;
 extern const int CCdeleteLoacalLimit;
 extern const int CCUploadFileSizeLimit;
 extern const int CCInputTextLimit;
+extern const int CCWidgetInputTitleLimit;
+extern const int CCWidgetInputChoiceTextLimit;
+extern const int CCWidgetInputNumberChoiceLimit;
 extern const int CCImageMaxSize;
 + (CCConstants *)sharedInstance;
 + (UIColor *)defaultBaseColor;

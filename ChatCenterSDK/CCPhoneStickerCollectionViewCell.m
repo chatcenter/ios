@@ -19,14 +19,6 @@
 
 @implementation CCPhoneStickerCollectionViewCell
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
-
 - (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options userList:(NSArray*)users {
 
     
@@ -78,12 +70,9 @@
         //        [stickerActionsContainer addSubview:button];
     }
     
-
-    
     return YES;
 
 }
-
 
 - (NSAttributedString *)createMessageString:(CCJSQMessage *)msg {
 
@@ -91,7 +80,6 @@
     long startCallTime = 0;
     long endCallTime = 0;
 
-    
     NSArray *events = msg.content[@"events"];
     if (events != nil && ![events isEqual:[NSNull null]]) {
         Boolean isMissedCall = false;
@@ -253,7 +241,6 @@
             [content setObject:callerInfo forKey:@"caller"];
         }
         [content setObject:@[caller] forKey:@"receivers"];
-        //        [callInfo setObject:_msg.uid forKey:@"id"];
         [callInfo removeObjectForKey:@"events"];
         [callInfo setObject:content forKey:@"content"];
         [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToCallAgain object:senderName userInfo:callInfo];
@@ -262,7 +249,6 @@
         if(callerInfo) {
             [content setObject:callerInfo forKey:@"caller"];
         }
-        //        [callInfo setObject:_msg.uid forKey:@"id"];
         [callInfo removeObjectForKey:@"events"];
         [callInfo setObject:content forKey:@"content"];
         [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToCallAgain object:receiverName userInfo:callInfo];
@@ -272,7 +258,6 @@
 
 
 + (CGSize) estimateSizeForMessage:(CCJSQMessage *)msg atIndexPath:(NSIndexPath *)indexPath hasPreviousMessage:(CCJSQMessage *)preMsg options:(CCStickerCollectionViewCellOptions)options withListUser:(NSArray *)users {
-    // NGOCNH
     int height = 0;
     
     // date height
@@ -404,8 +389,6 @@
             }
         }
     }
-    
-    
     
     // sticker actions height
     NSString *stickerActionType = msg.content[@"sticker-action"][@"action-type"];

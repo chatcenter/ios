@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "CCQuestionWidgetEditorViewController.h"
 #import "CCBaseQuestionWidgetPaneViewController.h"
+#import "CCConstants.h"
 
-@interface CCLinearScalePaneController : CCBaseQuestionWidgetPaneViewController
+@interface CCLinearScalePaneController : CCBaseQuestionWidgetPaneViewController<UITextFieldDelegate>
 @property (strong, nonatomic) IBOutlet UIButton *fromButton;
 @property (strong, nonatomic) IBOutlet UILabel *fromValueLabel;
 @property (strong, nonatomic) IBOutlet UITextField *fromLabelTextfield;

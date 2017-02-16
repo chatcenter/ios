@@ -67,6 +67,7 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
     cell.textView.leftViewMode = UITextFieldViewModeAlways;
     cell.textView.placeholder = [NSString stringWithFormat:@"%@ %ld", CCLocalizedString(@"Option"), indexPath.row + 1];
     cell.textView.text = label;
+    cell.textView.delegate = self;
     cell.index = indexPath.row;
     cell.delegate = self;
     if(optionLabels.count == 1 && indexPath.row == 0) {
@@ -86,6 +87,15 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
 }
 
 - (IBAction)addOption:(id)sender {
+    NSInteger numberOption = [optionLabels count];
+    if (numberOption >= CCWidgetInputNumberChoiceLimit) {
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:CCLocalizedString(@"Please select up to %d choices"), CCWidgetInputNumberChoiceLimit] message:nil preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:nil];
+        [alertVC addAction:okAction];
+        [self presentViewController:alertVC animated:YES completion:nil];
+        return;
+    }
+    
     [self getDataFromTextviews];
     [optionLabels addObject:@""];
     [self.tableView reloadData];
@@ -95,7 +105,7 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
     for (int i = 0; i < optionLabels.count; i++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:0];
         CCSingleSelectionQuestionWidgetEditorCell *theCell = [self.tableView cellForRowAtIndexPath:indexPath];
-        if (theCell != nil) {
+        if (theCell != nil && theCell.textView.text.length != 0) {
             optionLabels[i] = theCell.textView.text;
         }
     }
@@ -139,4 +149,14 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
     return stickerAction;
 }
 
+#pragma mark - Textview delegate
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+    if(range.length + range.location > textField.text.length)
+    {
+        return NO;
+    }
+    
+    NSUInteger newLength = [textField.text length] + [string length] - range.length;
+    return newLength <= CCWidgetInputChoiceTextLimit;
+}
 @end

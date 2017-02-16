@@ -15,7 +15,7 @@
 -(void)bringViewToVisibleArea:(UIView*)view;
 @end
 
-@interface CCQuestionWidgetEditorViewController : CCCommonWidgetEditorViewController<UIGestureRecognizerDelegate, CCQuestionEditorScrollViewDelegate, UITextFieldDelegate> {
+@interface CCQuestionWidgetEditorViewController : CCCommonWidgetEditorViewController<UIGestureRecognizerDelegate, CCQuestionEditorScrollViewDelegate, UITextViewDelegate> {
     
     IBOutlet UIView *containerView;
     IBOutlet UIScrollView *scrollView;

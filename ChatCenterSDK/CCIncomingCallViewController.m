@@ -48,11 +48,6 @@
     }
     [self setupCallerAvatar];
     self.callingLabel.text = CCLocalizedString(@"is calling you...");
-    
-    // Audio or Video call
-    if ([self.actionCall isEqualToString:CC_ACTIONTYPE_VOICECALL]) {
-        self.acceptVideo.hidden = YES;
-    }
 }
 
 - (void) setupCallerAvatar {
@@ -89,13 +84,13 @@
 
 #pragma mark - Actions
 - (IBAction)reject:(id)sender {
-    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id":uid}  completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id":@([uid integerValue])}  completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }];
 }
 
 - (IBAction)acceptVideo:(id)sender {
-    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":uid}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
         if (error == nil) {
             CCOpenTokVideoCallViewController *videoCallVC = [[CCOpenTokVideoCallViewController alloc] initWithNibName:@"CCOpenTokVideoCallViewController" bundle:SDK_BUNDLE];
             videoCallVC.isCaller = NO;
@@ -121,7 +116,7 @@
 }
 
 - (IBAction)acceptAudio:(id)sender {
-    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":uid}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
         if (error == nil) {
             CCOpenTokVideoCallViewController *videoCallVC = [[CCOpenTokVideoCallViewController alloc] initWithNibName:@"CCOpenTokVideoCallViewController" bundle:SDK_BUNDLE];
             videoCallVC.isCaller = NO;
@@ -148,10 +143,15 @@
 
 #pragma mark - CCVideoCallEventHandlerDelegate
 - (void)handleCallEvent:(NSString *)messageId content:(NSDictionary *)content {
+    
     NSArray *events = content[@"events"];
+    NSArray *receivers = content[@"receivers"];
+    NSDictionary *caller = content[@"caller"];
     if (events == nil) {
         return;
     }
+    
+    BOOL needHandleReject = NO;
     for (int i = 0; i < events.count; i++) {
         NSDictionary *eventContent = events[i][@"content"];
         if(eventContent == nil ) {
@@ -162,28 +162,114 @@
             return;
         }
         if ([action isEqualToString:@"reject"]) {
-            [self handleReject];
+            needHandleReject = YES;
         }
         if ([action isEqualToString:@"accept"]) {
-            [self handleAccept:content];
+            [self handleAccept:eventContent];
+            return;
         }
+    }
+    if (needHandleReject) {
+        [self handleReject:receivers caller:caller events:events];
     }
 }
 
-- (void) handleReject {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+- (void) handleReject:(NSArray *)receivers caller:(NSDictionary *)caller events:(NSArray *)events {
+    BOOL needCloseView = NO;
+    
+    if (events == nil) {
+        return;
+    }
+    ///
+    /// 1. Filter reject events
+    ///
+    NSMutableArray *rejectEvents = [NSMutableArray array];
+    for(NSDictionary *event in events) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            return;
+        }
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            return;
+        }
+        if ([action isEqualToString:@"reject"]) {
+            [rejectEvents addObject:event];
+        }
+    }
+    
+    ///
+    /// Case-1: If rejected user in receivers and the user's id is same with the current user's id
+    /// Or rejected user is caller then dismiss incoming view.
+    ///
+    for (NSDictionary *event in rejectEvents) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            continue;
+        }
+
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            continue;
+        }
+        
+        NSString *rejectedUserId = [eventContent[@"user"][@"user_id"] stringValue];
+        BOOL rejectedUserInReceivers = NO;
+        for(NSDictionary *user in receivers) {
+            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            if (userID != nil && [userID isEqualToString:rejectedUserId]) {
+                rejectedUserInReceivers = YES;
+                break;
+            }
+        }
+        NSString *callerId = [[caller objectForKey:@"user_id"] stringValue];
+        if ((!rejectedUserInReceivers && [callerId isEqualToString:rejectedUserId])|| (rejectedUserInReceivers && [rejectedUserId isEqualToString:uid])) {
+            needCloseView = YES;
+            break;
+        }
+    }
+    
+    ///
+    /// Case-2: All receivers already rejected
+    ///
+    NSMutableArray *tempReceivers = [receivers mutableCopy];
+    for (NSDictionary *event in rejectEvents) {
+        NSDictionary *eventContent = event[@"content"];
+        if(eventContent == nil ) {
+            continue;
+        }
+        
+        NSString *action = eventContent[@"action"];
+        if(action == nil) {
+            continue;
+        }
+        NSString *rejectedUserId = [eventContent[@"user"][@"user_id"] stringValue];
+        for(NSDictionary *user in tempReceivers) {
+            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            if (userID != nil && [userID isEqualToString:rejectedUserId]) {
+                [tempReceivers removeObject:user];
+                break;
+            }
+        }
+    }
+    
+    if ([tempReceivers count] == 0) {
+        needCloseView = YES;
+    }
+    
+    if (needCloseView) {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (void) handleAccept: (NSDictionary *)content {
-    NSArray *receivers = content[@"receivers"];
-    NSLog(@"Receivers = %@", receivers);
+    ///
+    /// Close incoming call view if other agent already accepted the call
+    ///
     BOOL otherAcceptedCall = YES;
-    for (NSDictionary *receiver in receivers) {
-        NSString *receiverId = [[receiver valueForKey:@"user_id"] stringValue];
-        if([receiverId isEqualToString:uid]) {
-            otherAcceptedCall = NO;
-            break;
-        }
+    NSString *acceptedUserId = [content[@"user"][@"user_id"] stringValue];
+    if([acceptedUserId isEqualToString:uid]) {
+        otherAcceptedCall = NO;
     }
     
     if (otherAcceptedCall) {

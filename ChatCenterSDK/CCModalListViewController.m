@@ -18,6 +18,7 @@
 #import "CCWebViewController.h"
 #import "UIImage+CCSDKImage.h"
 #import "CCModalListHeader.h"
+#import "CCAboutChatCenterViewController.h"
 
 int const CCMaxLoadOrg = 10000;
 
@@ -136,7 +137,7 @@ int const CCMaxLoadOrg = 10000;
         } else {
             return 0;
         }
-    } else { // Settings
+    } else { // Settings or About
         return 0;
     }
 }
@@ -385,9 +386,26 @@ int const CCMaxLoadOrg = 10000;
 
 -(void)pressSwitchApp:(NSDictionary *)app{
     /// selected cell is already selected or not
-    NSString *appUid = app[@"uid"];
+        if ([app valueForKey:@"id"] == nil
+        || [app[@"id"] isEqual:[NSNull null]]
+        || ![app[@"id"] isKindOfClass:[NSNumber class]]
+        || [app valueForKey:@"token"] == nil
+        || [app[@"token"] isEqual:[NSNull null]]
+        || ![app[@"token"] isKindOfClass:[NSString class]]
+        || [app valueForKey:@"name"] == nil
+        || [app[@"name"] isEqual:[NSNull null]]
+        || ![app[@"name"] isKindOfClass:[NSString class]]
+        || [app valueForKey:@"stickers"] == nil
+        || [app[@"stickers"] isEqual:[NSNull null]]
+        || ![app[@"stickers"] isKindOfClass:[NSArray class]]
+        || [app valueForKey:@"business_type"] == nil
+        || [app[@"business_type"] isEqual:[NSNull null]]
+        || ![app[@"business_type"] isKindOfClass:[NSString class]]){
+        return;
+    }
+    NSNumber *appId = app[@"id"];
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
-    if ([appUid isEqualToString:[ud stringForKey:@"ChatCenterUserdefaults_currentAppUid"]]) {
+    if (appId == [ud objectForKey:@"ChatCenterUserdefaults_currentAppId"]) {
         return;
     }
     
@@ -395,7 +413,7 @@ int const CCMaxLoadOrg = 10000;
     [CCConstants sharedInstance].appName = app[@"name"];
     [CCConstants sharedInstance].stickers = app[@"stickers"];
     [CCConstants sharedInstance].businessType = app[@"business_type"];
-    [ud setObject:appUid forKey:@"ChatCenterUserdefaults_currentAppUid"];
+    [ud setObject:appId forKey:@"ChatCenterUserdefaults_currentAppId"];
     [ud removeObjectForKey:@"ChatCenterUserdefaults_currentOrgUid"];
     [ud synchronize];
     [[CCCoredataBase sharedClient] deleteAllOrg];
@@ -425,41 +443,86 @@ int const CCMaxLoadOrg = 10000;
     }];
 }
 
+-(void) openDashboard {
+    NSURL *dashboardURL = [[NSURL alloc] initWithString:CC_WEB_DASHBOARD_URL];
+    if (dashboardURL != nil) {
+        [self openURL:dashboardURL];
+    }
+}
+
+-(void) pressAbout {
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
+    CCAboutChatCenterViewController *aboutAppView = [storyboard  instantiateViewControllerWithIdentifier:@"AboutChatCenterViewController"];
+    aboutAppView.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    aboutAppView.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    aboutAppView.isOpenedFromRightMenu = NO;
+    UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:aboutAppView];
+    [self presentViewController:rootNC animated:YES completion:nil];
+}
+
 - (IBAction)closeModalDialog:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (IBAction)onClickSetting:(id)sender {
     UIAlertController *actionSheet = nil;
-    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-    NSString *appVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];;
-    NSString *title = [NSString stringWithFormat:@"%@ %@",appName, appVersion];
+    ///
+    /// App name
+    ///
+    NSString *appName = CCLocalizedString(@"ChatCenter iO for iOS");
+    
+    ///
+    /// App version
+    ///
+    NSString *appVersion = [NSString stringWithFormat:@"%@ %@", CCLocalizedString(@"Version"), [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]];
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
-        actionSheet = [UIAlertController alertControllerWithTitle:title
-                                                          message:nil
+        actionSheet = [UIAlertController alertControllerWithTitle:appName
+                                                          message:appVersion
                                                    preferredStyle:UIAlertControllerStyleAlert];
     } else {
-        actionSheet = [UIAlertController alertControllerWithTitle:title
-                                                          message:nil
+        actionSheet = [UIAlertController alertControllerWithTitle:appName
+                                                          message:appVersion
                                                    preferredStyle:UIAlertControllerStyleActionSheet];
     }
+    
+    ///
+    /// Open dashboard
+    ///
+    UIAlertAction *openDashboardAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Open Dashboard") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self openDashboard];
+    }];
+    [actionSheet addAction:openDashboardAction];
+    
+    ///
+    /// About chatcenter
+    ///
+    UIAlertAction *aboutAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"About ChatCenter.iO") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self pressAbout];
+    }];
+    [actionSheet addAction:aboutAction];
+    
+    ///
+    /// Log out button
+    ///
     [actionSheet addAction:[UIAlertAction actionWithTitle:CCLocalizedString(@"Log out")
                                                     style:UIAlertActionStyleDestructive
                                                   handler:^(UIAlertAction *action){
                                                       [self pressSignOut];
                                                   }]];
+    
+
+    ///
+    /// Cancel button
+    ///
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel")
-                                                                                       style:UIAlertActionStyleDefault
+                                                                                       style:UIAlertActionStyleCancel
                                                                                      handler:nil];
-    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0) {
-        [cancelAction setValue:[UIColor lightGrayColor] forKey:@"titleTextColor"];
-    }
     [actionSheet addAction:cancelAction];
+    
     actionSheet.modalPresentationStyle = UIModalPresentationPopover;
     UIPopoverPresentationController *pop = actionSheet.popoverPresentationController;
     pop.sourceView = self.view;
     pop.sourceRect = self.view.bounds;
-    actionSheet.view.tintColor = [UIColor lightGrayColor];
     //avoid Snapshotting error
     [self presentViewController:actionSheet animated:YES completion:nil];
 }
@@ -549,8 +612,6 @@ int const CCMaxLoadOrg = 10000;
         if ([app[@"token"] isEqualToString:[ChatCenterClient sharedClient].appToken]) {
             self.lablelSwithApp.text = appName;
             UIImage *imageApp = [UIImage SDKImageNamed:[CCConstants sharedInstance].appIconName];
-//            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:imageApp diameter:circleAvatarSize];
-//            self.avatarApp.image = newIconImageAvatar.avatarImage;
             self.avatarApp.image = imageApp;
             if (app[@"app_icons"] != nil && [app[@"app_icons"] count] > 0 && app[@"app_icons"][0][@"icon_url"] != nil
                 && ![app[@"app_icons"][0][@"icon_url"] isEqualToString:@""]) {
@@ -569,10 +630,6 @@ int const CCMaxLoadOrg = 10000;
                             if (newIconImage != nil) {
                                 self.avatarApp.image = newIconImage;
                             }
-
-                            /*
-                            CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:newIconImage diameter:circleAvatarSize];
-                             */
                         });
                     }
                 });

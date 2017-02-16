@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15F34" minimumToolsVersion="Xcode 4.3">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11759" systemVersion="16A323" minimumToolsVersion="Xcode 4.3" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
     <entity name="CCChannel" representedClassName="CCChannel" syncable="YES">
         <attribute name="assignee" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="channel_informations" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="direct_message" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="direct_message" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="icon_url" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
-        <attribute name="last_updated_at" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="last_updated_at" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="latest_message" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="org_name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="org_uid" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="read" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="read" optional="YES" attributeType="Boolean" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="status" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="unread_messages" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="users" optional="YES" attributeType="Binary" syncable="YES"/>
     </entity>
     <entity name="CCMessage" representedClassName="CCMessage" syncable="YES">
         <attribute name="answer" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="channel_id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="channel_id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="channel_uid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="content" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="id" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="meta" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="question" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="status" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="status" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="user" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="users_read_message" optional="YES" attributeType="Binary" syncable="YES"/>
     </entity>
     <entity name="CCOrg" representedClassName="CCOrg" syncable="YES">
         <attribute name="ancestry" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="created" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="deleteAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="deleteAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="uid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="unreadMessagesChannels" optional="YES" attributeType="Binary" syncable="YES"/>
-        <attribute name="updateAt" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="updateAt" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="users" optional="YES" attributeType="Binary" syncable="YES"/>
     </entity>
     <elements>

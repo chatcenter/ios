@@ -79,6 +79,7 @@
         stickerActionsContainer.layer.borderWidth = 1.0;
         stickerActionsContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
     } else {
+        self.stickerContainer.backgroundColor = [UIColor clearColor];
         //
         // Text chat is shown with conventional bubble style coloring
         //
@@ -87,7 +88,6 @@
             self.stickerContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
             self.stickerContainer.layer.borderWidth = 1.0;
         } else {
-//            self.stickerContainer.backgroundColor = [UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0];
             stickerActionsContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
             self.stickerContainer.layer.borderColor = [[CCConstants sharedInstance] baseColor].CGColor;
             self.stickerContainer.layer.borderWidth = 1.0;
@@ -129,14 +129,6 @@
     }else{
         self.stickerTopLabelHeight.constant = 0;
     }
-
-/* No longer shows this style of suggestion in Moon
-    if ([msg.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
-        self.stickerTopLabel.text = CCLocalizedString(@"This message is invisible to the customer.");
-    } else {
-        self.stickerTopLabel.text = msg.senderDisplayName;
-    }
-*/
     
     //------------------------------
     //
@@ -147,9 +139,6 @@
     
     // Suggestion and image shouldn't have a message field
     if (message != nil && ![msg.type isEqualToString:CC_RESPONSETYPESUGGESTION] && ![msg.type isEqualToString:CC_STICKERTYPEIMAGE]) {
-//        CGFloat textAreaWidth = CC_STICKER_BUBBLE_WIDTH - 25;
-//        CGFloat textAreaHeight = [CCCommonStickerCollectionViewCell calculateTextHeightForAttributedString:message textWidth:textAreaWidth];
-
         CCMessageHeaderParameters *params = [[self class] getMessageHeaderParameterForMessage:msg];
         
         if(params.iconImage) {
@@ -575,7 +564,6 @@
     //
     // Question Widget
     //
-//    NSArray *stickerActions = msg.content[@"sticker-action"][@"action-data"];
     NSArray *stickerActions = [msg getArrayAtPath:@"sticker-action/action-data"];
     if (stickerActions != nil && stickerActions.count > 0) {
         img = [UIImage SDKImageNamed:@"questionBubbleIcon"];
@@ -586,24 +574,21 @@
     //
     NSDictionary *location = [msg getDictionaryAtPath:@"sticker-content/sticker-data/location"];
     if(location) {
-        img = [UIImage SDKImageNamed:@"CCmenu_icon_location"];
+        NSString *stickerType = [msg getStringAtPath:@"sticker-type"];
+        if (stickerType != nil && [stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
+            img = [UIImage SDKImageNamed:@"live-location-icon"];
+        } else {
+            img = [UIImage SDKImageNamed:@"CCmenu_icon_location"];
+        }
     }
     
     //
     // Calendar Widget
     //
-    NSString *st = [msg getStringAtPath:@"sticker-action/action-data/#0/value/start"];
+    NSNumber *st = [msg getNumberAtPath:@"sticker-action/action-data/0#/value/start"];
     if(st != nil ) {
         img = [UIImage SDKImageNamed:@"CCmenu_icon_calendar"];
     }
-    /*
-    NSArray<NSDictionary*> *ad = msg.content[@"sticker-action"][@"action-data"];
-    if(ad != nil && ad.count>0) {
-        NSDictionary *value = [ad[0] objectForKey:@"value"];
-        if (value != nil && ![value isEqual: [NSNull null]] && value[@"start"]) { // Has Time data
-             img = [UIImage SDKImageNamed:@"CCmenu_icon_calendar"];
-        }
-    }*/
     
     NSAttributedString *message = [self createMessageString:msg];
 
@@ -659,7 +644,6 @@
     [dummyTextView sizeToFit];
     
     return size;
-
 }
 
 
@@ -677,6 +661,8 @@
     NSString *stickerType = [msg.content objectForKey:CC_STICKER_TYPE];
     if ([stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
         text = CCLocalizedString(@"Live Location");
+    } else if ([stickerType isEqualToString:CC_STICKERTYPELOCATION] && (text == nil || [text isEqualToString:@""])) {
+        text = CCLocalizedString(@"Venue");
     }
     
     if (!text) {
@@ -716,55 +702,6 @@
                                     @"sticker_type": _msg.type ,
                                     @"reacted" : isReacted};
     [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
-
-    
-    
-    
-    /*
-    
-    NSInteger index = [sender tag];
-    NSArray *stickerActions = _msg.content[@"sticker-action"][@"action-data"];
-    
-    
-    if (stickerActions != nil && index < stickerActions.count) {
-        
-        
-        
-        NSDictionary *stickerAction = [stickerActions objectAtIndex:index];
-        
-        
-        NSArray *stickerActionsResponses = _msg.content[@"sticker-action"][@"action-response-data"];
-        
-        NSString *isReacted = @"false";
-        for(int j=0; j<stickerActionsResponses.count; j++) {
-            //
-            // Check if it's already reacted
-            //
-            NSDictionary *response = [stickerActionsResponses objectAtIndex:j];
-            NSDictionary *responseAction = [response objectForKey:@"action"];
-            if(responseAction != nil && ![responseAction isEqual:[NSNull null]]) {
-                if(([responseAction objectForKey:@"value"] != nil && [stickerAction objectForKey:@"value"] != nil &&
-                    [[responseAction objectForKey:@"value"] isKindOfClass:[NSDictionary class]] &&
-                    [[responseAction objectForKey:@"value"] isEqualToDictionary:[stickerAction objectForKey:@"value"]]) ||
-                   ([responseAction objectForKey:@"action"] != nil && [stickerAction objectForKey:@"action"] != nil &&
-                    [[responseAction objectForKey:@"action"] isKindOfClass:[NSArray class]] &&
-                    [[responseAction objectForKey:@"action"] isEqualToArray:[stickerAction objectForKey:@"action"]])) {
-                       isReacted = @"true";
-                       break;
-                   } 
-            }
-        }
-        // do action here!!!
-        NSDictionary *data = @{         @"msgId" : _msg.uid,
-                                        @"action-type" : _msg.content[@"sticker-action"][@"action-type"],
-                                        @"stickerAction" : stickerAction,
-                                        @"sticker_type": _msg.type ,
-                                        @"reacted" : isReacted};
-        [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:nil userInfo:data];
-    }
-    
-    */    
-    
 }
 
 - (void) onActionClicked:(UIButton*)sender {
@@ -789,8 +726,6 @@
         
         for(int j=0; j<stickerActionsResponses.count; j++) {
             NSDictionary *responseAction = [stickerActionsResponses objectAtIndex:j];
-//            NSDictionary *response = [stickerActionsResponses objectAtIndex:j];
-//            NSDictionary *responseAction = [response objectForKey:@"action"];   // The content of the reaction
             if(responseAction != nil && ![responseAction isEqual:[NSNull null]]) {
                 if(([responseAction objectForKey:@"value"] != nil && [stickerAction objectForKey:@"value"] != nil &&
                     [[responseAction objectForKey:@"value"] isKindOfClass:[NSDictionary class]] &&
@@ -830,7 +765,6 @@
                           options:(CCStickerCollectionViewCellOptions)options
                      withListUser:(NSArray *)users
 {
-    // NGOCNH
     int height = 0;
     
     //------------------------------
@@ -867,8 +801,6 @@
         CCMessageHeaderParameters *params = [self getMessageHeaderParameterForMessage:msg];
         
         height += params.textAreaSize.height + 5; // 5 for bottom margin
-    } else {
-//        height += 10;
     }
     
     //------------------------------
@@ -918,36 +850,6 @@
     }
 
     NSLog(@"WWW Height= %d", height);
-    
-    /*
-    NSString *stickerActionType = msg.content[@"sticker-action"][@"action-type"];
-    NSArray *stickerActions = msg.content[@"sticker-action"][@"action-data"];
-    NSLog(@"Sticker action = %@", stickerActions);
-    NSDictionary *labelStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0f]};
-    if (stickerActions != nil && stickerActions.count == 2 && [stickerActionType isEqualToString:@"confirm"]) {
-        int currButtonStartY = 0;
-        for (int i=0; i<stickerActions.count; i++) {
-            NSDictionary *stickerAction = [stickerActions objectAtIndex:i];
-            NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString:[stickerAction objectForKey:@"label"] attributes:labelStringAttributes];
-            int buttonHeight = MAX(CC_STICKER_ACTION_BUTTON_MIN_HEIGHT, [labelText boundingRectWithSize:CGSizeMake((CC_STICKER_BUBBLE_WIDTH - 10)/2, 1800) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size.height + 10);
-            if (currButtonStartY < buttonHeight) {
-                currButtonStartY = buttonHeight;
-            }
-        }
-        height += currButtonStartY;
-    }else if(![stickerActionType isEqualToString:@"text"] && stickerActions != nil && stickerActions.count > 0) {
-        // add actions
-        int currButtonStartY = 0;
-        for (int i=0; i<stickerActions.count; i++) {
-            NSDictionary *stickerAction = [stickerActions objectAtIndex:i];
-            NSMutableAttributedString *labelText = [[NSMutableAttributedString alloc] initWithString:[stickerAction objectForKey:@"label"] attributes:labelStringAttributes];
-            int buttonHeight = MAX(CC_STICKER_ACTION_BUTTON_MIN_HEIGHT, [labelText boundingRectWithSize:CGSizeMake(CC_STICKER_BUBBLE_WIDTH - 10, 1800) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size.height + 10);
-            currButtonStartY += buttonHeight;
-        }
-        height += currButtonStartY;
-    }
-     */
-    
     //------------------------------
     //
     // Part F: Status

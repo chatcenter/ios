@@ -25,9 +25,11 @@
 - (void)viewDidLoad{
     [super viewDidLoad];
     self.navigationItem.title = CCLocalizedString(@"About ChatCenter IO");
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
-                                                                                          target:self
-                                                                                          action:@selector(pressClose:)];
+    UIBarButtonItem *closeButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop
+                                                  target:self
+                                                  action:@selector(pressClose:)];
+    closeButton.tintColor = [CCConstants sharedInstance].baseColor;
+    self.navigationItem.leftBarButtonItem = closeButton;
     UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
     v.backgroundColor = [UIColor clearColor];
     [self.tableView setTableHeaderView:v];

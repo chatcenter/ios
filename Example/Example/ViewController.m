@@ -26,8 +26,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    //アプリトークンを入力ください
-    [ChatCenter setAppToken:"Please set App token" completionHandler:^{
+    
+    //-----------------
+    // Set AppToken
+    //-----------------
+    [ChatCenter setAppToken:@"j4KmracFAqvaMpALRuSz" completionHandler:^{
         ///Please set design custmization
         ///セット完了のコールバックです
         ///SDKのデザインカスタマイズはここに記述してください
@@ -53,7 +56,11 @@
 - (IBAction)didTapChat:(id)sender {
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     NSString *deviceToken = [ud stringForKey:@"deviceToken"];
-    NSString *orgId = "Please set Team ID";
+    
+    //-----------------
+    // Set TeamID
+    //-----------------
+    NSString *orgId = @"developer_success";
     
     [[ChatCenter sharedInstance] presentChatView:self
                                           orgUid:orgId

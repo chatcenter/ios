@@ -11,41 +11,49 @@
 #import "ChatCenterPrivate.h"
 #import "CCJSQMessage.h"
 #import "CCConstants.h"
+#import "CCSVProgressHUD.h"
 
-@interface CCLiveLocationStickerViewController () <MKMapViewDelegate>{
-    MKPointAnnotation *currentAnnotation;
+@interface CCLiveLocationStickerViewController (){
     BOOL shouldAutoShowUserLocation;
     int durationIndex;
     BOOL tappedDoneButton;
+    CLLocation *currentLocation;
 }
 @end
 
 @implementation CCLiveLocationStickerViewController
-int durationListSize = 16;
-int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, INT_MAX};
+int durationListSize = 4;
+int durationList[] = {15, 30, 45, 60};
+float MAP_ZOOM_LANDMASS = 5;
+float MAP_ZOOM_CITY = 10;
+float MAP_ZOOM_STREETS = 15;
+float MAP_ZOOM_BUILDINGS = 20;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    tappedDoneButton = NO;
-    [self.mapView setDelegate:self];
-    [self.mapView setShowsUserLocation:YES];
-    shouldAutoShowUserLocation = YES;
-    
+    ///
+    /// Google map set up
+    ///
+    self.mapView.myLocationEnabled = YES;
+    // setup location
+    [self locationSetup];
+
     self.navigationItem.title = CCLocalizedString(@"Share Live Location");
     
-    UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Cancel") style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
+    UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCcancel_btn"] style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
+    closeBtn.tintColor = [[CCConstants sharedInstance] baseColor];
     self.navigationItem.leftBarButtonItem = closeBtn;
     
     if (!_isOpenedFromWidgetMessage) {
         UIBarButtonItem *sendBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Next") style:UIBarButtonItemStylePlain target:self action:@selector(selectLiveLocationSticker:)];
+        sendBtn.tintColor = [[CCConstants sharedInstance] baseColor];
         self.navigationItem.rightBarButtonItem = sendBtn;
     } else {
         UIBarButtonItem *sendBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Done") style:UIBarButtonItemStylePlain target:self action:@selector(doneLiveLocationSticker:)];
+        sendBtn.tintColor = [[CCConstants sharedInstance] baseColor];
         self.navigationItem.rightBarButtonItem = sendBtn;
     }
     
-    // setup location
-    [self locationSetup];
     [self durationPickerSetup];
 }
 
@@ -72,7 +80,7 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
 }
 
 -(void)durationPickerSetup {
-    durationIndex = 3;
+    durationIndex = 0;
     [self updateDurationTitle];
 }
 
@@ -93,11 +101,17 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
     
     int hours = duration / 60;
     int minutes = duration - hours * 60;
-    if (hours >= 1) {
+    if (hours > 1) {
         if (minutes == 0) {
             return [NSString stringWithFormat:@"%d %@", hours, unit_hr];
         } else {
             return [NSString stringWithFormat:@"%d %@ %d %@", hours, unit_hr, minutes, unit_mn];
+        }
+    } else if (hours == 1) {
+        if (minutes == 0) {
+            return [NSString stringWithFormat:@"%d %@", hours, CCLocalizedString(@"hour")];
+        } else {
+            return [NSString stringWithFormat:@"%d %@ %d %@", hours, CCLocalizedString(@"hour"), minutes, unit_mn];
         }
     }
     return [NSString stringWithFormat:@"%d %@", minutes, unit_mn];
@@ -152,36 +166,10 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
     return YES;
 }
 
-
-- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
-    CLGeocoder *geo = [[CLGeocoder alloc] init];
-    CLLocation *loc = [[CLLocation alloc] initWithLatitude:self.mapView.centerCoordinate.latitude longitude:self.mapView.centerCoordinate.longitude];
-    
-    [geo reverseGeocodeLocation:loc
-              completionHandler:^(NSArray *placemarks, NSError *error) {
-                  if (!error){
-                      CLPlacemark *placemark = [placemarks objectAtIndex:0];
-                      NSString *address = [[placemark.addressDictionary valueForKey:@"FormattedAddressLines"] componentsJoinedByString:@", "];
-                      
-                      NSArray *anotations = self.mapView.annotations;
-                      [self.mapView removeAnnotations:anotations];
-                      
-                      MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
-                      annotation.coordinate = self.mapView.centerCoordinate;
-                      annotation.title = CCLocalizedString(@"Tap here");
-                      annotation.subtitle = address;
-                      [self.mapView selectAnnotation:annotation animated:NO];
-                      currentAnnotation = annotation;
-                  }
-                  else {
-                      NSLog(@"Could not locate");
-                  }
-              }];
-}
-
 - (void)selectLiveLocationSticker:(id)sender {
 
-    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",currentAnnotation.coordinate.latitude,currentAnnotation.coordinate.longitude,currentAnnotation.coordinate.latitude,currentAnnotation.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
+# ifdef CC_GOOGLEMAPS_API_KEY
+    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude,self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
     
     NSString *text = CCLocalizedString(@"Location");
     
@@ -193,8 +181,8 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
                                                 @{
                                                     @"type": @"start",
                                                     @"location" :
-                                                      @{@"lat":[NSString stringWithFormat:@"%f", currentAnnotation.coordinate.latitude],
-                                                        @"lng":[NSString stringWithFormat:@"%f", currentAnnotation.coordinate.longitude]}
+                                                      @{@"lat":[NSString stringWithFormat:@"%f", self.mapView.myLocation.coordinate.latitude],
+                                                        @"lng":[NSString stringWithFormat:@"%f", self.mapView.myLocation.coordinate.longitude]}
                                                   },
                                             @"thumbnail-url" : mapThumbURLStr
                                             }
@@ -212,10 +200,12 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
     [vc setMessage:msg];
     
     [self.navigationController pushViewController:vc animated:YES];
+# endif
 }
 
 - (void)doneLiveLocationSticker:(id)sender {
     if (!tappedDoneButton) {
+        [CCSVProgressHUD showWithStatus:nil maskType:SVProgressHUDMaskTypeBlack];
         tappedDoneButton = YES;
         NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
         [userDefault setInteger:durationList[durationIndex] forKey:kCCUserDefaults_liveLocationDuration];
@@ -244,20 +234,21 @@ int durationList[] = {15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 60
     }
 }
 
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
+    CLLocation *location = locations.lastObject;
+    currentLocation = location;
+    GMSCameraPosition *camera = [GMSCameraPosition cameraWithLatitude:currentLocation.coordinate.latitude
+                                                            longitude:currentLocation.coordinate.longitude
+                                                                 zoom:MAP_ZOOM_STREETS];
+    [self.mapView setCamera:camera];
+}
+
 - (void)locationManager:(CLLocationManager *)manager
     didUpdateToLocation:(CLLocation *)newLocation
            fromLocation:(CLLocation *)oldLocation
 {
 }
 
-- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation {
-    if (shouldAutoShowUserLocation) {
-        shouldAutoShowUserLocation = NO;
-        MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(self.mapView.userLocation.coordinate, 1500, 1500);
-        MKCoordinateRegion newRegion = [self.mapView regionThatFits:viewRegion];
-        [self.mapView setRegion:newRegion animated:YES];
-    }
-}
 #pragma mark - View Actions
 - (IBAction)lessButtonClicked:(id)sender {
     if(durationIndex == 0) {

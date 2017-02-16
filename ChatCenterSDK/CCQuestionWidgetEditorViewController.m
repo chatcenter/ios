@@ -57,6 +57,8 @@ static const float TOP_VIEW_HEIGHT = 255;
     tapOusideOfKeyboardGesture.delegate = self;
     [self.view addGestureRecognizer:tapOusideOfKeyboardGesture];
     [self setScrollviewContentHeight:TOP_VIEW_HEIGHT + 250];
+    
+    questionContent.delegate = self;
 }
 
 - (void) tapedOutsideOfKeyboard:(UITapGestureRecognizer *)gestureRecognizer {
@@ -128,6 +130,16 @@ static const float TOP_VIEW_HEIGHT = 255;
 - (void)dismissKeyboard {
     [questionContent resignFirstResponder];
 }
+
+#pragma mark - Textview delegate
+- (void)textViewDidChange:(UITextView *)textView {
+    NSString *inputText = [textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    long textLenght = inputText.length;
+    if (textLenght > CCWidgetInputTitleLimit) {
+        textView.text = [inputText substringToIndex:textLenght - 1];
+    }
+}
+
 
 #pragma mark - Override super class methods
 - (BOOL)validInput {
