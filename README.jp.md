@@ -17,7 +17,6 @@
     * [2. デザインのカスタマイズ](#DesignCustom)
     * [3. 未読メッセージ数の取得](#ConfirmMessage)
     * [4. Orgのオンライン/オフラインの取得](#GetOnline/Offline)
-    * [5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)
 
 <a id="GettingStarted"></a>
 ## Getting Started
@@ -174,11 +173,24 @@ en.lproj/ChatCenterSDK.strings
 
 <a id="SetGoogleAPIKey"></a>
 ## 3. Google APIキーのセット
-ChatCenterSDKではGoogleMapSDKを使用しています。そのため、Google APIのダッシュボードよりAPIキーを取得し、以下の設定をお願いします。<br>
-もし既にGoogle Maps SDKをご使用の場合はコードの重複を防ぐため、[5. Google Maps SDKを既に使用している場合](#DuplicateGoogleMapSDK)の設定もお願いします。<br>
+ChatCenterSDKではGoogleMapSDKを使用しています。そのため、Google APIのダッシュボードよりAPIキーを取得し、以下のようにdidFinishLaunchingWithOptionsにてセットをお願いします。<br>
 
-下図のように、プロジェクト > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor MacrosにCC_GOOGLEMAPS_API_KEY=\@\"GoogleAPIキー\"を追加してください。<br>
-<p align="center"><img src="InstallationImages/googlemapssdk3.png"></p>
+```
+例)
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+…
+
+[GMSServices provideAPIKey:"既存のAPIキーをセットください"];
+[GMSPlacesClient provideAPIKey:"既存のAPIキーをセットください"];
+
+…
+}
+```
+
 またGoogle APIのダッシュボードにて、Google Maps SDK for iOSおよびGoogle Places API for iOSが有効になっていることをご確認ください。
 <p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>
 ***
@@ -920,33 +932,4 @@ if([[ChatCenter sharedInstance] isUnreadMessageCount] == YES){
     }];
 
 …
-```
-***
-
-<a id="DuplicateGoogleMapSDK"></a>
-### 5. Google Maps SDKを既に使用している場合
-ChatCenterSDKでは、ロケーションウィジェットでGoogle Maps SDKを使用しています。
-もし導入されるアプリで既にGoogle Maps SDKを使用している場合は、コードの重複が生じる可能性があるため、以下の設定をお願いします。
-#### 5-1. Preprocessor Macrosの登録
-下図のように、プロジェクト > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macrosに"EXIST_GOOGLEMAPS_API_KEY=1"を追加してください。<br>
-この設定により、ChatCenterSDK内でAPIキーのセットが実施されないようになります。
-<p align="center"><img src="InstallationImages/googlemapssdk1.png"></p>
-
-#### 5-2. Google APIキーのセット
-既存のGoogle APIキーが、以下のようにdidFinishLaunchingWithOptionsにてセットされていることをご確認ください。
-
-```
-例)
-#import <GoogleMaps/GoogleMaps.h>
-#import <GooglePlaces/GooglePlaces.h>
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-…
-
-[GMSServices provideAPIKey:"既存のAPIキーをセットください"];
-[GMSPlacesClient provideAPIKey:"既存のAPIキーをセットください"];
-
-…
-}
 ```

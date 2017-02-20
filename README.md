@@ -175,12 +175,25 @@ Ex)
 
 <a id="SetGoogleAPIKey"></a>
 ## 3. Set Google API Key
-We are using Google Maps SDK for the Location Widget. Please create Google API Key in dashboard of Google API and set it into your project as below.<br>
-If you are already using Google Maps SDK, please refer to [5. Already using Google Maps SDK](#DuplicateGoogleMapSDK) for preventing duplication of codes.<br>
-Please add 
-CC_GOOGLEMAPS_API_KEY=\@\"YOUR_API_KEY\" in Project > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macros.<br>
-<p align="center"><img src="InstallationImages/googlemapssdk3.png"></p>
-Next, please confirm both Google Maps SDK for iOS and Google Places API are enabled in dashboard of Google API.
+We are using Google Maps SDK in the Location Widget.  Please create Google API Key in dashboard of Google API and set it in didFinishLaunchingWithOptions like below.<br>
+
+```
+Ex)
+#import <GoogleMaps/GoogleMaps.h>
+#import <GooglePlaces/GooglePlaces.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+…
+
+[GMSServices provideAPIKey:"YOUR_API_KEY];
+[GMSPlacesClient provideAPIKey:"YOUR_API_KEY"];
+
+…
+}
+```
+
+Please confirm both Google Maps SDK for iOS and Google Places API are enable in dashboard of Google API. 
 <p align="center"><img src="InstallationImages/googlemapssdk2.png"></p>
 ***
 
@@ -924,33 +937,4 @@ Ex)
     }];
 
 …
-```
-
-***
-
-<a id="DuplicateGoogleMapSDK"></a>
-### 5. Already using Google Maps SDK
-If you are already using Google Maps SDK in your app, please confirm steps below for preventing duplication of codes.
-#### 5-1. Set Preprocessor Macros
-Please add "EXIST_GOOGLEMAPS_API_KEY=1” in Project > Build Settings > Apple LLVM 8.0 - Preprocessing > Preprocessor Macros like below.<br>
-This will prevent ChatCenterSDK from setting API key.
-<p align="center"><img src="InstallationImages/googlemapssdk1.png"></p>
-
-#### 5-2. Set Google API key
-Please confirm your Google API key is set in didFinishLaunchingWithOptions like below.
-
-```
-Ex)
-#import <GoogleMaps/GoogleMaps.h>
-#import <GooglePlaces/GooglePlaces.h>
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-…
-
-[GMSServices provideAPIKey:"YOUR_API_KEY];
-[GMSPlacesClient provideAPIKey:"YOUR_API_KEY"];
-
-…
-}
 ```
