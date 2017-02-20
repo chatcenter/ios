@@ -163,14 +163,6 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     }];
     
     self.shareLocationTasks = [[NSMutableDictionary alloc] init];
-    // ------------------------------------------------------
-    // Google map configuration
-    // ------------------------------------------------------
-#ifndef EXIST_GOOGLEMAPS_API_KEY
-    [GMSServices provideAPIKey:CC_GOOGLEMAPS_API_KEY];
-    [GMSPlacesClient provideAPIKey:CC_GOOGLEMAPS_API_KEY];
-#endif
-
 }
 
 # pragma mark - Load Data
