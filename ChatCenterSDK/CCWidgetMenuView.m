@@ -61,6 +61,18 @@
             }
         }
         
+        ///
+        /// Remove location sticker if google api key is not set
+        ///
+        for (int i = 0; i < stickers.count; i++) {
+            if([stickers[i] isEqualToString:CC_STICKERTYPELOCATION]) {
+                if ([CCConstants sharedInstance].googleApiKey == nil) {
+                    [stickers removeObject:stickers[i]];
+                    break;
+                }
+            }
+        }
+        
         float stickerButtonWidth = screen.bounds.size.width / 3;
         float stickerButtonHeight = 80.0;
         float labelX = 0;

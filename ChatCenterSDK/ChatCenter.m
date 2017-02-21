@@ -215,6 +215,13 @@
         [CCConstants sharedInstance].appIconName = CC_APP_ICON_DEFAULT_NAME;
     }
 }
+
++ (void)setGoogleApiKey:(NSString *)apiKey {
+    if (apiKey) {
+        [CCConstants sharedInstance].googleApiKey = apiKey;
+    }
+}
+
 - (id)getChatView:(NSString *)orgUid
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken

@@ -202,14 +202,17 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" scrollEnabled="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="62" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="dB8-aC-RmB">
-                                <rect key="frame" x="0.0" y="0.0" width="343" height="447"/>
+                                <rect key="frame" x="0.0" y="0.0" width="180" height="447"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="180" id="g5c-CU-QFk"/>
+                                </constraints>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="CCYesNoQuestionWidgetEditorCell" id="r91-MJ-R2C" customClass="CCYesNoQuestionWidgetEditorCell">
-                                        <rect key="frame" x="0.0" y="28" width="343" height="62"/>
+                                        <rect key="frame" x="0.0" y="28" width="180" height="62"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="r91-MJ-R2C" id="zgz-JY-mfC">
-                                            <rect key="frame" x="0.0" y="0.0" width="343" height="62"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="180" height="62"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="radioButtonGreyOff" translatesAutoresizingMaskIntoConstraints="NO" id="q2j-pr-Ade">
@@ -310,7 +313,6 @@
                             <constraint firstItem="dB8-aC-RmB" firstAttribute="leading" secondItem="re1-S0-IUH" secondAttribute="leading" id="3fA-Nk-8zk"/>
                             <constraint firstItem="LiE-3w-nfi" firstAttribute="top" secondItem="dB8-aC-RmB" secondAttribute="bottom" id="Iuz-vV-OC0"/>
                             <constraint firstItem="dB8-aC-RmB" firstAttribute="top" secondItem="qdH-IM-m2Y" secondAttribute="bottom" id="JpT-Y4-ett"/>
-                            <constraint firstAttribute="trailing" secondItem="dB8-aC-RmB" secondAttribute="trailing" id="crU-L2-bBN"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="upQ-Jx-Njc"/>
@@ -500,7 +502,6 @@
                                                         <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="addOption:" destination="GB2-hi-0GM" eventType="touchUpInside" id="IRh-m1-y5d"/>
                                                         <action selector="delete:" destination="7rS-Xp-AtX" eventType="touchUpInside" id="XTi-d3-Ni1"/>
                                                     </connections>
                                                 </button>

@@ -219,4 +219,8 @@ providerRefreshToken:(NSString *)providerRefreshToken
 + (void)setHistoryViewTitle:(NSString *)historyViewTitle;
 + (void)setHistoryViewVoidMessage:(NSString *)historyViewVoidMessage;
 
+//--------------------------------------------------------------------
+// Google Api Key
+//--------------------------------------------------------------------
++ (void)setGoogleApiKey:(NSString *)apiKey;
 @end

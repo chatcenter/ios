@@ -66,11 +66,20 @@ static const float TOP_VIEW_HEIGHT = 255;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if ([touch.view isDescendantOfView:containerView] && _answerType == YesNo) {
-        return NO;
+    if (_answerType == YesNo) {
+        UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
+        CCYesNoQuestionPaneController *paneController = (CCYesNoQuestionPaneController *) [[navigationController viewControllers] lastObject];
+        if ([touch.view isDescendantOfView:paneController.tableView]) {
+            return NO;
+        }
+        return YES;
+    } else {
+        if ([touch.view isDescendantOfView:self.view]) {
+            return YES;
+        }
     }
     
-    return YES;
+    return NO;
 }
 
 - (void) tapTypeAnswerSelector:(UITapGestureRecognizer *)gestureRecognizer {

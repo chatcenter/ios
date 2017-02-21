@@ -179,13 +179,15 @@ ChatCenterSDKではGoogleMapSDKを使用しています。そのため、Google 
 例)
 #import <GoogleMaps/GoogleMaps.h>
 #import <GooglePlaces/GooglePlaces.h>
+#import "ChatCenter.h"
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 …
 
-[GMSServices provideAPIKey:"既存のAPIキーをセットください"];
-[GMSPlacesClient provideAPIKey:"既存のAPIキーをセットください"];
+[GMSServices provideAPIKey:"APIキーをセットください"];
+[GMSPlacesClient provideAPIKey:"APIキーをセットください"];
+[ChatCenter setGoogleApiKey:"APIキーをセットください"];
 
 …
 }

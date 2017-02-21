@@ -179,6 +179,7 @@ typedef uint32_t CCStickerCollectionViewCellOptions;
 @property (nonatomic, strong) NSString *videoCallBtnHilighted;
 @property (nonatomic, strong) NSString *videoCallBtnDisable;
 @property (nonatomic, strong) NSString *appIconName;
+@property (nonatomic, strong) NSString *googleApiKey;
 @property CGFloat chatViewCircleAvatarSize;
 @property BOOL hideOutGoingCircleAvatar;
 @property BOOL hideChatViewPhoneBtn;

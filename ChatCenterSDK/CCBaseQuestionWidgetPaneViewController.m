@@ -53,7 +53,7 @@ CGFloat keyboardHeight;
     
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
-    keyboardHeight = kbSize.height;
+    keyboardHeight = kbSize.height + 40;
     [self.scrollViewDelegate setViewMovedUp:keyboardHeight viewToShow:viewToShow];
 }
 

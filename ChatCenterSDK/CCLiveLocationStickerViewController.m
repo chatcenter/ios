@@ -167,9 +167,8 @@ float MAP_ZOOM_BUILDINGS = 20;
 }
 
 - (void)selectLiveLocationSticker:(id)sender {
-
-# ifdef CC_GOOGLEMAPS_API_KEY
-    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude,self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
+    NSString *googleApiKey = [CCConstants sharedInstance].googleApiKey;
+    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude,self.mapView.myLocation.coordinate.latitude,self.mapView.myLocation.coordinate.longitude, googleApiKey];
     
     NSString *text = CCLocalizedString(@"Location");
     
@@ -200,7 +199,6 @@ float MAP_ZOOM_BUILDINGS = 20;
     [vc setMessage:msg];
     
     [self.navigationController pushViewController:vc animated:YES];
-# endif
 }
 
 - (void)doneLiveLocationSticker:(id)sender {

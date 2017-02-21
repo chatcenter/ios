@@ -108,8 +108,8 @@ int mapTapCount = 0; // Count times tap on the MapView
 }
 
 - (void)sendLocationMessage {
-# ifdef CC_GOOGLEMAPS_API_KEY
-    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude,selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude, CC_GOOGLEMAPS_API_KEY];
+    NSString *googleApiKey = [CCConstants sharedInstance].googleApiKey;
+    NSString *mapThumbURLStr = [NSString stringWithFormat:@"https://maps.googleapis.com/maps/api/staticmap?center=%lf,%lf&size=450x230&zoom=15&sensor=true&markers=%lf,%lf&key=%@",selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude,selectedPlace.coordinate.latitude,selectedPlace.coordinate.longitude, googleApiKey];
     
     NSString *text = selectedPlace.name;
     if (!text) {
@@ -137,7 +137,6 @@ int mapTapCount = 0; // Count times tap on the MapView
     [vc setMessage:msg];
     returnFromPreview = YES;
     [self.navigationController pushViewController:vc animated:YES];
-#endif
 }
 
 - (void) showPlacePicker {

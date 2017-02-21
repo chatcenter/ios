@@ -181,6 +181,7 @@ We are using Google Maps SDK in the Location Widget.  Please create Google API K
 Ex)
 #import <GoogleMaps/GoogleMaps.h>
 #import <GooglePlaces/GooglePlaces.h>
+#import "ChatCenter.h"
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -188,6 +189,7 @@ Ex)
 
 [GMSServices provideAPIKey:"YOUR_API_KEY];
 [GMSPlacesClient provideAPIKey:"YOUR_API_KEY"];
+[ChatCenter setGoogleApiKey:"YOUR_API_KEY"];
 
 …
 }
