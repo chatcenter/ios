@@ -444,7 +444,7 @@ int const CCMaxLoadOrg = 10000;
 }
 
 -(void) openDashboard {
-    NSURL *dashboardURL = [[NSURL alloc] initWithString:CC_WEB_DASHBOARD_URL];
+    NSURL *dashboardURL = [[NSURL alloc] initWithString:[ChatCenter getWebDashboardUrl]];
     if (dashboardURL != nil) {
         [self openURL:dashboardURL];
     }

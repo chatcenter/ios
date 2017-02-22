@@ -223,4 +223,18 @@ providerRefreshToken:(NSString *)providerRefreshToken
 // Google Api Key
 //--------------------------------------------------------------------
 + (void)setGoogleApiKey:(NSString *)apiKey;
+//--------------------------------------------------------------------
+// Base Url
+//--------------------------------------------------------------------
++ (void)setApiBaseUrl:(NSString *)apiBaseUrl;
++ (NSString *)getApiBaseUrl;
+
++ (void)setWebsocketBaseUrl:(NSString *)websocketBaseUrl;
++ (NSString *)getWebsocketBaseUrl;
+
++ (void)setWebDashboardUrl:(NSString *)webDashboardUrl;
++ (NSString *)getWebDashboardUrl;
+
++ (void)setEnabledVideoCall:(BOOL)enabled;
++ (BOOL)isVideoEnabled;
 @end

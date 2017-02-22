@@ -218,9 +218,7 @@ int kCloseStickerMenuButtonTag  = 997;
     self.automaticallyScrollsToMostRecentMessage = NO;
     [self viewSetUp];
     [self customNibsSetUp];
-#ifdef CC_VIDEO
     [[CCConnectionHelper sharedClient] isSupportVideoChat];
-#endif
     if(self.channelId != nil) {
         [self loadChannelInfo:self.channelId];
     }
@@ -487,7 +485,6 @@ int kCloseStickerMenuButtonTag  = 997;
     // Right menu buttons init
     //
     //--------------------------------------------------------------------
-#ifdef CC_VIDEO
     UIButton* voiceCallButtonView = [self barButtonItemWithImageName:[CCConstants sharedInstance].voiceCallBtnNormal
                                                   hilightedImageName:[CCConstants sharedInstance].voiceCallBtnHilighted
                                                     disableImageName:[CCConstants sharedInstance].voiceCallBtnDisable
@@ -506,7 +503,6 @@ int kCloseStickerMenuButtonTag  = 997;
         videoCallButtonView.tintColor = [CCConstants sharedInstance].baseColor;
     }
     videoCallButton = [[UIBarButtonItem alloc] initWithCustomView:videoCallButtonView];
-#endif
     
     UIButton* rightMenuButtonView = [self barButtonItemWithImageName:[CCConstants sharedInstance].infoBtnNormal
                                                   hilightedImageName:[CCConstants sharedInstance].infoBtnHilighted
@@ -709,13 +705,9 @@ int kCloseStickerMenuButtonTag  = 997;
             }
             
             if([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
-#if CC_VIDEO
                 if (![self isVideocallEnabled]){
                     [stickers removeObject:stickers[i]];
                 }
-#else
-                [stickers removeObject:stickers[i]];
-#endif
             }
         }
         if (stickers == nil || stickers.count == 0) {
@@ -3039,7 +3031,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 }
 
 - (BOOL)isVideocallEnabled {
-    if ([self isAppVideocallEnabled] && [[CCConnectionHelper sharedClient] isSupportVideoChat] && [self processChannelUserVideoChatInfo]){
+    if ([ChatCenter isVideoEnabled] && [self isAppVideocallEnabled] && [[CCConnectionHelper sharedClient] isSupportVideoChat] && [self processChannelUserVideoChatInfo]){
         return YES;
     }else{
         return NO;

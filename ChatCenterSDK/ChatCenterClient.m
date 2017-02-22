@@ -14,6 +14,7 @@
 #import "CCUserDefaultsUtil.h"
 #import "CCHistoryFilterViewController.h"
 #import "CCConstants.h"
+#import "ChatCenter.h"
 
 @interface ChatCenterClient()
 
@@ -28,7 +29,7 @@
     
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedClient = [[ChatCenterClient alloc] initWithBaseURL:[NSURL URLWithString:CC_API_BASE_URL]];
+        sharedClient = [[ChatCenterClient alloc] initWithBaseURL:[NSURL URLWithString:[ChatCenter getApiBaseUrl]]];
     });
     
     return sharedClient;

@@ -6,11 +6,6 @@
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 #import "CCConstants.h"
-
-#ifndef CC_VIDEO
-
-#else
-
 #import "OTDefaultAudioDeviceWithVolumeControl.h"
 
 /* private API declares: for internal use only. */
@@ -118,5 +113,3 @@
 }
 
 @end
-
-#endif

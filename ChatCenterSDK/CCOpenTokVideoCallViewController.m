@@ -6,12 +6,6 @@
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 #import "CCConstants.h"
-#ifndef CC_VIDEO
-@interface CCOpenTokVideoCallViewController {
-}
-@end
-#else
-
 #import "CCOpenTokVideoCallViewController.h"
 #import <OpenTok/OpenTok.h>
 #import "OTDefaultAudioDeviceWithVolumeControl.h"
@@ -572,5 +566,3 @@ static bool subscribeToSelf = NO;
     }
 }
 @end
-
-#endif

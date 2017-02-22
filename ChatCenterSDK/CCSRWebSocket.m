@@ -59,7 +59,7 @@
     _webSocket.delegate = nil;
     [_webSocket close];
     
-     NSString *url = [NSString stringWithFormat:@"%@?authentication=%@&app_token=%@",CC_WEBSOCKET_BASE_URL, token, [ChatCenterClient sharedClient].appToken];
+     NSString *url = [NSString stringWithFormat:@"%@?authentication=%@&app_token=%@",[ChatCenter getWebsocketBaseUrl], token, [ChatCenterClient sharedClient].appToken];
     _webSocket = [[CCSRWebSocketOriginal alloc] initWithURLRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
     _webSocket.delegate = self;
     

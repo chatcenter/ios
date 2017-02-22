@@ -222,6 +222,55 @@
     }
 }
 
++ (void)setApiBaseUrl:(NSString *)apiBaseUrl {
+    if (apiBaseUrl) {
+        [CCConstants sharedInstance].apiBaseUrl = apiBaseUrl;
+    } else {
+        [CCConstants sharedInstance].apiBaseUrl = CC_DEFAULT_API_BASE_URL;
+    }
+}
+
++ (NSString *)getApiBaseUrl {
+    if ([CCConstants sharedInstance].apiBaseUrl != nil) {
+        return [CCConstants sharedInstance].apiBaseUrl;
+    }
+    return CC_DEFAULT_API_BASE_URL;
+}
+
++ (void)setWebsocketBaseUrl:(NSString *)websocketBaseUrl {
+    if (websocketBaseUrl) {
+        [CCConstants sharedInstance].websocketBaseUrl = websocketBaseUrl;
+    }
+}
+
++ (NSString *)getWebsocketBaseUrl {
+    if ([CCConstants sharedInstance].websocketBaseUrl != nil) {
+        return [CCConstants sharedInstance].websocketBaseUrl;
+    }
+    return CC_DEFAULT_WEBSOCKET_BASE_URL;
+}
+
++ (void)setWebDashboardUrl:(NSString *)webDashboardUrl {
+    if (webDashboardUrl) {
+        [CCConstants sharedInstance].webDashboardUrl = webDashboardUrl;
+    }
+}
+
++ (NSString *)getWebDashboardUrl {
+    if ([CCConstants sharedInstance].webDashboardUrl != nil) {
+        return [CCConstants sharedInstance].webDashboardUrl;
+    }
+    return CC_DEFAULT_WEB_DASHBOARD_URL;
+}
+
++ (void)setEnabledVideoCall:(BOOL)enabled {
+    [CCConstants sharedInstance].enableVideoCall = enabled;
+}
+
++ (BOOL)isVideoEnabled {
+    return [CCConstants sharedInstance].enableVideoCall;
+}
+
 - (id)getChatView:(NSString *)orgUid
          provider:(NSString *)provider
     providerToken:(NSString *)providerToken

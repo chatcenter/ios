@@ -6,9 +6,6 @@
 //  Copyright © 2016 AppSocially Inc. All rights reserved.
 //
 #import "CCConstants.h"
-
-#ifdef CC_VIDEO
-
 #import <Foundation/Foundation.h>
 #import <OpenTok/OpenTok.h>
 
@@ -42,9 +39,3 @@
 @property (nonatomic) uint32_t preferredAudioComponentSubtype;
 
 @end
-
-#else
-@interface OTDefaultAudioDevice : NSObject {
-}
-@end
-#endif

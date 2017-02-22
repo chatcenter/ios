@@ -13,25 +13,10 @@
 #define CC_SDK_VERSION                    @"1.1.0"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
-#define CC_VIDEO 1
-
-#ifdef API_BASE_URL
-    #define CC_API_BASE_URL             API_BASE_URL
-#else
-    #define CC_API_BASE_URL             @"https://api.chatcenter.io/"
-#endif
-
-#ifdef WEBSOCKET_BASE_URL
-    #define CC_WEBSOCKET_BASE_URL       WEBSOCKET_BASE_URL
-#else
-    #define CC_WEBSOCKET_BASE_URL       @"wss://api.chatcenter.io/"
-#endif
-
-#ifdef WEB_DASHBOARD_URL
-    #define CC_WEB_DASHBOARD_URL        WEB_DASHBOARD_URL
-#else
-    #define CC_WEB_DASHBOARD_URL        @"https://app.chatcenter.io"
-#endif
+#define CC_DEFAULT_VIDEO_ENABLED        1
+#define CC_DEFAULT_API_BASE_URL         @"https://api.chatcenter.io/"
+#define CC_DEFAULT_WEBSOCKET_BASE_URL   @"wss://api.chatcenter.io/"
+#define CC_DEFAULT_WEB_DASHBOARD_URL    @"https://app.chatcenter.io"
 
 
 #define kBundleResourceName         @"ChatCenter"
@@ -180,6 +165,11 @@ typedef uint32_t CCStickerCollectionViewCellOptions;
 @property (nonatomic, strong) NSString *videoCallBtnDisable;
 @property (nonatomic, strong) NSString *appIconName;
 @property (nonatomic, strong) NSString *googleApiKey;
+@property (nonatomic, strong) NSString *apiBaseUrl;
+@property (nonatomic, strong) NSString *webDashboardUrl;
+@property (nonatomic, strong) NSString *websocketBaseUrl;
+@property (nonatomic) BOOL enableVideoCall;
+
 @property CGFloat chatViewCircleAvatarSize;
 @property BOOL hideOutGoingCircleAvatar;
 @property BOOL hideChatViewPhoneBtn;

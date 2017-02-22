@@ -1321,7 +1321,6 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     [self.navigationController pushViewController:channelInfoView animated:YES];
 }
 
-#ifdef CC_VIDEO
 -(void)pressVideoCall {
     if(self.chatAndHistoryViewController.chatViewController != nil) {
         [self.chatAndHistoryViewController.chatViewController pressVideoCall];
@@ -1333,7 +1332,6 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         [self.chatAndHistoryViewController.chatViewController pressVoiceCall];
     }
 }
-#endif
 
 - (IBAction)closeModalDialog:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];

@@ -56,6 +56,7 @@ const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
         instance = [CCConstants new];
         instance.isAgent = NO;
         instance.isModal = NO;
+        instance.enableVideoCall = CC_DEFAULT_VIDEO_ENABLED;
         
     });
     return instance;

@@ -97,12 +97,10 @@
 - (void) pressImage;
 - (void) takePhoto;
 - (void) pressPhrase;
-#ifdef CC_VIDEO
 - (void) pressVideoCall;
 - (void) pressVoiceCall;
 - (BOOL)processUserMeVideoChatInfo;
 - (BOOL)processChannelUserVideoChatInfo;
-#endif
 
 //// Called locally and from CCSuggestionInputView
 - (void)performOpenAction:(NSDictionary*)stickerAction
