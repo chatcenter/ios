@@ -20,13 +20,13 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  A constant defining the default height of a `JSQMessagesTypingIndicatorFooterView`.
+ *  A constant defining the default height of a `CCJSQMessagesTypingIndicatorFooterView`.
  */
 FOUNDATION_EXPORT const CGFloat kJSQMessagesTypingIndicatorFooterViewHeight;
 
 /**
- *  The `JSQMessagesTypingIndicatorFooterView` class implements a reusable view that can be placed
- *  at the bottom of a `JSQMessagesCollectionView`. This view represents a typing indicator 
+ *  The `CCJSQMessagesTypingIndicatorFooterView` class implements a reusable view that can be placed
+ *  at the bottom of a `CCJSQMessagesCollectionView`. This view represents a typing indicator 
  *  for incoming messages.
  */
 @interface CCJSQMessagesTypingIndicatorFooterView : UICollectionReusableView

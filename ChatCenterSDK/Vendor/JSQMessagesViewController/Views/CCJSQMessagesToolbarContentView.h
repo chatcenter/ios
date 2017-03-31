@@ -28,7 +28,7 @@
 FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingDefault;
 
 /**
- *  A `JSQMessagesToolbarContentView` represents the content displayed in a `JSQMessagesInputToolbar`.
+ *  A `CCJSQMessagesToolbarContentView` represents the content displayed in a `CCJSQMessagesInputToolbar`.
  *  These subviews consist of a left button, a text view, and a right button. One button is used as
  *  the send button, and the other as the accessory button. The text view is used for composing messages.
  */
@@ -59,12 +59,19 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
 @property (assign, nonatomic) CGFloat leftBarButtonItemWidth;
 
 /**
+ *  Specifies the amount of spacing between the content view and the leading edge of leftBarButtonItem.
+ *
+ *  @discussion The default value is `8.0f`.
+ */
+@property (assign, nonatomic) CGFloat leftContentPadding;
+
+/**
  *  The container view for the leftBarButtonItem.
  *
  *  @discussion
  *  You may use this property to add additional button items to the left side of the toolbar content view.
  *  However, you will be completely responsible for responding to all touch events for these buttons
- *  in your `JSQMessagesViewController` subclass.
+ *  in your `CCJSQMessagesViewController` subclass.
  */
 @property (weak, nonatomic, readonly) UIView *leftBarButtonContainerView;
 
@@ -88,19 +95,26 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesToolbarContentViewHorizontalSpacingD
 @property (assign, nonatomic) CGFloat rightBarButtonItemWidth;
 
 /**
+ *  Specifies the amount of spacing between the content view and the trailing edge of rightBarButtonItem.
+ *
+ *  @discussion The default value is `8.0f`.
+ */
+@property (assign, nonatomic) CGFloat rightContentPadding;
+
+/**
  *  The container view for the rightBarButtonItem.
  *
  *  @discussion 
  *  You may use this property to add additional button items to the right side of the toolbar content view.
  *  However, you will be completely responsible for responding to all touch events for these buttons
- *  in your `JSQMessagesViewController` subclass.
+ *  in your `CCJSQMessagesViewController` subclass.
  */
 @property (weak, nonatomic, readonly) UIView *rightBarButtonContainerView;
 
 #pragma mark - Class methods
 
 /**
- *  Returns the `UINib` object initialized for a `JSQMessagesToolbarContentView`.
+ *  Returns the `UINib` object initialized for a `CCJSQMessagesToolbarContentView`.
  *
  *  @return The initialized `UINib` object or `nil` if there were errors during
  *  initialization or the nib file could not be located.

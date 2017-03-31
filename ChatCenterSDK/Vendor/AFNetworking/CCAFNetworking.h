@@ -1,6 +1,6 @@
-// AFNetworking.h
+// CCAFNetworking.h
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com/)
+// Copyright (c) 2013 CCAFNetworking (http://CCAFnetworking.com/)
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,20 @@
 
 #import <Foundation/Foundation.h>
 #import <Availability.h>
+#import <TargetConditionals.h>
 
-#ifndef _AFNETWORKING_
-    #define _AFNETWORKING_
+#ifndef _CCAFNETWORKING_
+    #define _CCAFNETWORKING_
 
     #import "CCAFURLRequestSerialization.h"
     #import "CCAFURLResponseSerialization.h"
     #import "CCAFSecurityPolicy.h"
+
 #if !TARGET_OS_WATCH
     #import "CCAFNetworkReachabilityManager.h"
-    #import "CCAFURLConnectionOperation.h"
-    #import "CCAFHTTPRequestOperation.h"
-    #import "CCAFHTTPRequestOperationManager.h"
 #endif
 
-#if ( ( defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1090) || \
-      ( defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000 ) || \
-       TARGET_OS_WATCH )
     #import "CCAFURLSessionManager.h"
     #import "CCAFHTTPSessionManager.h"
-#endif
 
-#endif /* _AFNETWORKING_ */
+#endif /* _CCAFNETWORKING_ */

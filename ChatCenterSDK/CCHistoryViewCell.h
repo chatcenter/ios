@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCMGSwipeTableCell.h"
 
-@interface CCHistoryViewCell : UITableViewCell
+@interface CCHistoryViewCell : CCMGSwipeTableCell
 
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *avatarLeftMargin;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *timeStampRightMargin;

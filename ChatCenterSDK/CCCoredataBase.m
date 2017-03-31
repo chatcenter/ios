@@ -9,6 +9,7 @@
 #import "CCCoredataBase.h"
 #import "CCConstants.h"
 #import "ChatCenter.h"
+#import "CCUserDefaultsUtil.h"
 
 @implementation CCCoredataBase
 @synthesize managedObjectContext = _managedObjectContext;
@@ -1320,6 +1321,40 @@
     if (resultArray != nil && [resultArray count] != 0) {
         NSManagedObject *object = resultArray[0];
         [object setValue:unreadMessages forKey:@"unread_messages"];
+        
+        if (![[self managedObjectContext] save:&error]) {
+            NSLog(@"error = %@", error);
+            return NO;
+        }else{
+            return YES;
+        }
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
+- (BOOL)updateChannelWithChannelStatus:(NSString *)uid status:(NSString *)status {
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"CCChannel" inManagedObjectContext:[self managedObjectContext]];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setFetchBatchSize:CCloadLoacalChannelLimit];
+    NSSortDescriptor *sort = [[NSSortDescriptor alloc] initWithKey:@"updateAt" ascending:YES];
+    [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"uid = %@", uid];
+    [fetchRequest setPredicate:pred];
+    NSFetchedResultsController *fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                               managedObjectContext:[self managedObjectContext]
+                                                                                                 sectionNameKeyPath:nil
+                                                                                                          cacheName:nil];
+    NSError *error = nil;
+    if (![fetchedResultsController performFetch:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    }
+    NSArray *resultArray = [fetchedResultsController fetchedObjects];
+    if (resultArray != nil && [resultArray count] != 0) {
+        NSManagedObject *object = resultArray[0];
+        [object setValue:status forKey:@"status"];
         
         if (![[self managedObjectContext] save:&error]) {
             NSLog(@"error = %@", error);

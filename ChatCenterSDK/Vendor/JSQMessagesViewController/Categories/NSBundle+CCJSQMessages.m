@@ -30,7 +30,7 @@
 + (NSBundle *)jsq_messagesAssetBundle
 {
     NSString *bundleResourcePath = [NSBundle jsq_messagesBundle].resourcePath;
-    NSString *assetPath = [bundleResourcePath stringByAppendingPathComponent:@"CCJSQMessagesAssets.bundle"];
+    NSString *assetPath = [bundleResourcePath stringByAppendingPathComponent:@"JSQMessagesAssets.bundle"];
     return [NSBundle bundleWithPath:assetPath];
 }
 

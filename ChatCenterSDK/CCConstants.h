@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.1.0"
+#define CC_SDK_VERSION                    @"1.1.1"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_DEFAULT_VIDEO_ENABLED        1
@@ -101,6 +101,7 @@ extern NSString *const kCCUserDefaults_userIconUrl;
 extern NSString *const kCCUserDefaults_userId;
 extern NSString *const kCCUserDefaults_userEmail;
 extern NSString *const kCCUserDefaults_liveLocationDuration;
+extern NSString *const kCCUserDefaults_privilege;
 
 typedef enum {
     CCGetChannels,
@@ -113,7 +114,8 @@ enum {
     CCStickerCollectionViewCellOptionShowStatus  = (1 << 2),
     CCStickerCollectionViewCellOptionShowAsMyself  = (1 << 3),
     CCStickerCollectionViewCellOptionShowAsWidget  = (1 << 4),
-    CCStickerCollectionViewCellOptionShowLiveIcon = (1<<5)
+    CCStickerCollectionViewCellOptionShowAsAgent  = (1 << 5),
+    CCStickerCollectionViewCellOptionShowLiveIcon = (1 << 6)
 };
 typedef uint32_t CCStickerCollectionViewCellOptions;
 
@@ -197,6 +199,7 @@ extern const int CCInputTextLimit;
 extern const int CCWidgetInputTitleLimit;
 extern const int CCWidgetInputChoiceTextLimit;
 extern const int CCWidgetInputNumberChoiceLimit;
+extern const int CCNoteInputtextLimit;
 extern const int CCImageMaxSize;
 + (CCConstants *)sharedInstance;
 + (UIColor *)defaultBaseColor;

@@ -21,17 +21,15 @@
 #import "CCJSQMessageMediaData.h"
 
 /**
- *  The `JSQMessageData` protocol defines the common interface through which 
- *  a `JSQMessagesViewController` and `JSQMessagesCollectionView` interact with message model objects.
+ *  The `CCJSQMessageData` protocol defines the common interface through which 
+ *  a `CCJSQMessagesViewController` and `CCJSQMessagesCollectionView` interact with message model objects.
  *
  *  It declares the required and optional methods that a class must implement so that instances of that class 
- *  can be displayed properly within a `JSQMessagesCollectionViewCell`.
+ *  can be displayed properly within a `CCJSQMessagesCollectionViewCell`.
  *
- *  Two concrete classes that conform to this protocol are provided in the library. See `JSQTextMessage` and `JSQMediaMessage`.
+ *  The class that conforms to this protocol is provided in the library. See `CCJSQMessage`.
  *
- *  @see JSQMessage.
- *  @see JSQTextMessage.
- *  @see JSQMediaMessage.
+ *  @see CCJSQMessage.
  */
 @protocol CCJSQMessageData <NSObject>
 
@@ -63,8 +61,8 @@
 
 /**
  *  This method is used to determine if the message data item contains text or media.
- *  If this method returns `YES`, an instance of `JSQMessagesViewController` will ignore 
- *  the `text` method of this protocol when dequeuing a `JSQMessagesCollectionViewCell`
+ *  If this method returns `YES`, an instance of `CCJSQMessagesViewController` will ignore 
+ *  the `text` method of this protocol when dequeuing a `CCJSQMessagesCollectionViewCell`
  *  and only call the `media` method. 
  *
  *  Similarly, if this method returns `NO` then the `media` method will be ignored and

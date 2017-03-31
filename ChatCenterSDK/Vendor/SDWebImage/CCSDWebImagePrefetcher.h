@@ -1,5 +1,5 @@
 /*
- * This file is part of the SDWebImage package.
+ * This file is part of the CCSDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -11,7 +11,7 @@
 
 @class CCSDWebImagePrefetcher;
 
-@protocol SDWebImagePrefetcherDelegate <NSObject>
+@protocol CCSDWebImagePrefetcherDelegate <NSObject>
 
 @optional
 
@@ -23,7 +23,7 @@
  * @param finishedCount   The total number of images that were prefetched (successful or not)
  * @param totalCount      The total number of images that were to be prefetched
  */
-- (void)imagePrefetcher:(CCSDWebImagePrefetcher *)imagePrefetcher didPrefetchURL:(NSURL *)imageURL finishedCount:(NSUInteger)finishedCount totalCount:(NSUInteger)totalCount;
+- (void)imagePrefetcher:(nonnull CCSDWebImagePrefetcher *)imagePrefetcher didPrefetchURL:(nullable NSURL *)imageURL finishedCount:(NSUInteger)finishedCount totalCount:(NSUInteger)totalCount;
 
 /**
  * Called when all images are prefetched.
@@ -31,12 +31,12 @@
  * @param totalCount      The total number of images that were prefetched (whether successful or not)
  * @param skippedCount    The total number of images that were skipped
  */
-- (void)imagePrefetcher:(CCSDWebImagePrefetcher *)imagePrefetcher didFinishWithTotalCount:(NSUInteger)totalCount skippedCount:(NSUInteger)skippedCount;
+- (void)imagePrefetcher:(nonnull CCSDWebImagePrefetcher *)imagePrefetcher didFinishWithTotalCount:(NSUInteger)totalCount skippedCount:(NSUInteger)skippedCount;
 
 @end
 
-typedef void(^SDWebImagePrefetcherProgressBlock)(NSUInteger noOfFinishedUrls, NSUInteger noOfTotalUrls);
-typedef void(^SDWebImagePrefetcherCompletionBlock)(NSUInteger noOfFinishedUrls, NSUInteger noOfSkippedUrls);
+typedef void(^CCSDWebImagePrefetcherProgressBlock)(NSUInteger noOfFinishedUrls, NSUInteger noOfTotalUrls);
+typedef void(^CCSDWebImagePrefetcherCompletionBlock)(NSUInteger noOfFinishedUrls, NSUInteger noOfSkippedUrls);
 
 /**
  * Prefetch some URLs in the cache for future use. Images are downloaded in low priority.
@@ -46,7 +46,7 @@ typedef void(^SDWebImagePrefetcherCompletionBlock)(NSUInteger noOfFinishedUrls, 
 /**
  *  The web image manager
  */
-@property (strong, nonatomic, readonly) CCSDWebImageManager *manager;
+@property (strong, nonatomic, readonly, nonnull) CCSDWebImageManager *manager;
 
 /**
  * Maximum number of URLs to prefetch at the same time. Defaults to 3.
@@ -54,35 +54,42 @@ typedef void(^SDWebImagePrefetcherCompletionBlock)(NSUInteger noOfFinishedUrls, 
 @property (nonatomic, assign) NSUInteger maxConcurrentDownloads;
 
 /**
- * SDWebImageOptions for prefetcher. Defaults to SDWebImageLowPriority.
+ * CCSDWebImageOptions for prefetcher. Defaults to CCSDWebImageLowPriority.
  */
-@property (nonatomic, assign) SDWebImageOptions options;
+@property (nonatomic, assign) CCSDWebImageOptions options;
 
 /**
  * Queue options for Prefetcher. Defaults to Main Queue.
  */
-@property (nonatomic, assign) dispatch_queue_t prefetcherQueue;
+@property (nonatomic, assign, nonnull) dispatch_queue_t prefetcherQueue;
 
-@property (weak, nonatomic) id <SDWebImagePrefetcherDelegate> delegate;
+@property (weak, nonatomic, nullable) id <CCSDWebImagePrefetcherDelegate> delegate;
 
 /**
  * Return the global image prefetcher instance.
  */
-+ (CCSDWebImagePrefetcher *)sharedImagePrefetcher;
++ (nonnull instancetype)sharedImagePrefetcher;
 
 /**
- * Assign list of URLs to let SDWebImagePrefetcher to queue the prefetching,
+ * Allows you to instantiate a prefetcher with any arbitrary image manager.
+ */
+- (nonnull instancetype)initWithImageManager:(nonnull CCSDWebImageManager *)manager NS_DESIGNATED_INITIALIZER;
+
+/**
+ * Assign list of URLs to let CCSDWebImagePrefetcher to queue the prefetching,
  * currently one image is downloaded at a time,
- * and skips images for failed downloads and proceed to the next image in the list
+ * and skips images for failed downloads and proceed to the next image in the list.
+ * Any previously-running prefetch operations are canceled.
  *
  * @param urls list of URLs to prefetch
  */
-- (void)prefetchURLs:(NSArray *)urls;
+- (void)prefetchURLs:(nullable NSArray<NSURL *> *)urls;
 
 /**
- * Assign list of URLs to let SDWebImagePrefetcher to queue the prefetching,
+ * Assign list of URLs to let CCSDWebImagePrefetcher to queue the prefetching,
  * currently one image is downloaded at a time,
- * and skips images for failed downloads and proceed to the next image in the list
+ * and skips images for failed downloads and proceed to the next image in the list.
+ * Any previously-running prefetch operations are canceled.
  *
  * @param urls            list of URLs to prefetch
  * @param progressBlock   block to be called when progress updates; 
@@ -92,7 +99,9 @@ typedef void(^SDWebImagePrefetcherCompletionBlock)(NSUInteger noOfFinishedUrls, 
  *                        first param is the number of completed (successful or not) requests,
  *                        second parameter is the number of skipped requests
  */
-- (void)prefetchURLs:(NSArray *)urls progress:(SDWebImagePrefetcherProgressBlock)progressBlock completed:(SDWebImagePrefetcherCompletionBlock)completionBlock;
+- (void)prefetchURLs:(nullable NSArray<NSURL *> *)urls
+            progress:(nullable CCSDWebImagePrefetcherProgressBlock)progressBlock
+           completed:(nullable CCSDWebImagePrefetcherCompletionBlock)completionBlock;
 
 /**
  * Remove and cancel queued list

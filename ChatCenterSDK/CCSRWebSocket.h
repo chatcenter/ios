@@ -10,7 +10,7 @@
 
 @interface CCSRWebSocket : NSObject
 
-@property (nonatomic, copy) void (^didReceiveMessageCallback)(NSString *type, NSNumber *uid, NSDictionary *content, NSString *channelId, NSString *userUid, NSDate *date, NSString *displayName, NSString *userIconUrl, NSDictionary *answer);
+@property (nonatomic, copy) void (^didReceiveMessageCallback)(NSString *type, NSNumber *uid, NSDictionary *content, NSString *channelId, NSString *userUid, NSDate *date, NSString *displayName, NSString *userIconUrl, BOOL userAdmin, NSDictionary *answer);
 @property (nonatomic, copy) void (^didReceiveJoinCallback)(NSString *channelId, BOOL newChannel);
 @property (nonatomic, copy) void (^didReceiveOnlineCallback)(NSString *channelUid, NSDictionary *user);
 @property (nonatomic, copy) void (^didReceiveReceiptCallback)(NSString *channelId, NSArray *messages, NSString *userUid, BOOL userAdmin);
@@ -22,10 +22,12 @@
 @property (nonatomic, copy) void (^didReceiveUnassignedCallback)(NSString *channelUid);
 @property (nonatomic, copy) void (^didReceiveInviteCallCallback) (NSString *messageId, NSString *channelId, NSDictionary *content);
 @property (nonatomic, copy) void (^didReceiveCallEventCallback) (NSString *messageId, NSDictionary *content);
-@property (nonatomic, copy) void (^didReceiveDeleteChannelCallback)(void);
+@property (nonatomic, copy) void (^didReceiveTypingCallback) (NSString *channelUid, NSDictionary *user);
+@property (nonatomic, copy) void (^didReceiveDeleteChannelCallback)(NSString *channelUid);
+@property (nonatomic, copy) void (^didReceiveCloseChannelCallback)(NSString *channelUid);
 
 + (CCSRWebSocket *)sharedInstance;
 - (void)reconnect;
 - (void)disconnect;
-
+- (void)sendMessage:(NSString *)message;
 @end

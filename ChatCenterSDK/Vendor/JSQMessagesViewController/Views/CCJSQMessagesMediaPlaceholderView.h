@@ -20,14 +20,14 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  A `JSQMessagesMediaPlaceholderView` object represents a loading or placeholder
+ *  A `CCJSQMessagesMediaPlaceholderView` object represents a loading or placeholder
  *  view for media message objects whose media attachments are not yet available. 
  *  When sending or receiving media messages that must be uploaded or downloaded from the network,
  *  you may display this view temporarily until the media attachement is available.
  *  You should return an instance of this class from the `mediaPlaceholderView` method in
- *  the `JSQMessageMediaData` protocol.
+ *  the `CCJSQMessageMediaData` protocol.
  *
- *  @see JSQMessageMediaData.
+ *  @see CCJSQMessageMediaData.
  */
 @interface CCJSQMessagesMediaPlaceholderView : UIView
 
@@ -45,10 +45,10 @@
  *  Creates a media placeholder view object with a light gray background and
  *  a centered activity indicator.
  *
- *  @discussion When initializing a `JSQMessagesMediaPlaceholderView` with this method,
+ *  @discussion When initializing a `CCJSQMessagesMediaPlaceholderView` with this method,
  *  its imageView property will be nil.
  *
- *  @return An initialized `JSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
  */
 + (instancetype)viewWithActivityIndicator;
 
@@ -56,10 +56,10 @@
  *  Creates a media placeholder view object with a light gray background and
  *  a centered paperclip attachment icon.
  *
- *  @discussion When initializing a `JSQMessagesMediaPlaceholderView` with this method,
+ *  @discussion When initializing a `CCJSQMessagesMediaPlaceholderView` with this method,
  *  its activityIndicatorView property will be nil.
  *
- *  @return An initialized `JSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
  */
 + (instancetype)viewWithAttachmentIcon;
 
@@ -70,7 +70,7 @@
  *  @param backgroundColor       The background color of the view. This value must not be `nil`.
  *  @param activityIndicatorView An initialized activity indicator to be added and centered in the view. This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
  */
 - (instancetype)initWithFrame:(CGRect)frame
               backgroundColor:(UIColor *)backgroundColor
@@ -83,7 +83,7 @@
  *  @param backgroundColor The background color of the view. This value must not be `nil`.
  *  @param imageView       An initialized image view to be added and centered in the view. This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesMediaPlaceholderView` object if successful, `nil` otherwise.
  */
 - (instancetype)initWithFrame:(CGRect)frame
               backgroundColor:(UIColor *)backgroundColor

@@ -19,10 +19,10 @@
 #import "CCJSQMediaItem.h"
 
 /**
- *  The `JSQVideoMediaItem` class is a concrete `JSQMediaItem` subclass that implements the `JSQMessageMediaData` protocol
- *  and represents a video media message. An initialized `JSQVideoMediaItem` object can be passed
- *  to a `JSQMediaMessage` object during its initialization to construct a valid media message object.
- *  You may wish to subclass `JSQVideoMediaItem` to provide additional functionality or behavior.
+ *  The `CCJSQVideoMediaItem` class is a concrete `CCJSQMediaItem` subclass that implements the `CCJSQMessageMediaData` protocol
+ *  and represents a video media message. An initialized `CCJSQVideoMediaItem` object can be passed
+ *  to a `CCJSQMediaMessage` object during its initialization to construct a valid media message object.
+ *  You may wish to subclass `CCJSQVideoMediaItem` to provide additional functionality or behavior.
  */
 @interface CCJSQVideoMediaItem : CCJSQMediaItem <CCJSQMessageMediaData, NSCoding, NSCopying>
 
@@ -44,10 +44,10 @@
  *  @param fileURL       The URL that identifies the video resource.
  *  @param isReadyToPlay A boolean value that specifies if the video is ready to play.
  *
- *  @return An initialized `JSQVideoMediaItem` if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQVideoMediaItem` if successful, `nil` otherwise.
  *
  *  @discussion If the video must be downloaded from the network,
- *  you may initialize a `JSQVideoMediaItem` with a `nil` fileURL or specify `NO` for
+ *  you may initialize a `CCJSQVideoMediaItem` with a `nil` fileURL or specify `NO` for
  *  isReadyToPlay. Once the video has been saved to disk, or is ready to stream, you can
  *  set the fileURL property or isReadyToPlay property, respectively.
  */

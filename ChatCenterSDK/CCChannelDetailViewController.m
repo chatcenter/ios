@@ -25,6 +25,7 @@
     float circleAvatarSize;
     float randomCircleAvatarFontSize;
     float randomCircleAvatarTextOffset;
+    NSArray *channelRoles;
 }
 @end
 
@@ -39,6 +40,15 @@
     [self.collectionView.backgroundView addGestureRecognizer:tapGesture];
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(deviceOrientationDidChange:) name: UIDeviceOrientationDidChangeNotification object: nil];
+    
+    ///
+    /// Channel roles
+    ///
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *privelege = [ud dictionaryForKey:kCCUserDefaults_privilege];
+    if(privelege[@"channel"] != nil) {
+        channelRoles = privelege[@"channel"];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -83,7 +93,6 @@
     [self.emailProfileInfo addGestureRecognizer:tapEmailGesture];
     UITapGestureRecognizer *tapIconGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showGuestInfor:)];
     [self.imageProfileTapAreaView addGestureRecognizer:tapIconGesture];
-    
     
     //--------------------------------------------------------------------
     // Display custom back button
@@ -288,7 +297,7 @@
             }
         } else {
             // Retry if missing information
-            [[CCConnectionHelper sharedClient] loadUser:NO userUid:user[@"id"] completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [[CCConnectionHelper sharedClient] loadUser:NO userUid:user[@"id"] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                 if (result != nil) {
                     if (result[@"online_at"] != nil && !([result[@"online_at"] isEqual:[NSNull null]])) {
                         if([[result[@"online"] stringValue] isEqualToString:@"true"]) {
@@ -391,8 +400,13 @@
         return 0;
     }
     
+    // Hide close conversation
+    if (section == CC_MENU_CLOSE_SECTION && !(channelRoles != nil && [channelRoles containsObject:@"close"])) {
+        return 0;
+    }
+    
     // Hide delete conversation
-    if (section == CC_MENU_DELETE_SECTION)
+    if (section == CC_MENU_DELETE_SECTION && !(channelRoles != nil && [channelRoles containsObject:@"destroy"]))
     {
         return 0;
     }
@@ -471,7 +485,7 @@
         if (funnel[@"id"] != nil && ![funnel[@"id"] isEqual:[NSNull null]]) {
             shouldShowAlert = YES;
             UIAlertAction *action = [UIAlertAction actionWithTitle:funnel[@"name"] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-                [[CCConnectionHelper sharedClient] setBusinessFunnelToChannel:self.channelId funnelId:funnel[@"id"] showProgress:NO completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                [[CCConnectionHelper sharedClient] setBusinessFunnelToChannel:self.channelId funnelId:funnel[@"id"] showProgress:NO completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                     if (error == nil) {
                         [self loadChannelInformation:self.channelId];
                     }
@@ -499,7 +513,7 @@
 -(void) pressCloseChannel {
     NSString *channelStatus = self.channelInfo[@"status"];
     if (channelStatus != nil && [channelStatus isEqualToString:@"closed"]) {
-        [[CCConnectionHelper sharedClient] openChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+        [[CCConnectionHelper sharedClient] openChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
             if (error == nil) {
                 NSString *saveImageString = CCLocalizedString(@"Conversation Opened");
                 [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
@@ -507,22 +521,43 @@
             }
         }];
     } else {
-        [[CCConnectionHelper sharedClient] closeChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-            if (error == nil) {
-                NSString *saveImageString = CCLocalizedString(@"Conversation Closed");
-                [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
-                [self loadChannelInformation:self.channelId];
-            }
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"チャットをクローズしますか？") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [[CCConnectionHelper sharedClient] closeChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+                if (error == nil) {
+                    NSString *saveImageString = CCLocalizedString(@"Conversation Closed");
+                    [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
+                    [self loadChannelInformation:self.channelId];
+                }
+            }];
         }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDefault handler:nil];
+        [alertVC addAction:okAction];
+        [alertVC addAction:cancelAction];
+        [self presentViewController:alertVC animated:YES completion:nil];
     }
 }
 
 -(void) pressDeleteChannel {
-    [[CCConnectionHelper sharedClient] deleteChannel:self.channelId completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
-        if (error == nil) {
-            [self.navigationController popViewControllerAnimated:YES];
-        }
+    UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"チャットを削除しますか？") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [[CCConnectionHelper sharedClient] deleteChannel:self.channelId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+            if (error == nil) {
+                if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
+                    [self.navigationController popViewControllerAnimated:YES];
+                } else {
+                    NSMutableArray *viewControllers = [[self.navigationController viewControllers] mutableCopy];
+                    [viewControllers removeLastObject];
+                    [viewControllers removeLastObject];
+                    [self.navigationController setViewControllers:viewControllers animated:YES];
+                }
+            }
+        }];
     }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDefault handler:nil];
+    [alertVC addAction:okAction];
+    [alertVC addAction:cancelAction];
+    [self presentViewController:alertVC animated:YES completion:nil];
 }
 
 -(void) pressAbout {
@@ -607,7 +642,7 @@
         return;
     }
     // Load channel
-    [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:self.channelId completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:self.channelId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if(result != nil){
             self.channelInfo = result;
             // Funnel information
@@ -656,7 +691,7 @@
                     }
                     if (self.profileUser == nil) {
                         // Get full infor of assignee
-                        [[CCConnectionHelper sharedClient] loadUser:NO userUid:self.assigneeInfo[@"id"] completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                        [[CCConnectionHelper sharedClient] loadUser:NO userUid:self.assigneeInfo[@"id"] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                             if (result != nil) {
                                 self.profileUser = result;
                                 [self setupAvatar:assignee imageView:self.channelAvatar];
@@ -724,7 +759,7 @@
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
     float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     if(osVersion >= 9.0) {
-        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL entersReaderIfAvailable:YES];
+        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL];
         if ([CCConstants sharedInstance].headerItemColor != nil) {
             webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
         }else{

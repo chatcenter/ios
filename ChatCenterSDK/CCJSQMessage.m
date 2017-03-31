@@ -38,6 +38,7 @@
                                           onDate:(NSDate *)date
                                      displayName:(NSString *)displayName
                                      userIconUrl:(NSString *)userIconUrl
+                                       userAdmin:(BOOL) userAdmin
                                           answer:(NSDictionary *)answer
                                           status:(NSInteger)status {
     
@@ -70,6 +71,7 @@
         NSMutableDictionary *newContent = [NSMutableDictionary dictionaryWithDictionary:content];
         msg.content =  [newContent copy];
         msg.status = status;
+        msg.isAgent = userAdmin;
         [messages addObject:msg];
     } else if ([messageType isEqualToString:CC_STICKERTYPEIMAGE]) {
         //
@@ -86,6 +88,7 @@
         message.content = [newContent copy];
         message.status = status;
         message.type = CC_STICKERTYPEIMAGE;
+        message.isAgent = userAdmin;
         [messages addObject:message];
         
     }else if([messageType isEqualToString:CC_RESPONSETYPELINK]
@@ -110,6 +113,7 @@
                                                               date:date
                                                               text:sendText];
         msg.status = status;
+        msg.isAgent = userAdmin;
         [messages addObject:msg];
     }else if([messageType isEqualToString:CC_RESPONSETYPEINFORMATION]
              && content != nil)
@@ -181,6 +185,7 @@
             msg.content = @{@"attributedText" : attributedText};
             msg.type = CC_RESPONSETYPEINFORMATION;
             msg.status = status;
+            msg.isAgent = userAdmin;
             [messages addObject:msg];
         }
     }else if([messageType isEqualToString:CC_RESPONSETYPESTICKER])
@@ -200,6 +205,7 @@
             newContent[@"usersReadMessage"] = usersReadMessage;
             msg.content =  [newContent copy];
             msg.status = status;
+            msg.isAgent = userAdmin;
             [messages addObject:msg];
         }
         //Do not need to display message:resposne because server will send text message of response
@@ -232,6 +238,7 @@
             newContent[@"usersReadMessage"] = usersReadMessage;
             msg.content =  [newContent copy];
             msg.status = status;
+            msg.isAgent = userAdmin;
             [messages addObject:msg];
         }
     }else if([messageType isEqualToString:CC_RESPONSETYPEPROPERTY]
@@ -389,6 +396,7 @@
                             @"lowerContent" : [self attributedStringWithHTML:[self styledHTMLwithHTML:lowerContent]]};
             msg.type = CC_RESPONSETYPEPROPERTY;
             msg.status = status;
+            msg.isAgent = userAdmin;
             [messages addObject:msg];
         }
     }else if([messageType isEqualToString:CC_RESPONSETYPEIMAGE]
@@ -407,6 +415,7 @@
             newContent[@"usersReadMessage"] = usersReadMessage;
             message.content = [newContent copy];
             message.status = status;
+            message.isAgent = userAdmin;
             [messages addObject:message];
             
 
@@ -428,6 +437,7 @@
             newContent[@"usersReadMessage"] = usersReadMessage;
             message.content = [newContent copy];
             message.status = status;
+            message.isAgent = userAdmin;
             [messages addObject:message];
         }
     }else if([messageType isEqualToString:CC_RESPONSETYPEDATETIMEAVAILABILITY]
@@ -499,6 +509,7 @@
                                                               date:date
                                                               text:content[@"text"]];
         msg.status = status;
+        msg.isAgent = userAdmin;
         [messages addObject:msg];
     }else if([messageType isEqualToString:CC_RESPONSETYPEMESSAGE]
              && content[@"text"] != nil)
@@ -515,6 +526,7 @@
         newContent[@"usersReadMessage"] = usersReadMessage;
         message.content = [newContent copy];
         message.status = status;
+        message.isAgent = userAdmin;
         [messages addObject:message];
     }else if([messageType isEqualToString:CC_RESPONSETYPEQUESTION]
              && content[@"question"] != nil)
@@ -524,6 +536,7 @@
                                                               date:date
                                                               text:@""];
         msg.status = status;
+        msg.isAgent = userAdmin;
         [messages addObject:msg];
     } else if([messageType isEqualToString:CC_RESPONSETYPECALL]) {
         CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:userUid
@@ -532,6 +545,7 @@
                                                               text:@""];
         msg.status = status;
         msg.content = content;
+        msg.isAgent = userAdmin;
         [messages addObject:msg];
     } else {
         return nil;

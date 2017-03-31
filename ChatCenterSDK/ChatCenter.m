@@ -778,14 +778,14 @@ providerRefreshToken:(NSString *)providerRefreshToken
 
 -(void)loadOrgsAndChannelsAndMessagesAndConnectWebSocket:(CCUISplitViewController *)splitVC{
     __block CCUISplitViewController *blockSplitVC = splitVC;
-    [[CCConnectionHelper sharedClient] loadOrgsAndChannelsAndConnectWebSocket:YES getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadOrgsAndChannelsAndConnectWebSocket:YES getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
             NSLog(@"loadChannelsAndConnectWebSocket success!");
             if ([result isEqualToString:@"No Message yet"]) {
                 [blockSplitVC displayModalList];
             }
         }else{
-            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:task] == YES){
                 [[CCConnectionHelper sharedClient] displayAuthenticationErrorAlert];
             }
         }
@@ -840,7 +840,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
                                    providerExpiresAt:providerExpiresAt
                                          deviceToken:deviceToken
                                         showProgress:NO
-                                   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                   completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
         if (result != nil) {
             [[CCConnectionHelper sharedClient] refreshData];
@@ -890,7 +890,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
                                   providerExpiresAt:providerExpiresAt
                                         deviceToken:deviceToken
                                        showProgress:showProgress
-                                  completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                                  completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                                       if(completionHandler != nil) completionHandler(result, error);
                                   }];
 }
@@ -905,7 +905,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
 
 - (void)isTokenVailid:(void (^)(BOOL result))completionHandler{
     [[CCConnectionHelper sharedClient] loadUserMe:NO
-                                completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
             if(result != nil) {
                 if(completionHandler != nil) completionHandler(YES);

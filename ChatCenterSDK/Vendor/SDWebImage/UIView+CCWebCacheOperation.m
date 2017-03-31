@@ -1,5 +1,5 @@
 /*
- * This file is part of the SDWebImage package.
+ * This file is part of the CCSDWebImage package.
  * (c) Olivier Poitrey <rs@dailymotion.com>
  *
  * For the full copyright and license information, please view the LICENSE
@@ -7,14 +7,19 @@
  */
 
 #import "UIView+CCWebCacheOperation.h"
+
+#if SD_UIKIT || SD_MAC
+
 #import "objc/runtime.h"
 
 static char loadOperationKey;
 
-@implementation UIView (CCWebCacheOperation)
+typedef NSMutableDictionary<NSString *, id> CCSDOperationsDictionary;
 
-- (NSMutableDictionary *)operationDictionary {
-    NSMutableDictionary *operations = objc_getAssociatedObject(self, &loadOperationKey);
+@implementation UIView (WebCacheOperation)
+
+- (CCSDOperationsDictionary *)operationDictionary {
+    CCSDOperationsDictionary *operations = objc_getAssociatedObject(self, &loadOperationKey);
     if (operations) {
         return operations;
     }
@@ -23,16 +28,20 @@ static char loadOperationKey;
     return operations;
 }
 
-- (void)sd_setImageLoadOperation:(id)operation forKey:(NSString *)key {
-    [self sd_cancelImageLoadOperationWithKey:key];
-    NSMutableDictionary *operationDictionary = [self operationDictionary];
-    [operationDictionary setObject:operation forKey:key];
+- (void)sd_setImageLoadOperation:(nullable id)operation forKey:(nullable NSString *)key {
+    if (key) {
+        [self sd_cancelImageLoadOperationWithKey:key];
+        if (operation) {
+            CCSDOperationsDictionary *operationDictionary = [self operationDictionary];
+            operationDictionary[key] = operation;
+        }
+    }
 }
 
-- (void)sd_cancelImageLoadOperationWithKey:(NSString *)key {
+- (void)sd_cancelImageLoadOperationWithKey:(nullable NSString *)key {
     // Cancel in progress downloader from queue
-    NSMutableDictionary *operationDictionary = [self operationDictionary];
-    id operations = [operationDictionary objectForKey:key];
+    CCSDOperationsDictionary *operationDictionary = [self operationDictionary];
+    id operations = operationDictionary[key];
     if (operations) {
         if ([operations isKindOfClass:[NSArray class]]) {
             for (id <CCSDWebImageOperation> operation in operations) {
@@ -47,9 +56,13 @@ static char loadOperationKey;
     }
 }
 
-- (void)sd_removeImageLoadOperationWithKey:(NSString *)key {
-    NSMutableDictionary *operationDictionary = [self operationDictionary];
-    [operationDictionary removeObjectForKey:key];
+- (void)sd_removeImageLoadOperationWithKey:(nullable NSString *)key {
+    if (key) {
+        CCSDOperationsDictionary *operationDictionary = [self operationDictionary];
+        [operationDictionary removeObjectForKey:key];
+    }
 }
 
 @end
+
+#endif

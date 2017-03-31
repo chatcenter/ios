@@ -43,12 +43,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    _image = nil;
-    _cachedImageView = nil;
-}
-
 - (void)clearCachedMediaViews
 {
     [super clearCachedMediaViews];
@@ -69,7 +63,7 @@
     _cachedImageView = nil;
 }
 
-#pragma mark - JSQMessageMediaData protocol
+#pragma mark - CCJSQMessageMediaData protocol
 
 - (UIView *)mediaView
 {

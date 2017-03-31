@@ -1,15 +1,18 @@
-//
-//  UIImage+MultiFormat.h
-//  SDWebImage
-//
-//  Created by Olivier Poitrey on 07/06/13.
-//  Copyright (c) 2013 Dailymotion. All rights reserved.
-//
+/*
+ * This file is part of the CCSDWebImage package.
+ * (c) Olivier Poitrey <rs@dailymotion.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-#import <UIKit/UIKit.h>
+#import "CCSDWebImageCompat.h"
+#import "NSData+ImageContentType.h"
 
-@interface UIImage (CCMultiFormat)
+@interface UIImage (MultiFormat)
 
-+ (UIImage *)sd_imageWithData:(NSData *)data;
++ (nullable UIImage *)sd_imageWithData:(nullable NSData *)data;
+- (nullable NSData *)sd_imageData;
+- (nullable NSData *)sd_imageDataAsFormat:(CCSDImageFormat)imageFormat;
 
 @end

@@ -126,6 +126,7 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
     cell.layoutMargins = UIEdgeInsetsZero;
     cell.textLabel.numberOfLines = 0;
     cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    cell.textLabel.textAlignment = NSTextAlignmentCenter;
     //...
     
     if(row<actionData.count) {

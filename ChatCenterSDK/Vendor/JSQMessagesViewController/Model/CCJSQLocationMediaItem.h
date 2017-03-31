@@ -20,18 +20,18 @@
 #import <MapKit/MapKit.h>
 
 /**
- *  A completion handler block for a `JSQLocationMediaItem`. See `setLocation: withCompletionHandler:`.
+ *  A completion handler block for a `CCJSQLocationMediaItem`. See `setLocation: withCompletionHandler:`.
  */
-typedef void (^JSQLocationMediaItemCompletionBlock)(void);
+typedef void (^CCJSQLocationMediaItemCompletionBlock)(void);
 
 
 #import "CCJSQMediaItem.h"
 
 /**
- *  The `JSQLocationMediaItem` class is a concrete `JSQMediaItem` subclass that implements the `JSQMessageMediaData` protocol
- *  and represents a location media message. An initialized `JSQLocationMediaItem` object can be passed
- *  to a `JSQMediaMessage` object during its initialization to construct a valid media message object.
- *  You may wish to subclass `JSQLocationMediaItem` to provide additional functionality or behavior.
+ *  The `CCJSQLocationMediaItem` class is a concrete `CCJSQMediaItem` subclass that implements the `CCJSQMessageMediaData` protocol
+ *  and represents a location media message. An initialized `CCJSQLocationMediaItem` object can be passed
+ *  to a `CCJSQMediaMessage` object during its initialization to construct a valid media message object.
+ *  You may wish to subclass `CCJSQLocationMediaItem` to provide additional functionality or behavior.
  */
 @interface CCJSQLocationMediaItem : CCJSQMediaItem <CCJSQMessageMediaData, MKAnnotation, NSCoding, NSCopying>
 
@@ -50,10 +50,10 @@ typedef void (^JSQLocationMediaItemCompletionBlock)(void);
  *
  *  @param location The location for the media item. This value may be `nil`.
  *
- *  @return An initialized `JSQLocationMediaItem` if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQLocationMediaItem` if successful, `nil` otherwise.
  *
  *  @discussion If the location data must be dowloaded from the network,
- *  you may initialize a `JSQLocationMediaItem` object with a `nil` location.
+ *  you may initialize a `CCJSQLocationMediaItem` object with a `nil` location.
  *  Once the location data has been retrieved, you can then set the location property
  *  using `setLocation: withCompletionHandler:`
  */
@@ -69,7 +69,7 @@ typedef void (^JSQLocationMediaItemCompletionBlock)(void);
  *  @param location   The location for the media item.
  *  @param completion The block to call after the map view snapshot for the given location has been created.
  */
-- (void)setLocation:(CLLocation *)location withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion;
+- (void)setLocation:(CLLocation *)location withCompletionHandler:(CCJSQLocationMediaItemCompletionBlock)completion;
 
 /**
  *  Sets the specified location for the location media item and immediately begins creating
@@ -82,5 +82,5 @@ typedef void (^JSQLocationMediaItemCompletionBlock)(void);
  *  @param completion The block to call after the map view snapshot for the given location has been created.
  */
 - (void)setLocation:(CLLocation *)location
-             region:(MKCoordinateRegion)region withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion;
+             region:(MKCoordinateRegion)region withCompletionHandler:(CCJSQLocationMediaItemCompletionBlock)completion;
 @end

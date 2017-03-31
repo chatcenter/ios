@@ -1,6 +1,6 @@
-// AFNetworkActivityLogger.h
+// CCAFNetworkActivityLogger.h
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com/)
+// Copyright (c) 2015 CCAFNetworking (http://CCAFnetworking.com/)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,23 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-
-typedef NS_ENUM(NSUInteger, AFHTTPRequestLoggerLevel) {
-  AFLoggerLevelOff,
-  AFLoggerLevelDebug,
-  AFLoggerLevelInfo,
-  AFLoggerLevelWarn,
-  AFLoggerLevelError,
-  AFLoggerLevelFatal = AFLoggerLevelOff,
-};
+#import "CCAFNetworkActivityLoggerProtocol.h"
 
 /**
- `AFNetworkActivityLogger` logs requests and responses made by AFNetworking, with an adjustable level of detail.
+ `CCAFNetworkActivityLogger` logs requests and responses made by CCAFNetworking, with an adjustable level of detail.
  
- Applications should enable the shared instance of `AFNetworkActivityLogger` in `AppDelegate -application:didFinishLaunchingWithOptions:`:
+ Applications should enable the shared instance of `CCAFNetworkActivityLogger` in `AppDelegate -application:didFinishLaunchingWithOptions:`:
 
-        [[AFNetworkActivityLogger sharedLogger] startLogging];
+        [[CCAFNetworkActivityLogger sharedLogger] startLogging];
  
- `AFNetworkActivityLogger` listens for `AFNetworkingOperationDidStartNotification` and `AFNetworkingOperationDidFinishNotification` notifications, which are posted by AFNetworking as request operations are started and finish. For further customization of logging output, users are encouraged to implement desired functionality by listening for these notifications.
+ `CCAFNetworkActivityLogger` listens for `CCAFNetworkingOperationDidStartNotification` and `CCAFNetworkingOperationDidFinishNotification` notifications, which are posted by CCAFNetworking as request operations are started and finish. For further customization of logging output, users are encouraged to implement desired functionality by listening for these notifications.
  */
 @interface CCAFNetworkActivityLogger : NSObject
 
 /**
- The level of logging detail. See "Logging Levels" for possible values. `AFLoggerLevelInfo` by default.
+ The set of loggers current managed by the shared activity logger. By default, this includes one `CCAFNetworkActivityConsoleLogger`
  */
-@property (nonatomic, assign) AFHTTPRequestLoggerLevel level;
-
-/**
- Omit requests which match the specified predicate, if provided. `nil` by default.
- 
- @discussion Each notification has an associated `NSURLRequest`. To filter out request and response logging, such as all network activity made to a particular domain, this predicate can be set to match against the appropriate URL string pattern.
- */
-@property (nonatomic, strong) NSPredicate *filterPredicate;
+@property (nonatomic, strong, readonly) NSSet <CCAFNetworkActivityLoggerProtocol> *loggers;
 
 /**
  Returns the shared logger instance.
@@ -60,50 +45,24 @@ typedef NS_ENUM(NSUInteger, AFHTTPRequestLoggerLevel) {
 + (instancetype)sharedLogger;
 
 /**
- Start logging requests and responses.
+ Start logging requests and responses to all managed loggers.
  */
 - (void)startLogging;
 
 /**
- Stop logging requests and responses.
+ Stop logging requests and responses to all managed loggers.
  */
 - (void)stopLogging;
 
-@end
-
-///----------------
-/// @name Constants
-///----------------
 
 /**
- ## Logging Levels
+ Adds the given logger to be managed to the `loggers` set.
+ */
+- (void)addLogger:(id <CCAFNetworkActivityLoggerProtocol>)logger;
 
- The following constants specify the available logging levels for `AFNetworkActivityLogger`:
+/**
+ Removes the given logger from the `loggers` set.
+ */
+- (void)removeLogger:(id <CCAFNetworkActivityLoggerProtocol>)logger;
 
- enum {
- AFLoggerLevelOff,
- AFLoggerLevelDebug,
- AFLoggerLevelInfo,
- AFLoggerLevelWarn,
- AFLoggerLevelError,
- AFLoggerLevelFatal = AFLoggerLevelOff,
- }
-
- `AFLoggerLevelOff`
- Do not log requests or responses.
-
- `AFLoggerLevelDebug`
- Logs HTTP method, URL, header fields, & request body for requests, and status code, URL, header fields, response string, & elapsed time for responses.
- 
- `AFLoggerLevelInfo`
- Logs HTTP method & URL for requests, and status code, URL, & elapsed time for responses.
-
- `AFLoggerLevelWarn`
- Logs HTTP method & URL for requests, and status code, URL, & elapsed time for responses, but only for failed requests.
- 
- `AFLoggerLevelError`
- Equivalent to `AFLoggerLevelWarn`
-
- `AFLoggerLevelFatal`
- Equivalent to `AFLoggerLevelOff`
-*/
+@end

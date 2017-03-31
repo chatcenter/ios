@@ -19,8 +19,8 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  `JSQMessagesCellTextView` is a subclass of `UITextView` that is used to display text
- *  in a `JSQMessagesCollectionViewCell`.
+ *  `CCJSQMessagesCellTextView` is a subclass of `UITextView` that is used to display text
+ *  in a `CCJSQMessagesCollectionViewCell`.
  */
 @interface CCJSQMessagesCellTextView : UITextView
 

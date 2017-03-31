@@ -90,15 +90,27 @@
             title = CCLocalizedString(@"About ChatCenter IO");
             break;
         case 1:
-            urlString = @"https://www.chatcenter.io/termsofservice/";
+            if([self.deviceLanguage isEqualToString:@"ja"]) {
+                urlString = @"https://www.chatcenter.io/ja/termsofservice/";
+            } else {
+                urlString = @"https://www.chatcenter.io/termsofservice/";
+            }
             title = CCLocalizedString(@"Terms of service");
             break;
         case 2:
-            urlString = @"https://www.chatcenter.io/privacypolicy/";
+            if([self.deviceLanguage isEqualToString:@"ja"]) {
+                urlString = @"https://www.chatcenter.io/ja/privacypolicy/";
+            } else {
+                urlString = @"https://www.chatcenter.io/privacypolicy/";
+            }
             title = CCLocalizedString(@"Privacy policy");
             break;
         case 3:
-            urlString = @"https://www.chatcenter.io/sla/";
+            if([self.deviceLanguage isEqualToString:@"ja"]) {
+                urlString = @"https://www.chatcenter.io/ja/sla/";
+            } else {
+                urlString = @"https://www.chatcenter.io/sla/";
+            }
             title = CCLocalizedString(@"Service Level Agreement");
             break;
         case 4:
@@ -135,7 +147,7 @@
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
     float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     if(osVersion >= 9.0) {
-        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:urlString] entersReaderIfAvailable:YES];
+        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:urlString]];
         webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
         [self presentViewController:webViewController animated:YES completion:nil];
         return;

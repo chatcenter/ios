@@ -420,7 +420,7 @@ static bool subscribeToSelf = NO;
 
 - (void) doHangup {
     NSLog(@"doHangup channelid = %@", self.channelUid);
-    [[CCConnectionHelper sharedClient] hangupCall:self.channelUid messageId:self.messageId user:@{@"user_id": _publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] hangupCall:self.channelUid messageId:self.messageId user:@{@"user_id": _publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if(!isClosed) {
             isClosed = YES;
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
@@ -430,7 +430,7 @@ static bool subscribeToSelf = NO;
 
 - (void) doReject {
     NSLog(@"doReject channelid = %@", self.channelUid);
-    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id": self.publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id": self.publisherInfor[@"user_id"]} completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if(!isClosed) {
             isClosed = YES;
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];

@@ -34,12 +34,6 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 
 @property (assign, nonatomic) BOOL jsq_isObserving;
 
-- (void)jsq_leftBarButtonPressed:(UIButton *)sender;
-- (void)jsq_rightBarButtonPressed:(UIButton *)sender;
-
-- (void)jsq_addObservers;
-- (void)jsq_removeObservers;
-
 @end
 
 
@@ -58,7 +52,7 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
     self.jsq_isObserving = NO;
     self.sendButtonOnRight = YES;
 
-    self.preferredDefaultHeight = 48.0f;
+    self.preferredDefaultHeight = 36.0f;
     self.maximumHeight = NSNotFound;
 
     CCJSQMessagesToolbarContentView *toolbarContentView = [self loadToolbarContentView];
@@ -87,7 +81,6 @@ static void * kJSQMessagesInputToolbarKeyValueObservingContext = &kJSQMessagesIn
 - (void)dealloc
 {
     [self jsq_removeObservers];
-    _contentView = nil;
 }
 
 #pragma mark - Setters

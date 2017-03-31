@@ -26,11 +26,16 @@
 #import "CCSVProgressHUD.h"
 #import "CCHistoryViewCell.h"
 #import "UIImage+CCSDKImage.h"
+#import "CCMGSwipeTableCell.h"
+#import "CCMGSwipeButton.h"
+#import "CCAssignAssigneeViewController.h"
+#import "CCUserDefaultsUtil.h"
 
 int const CCMaxLoadChannel = 10000;
 int const CCRandomCircleAvatarSize = 128;
 int const CCRandomCircleAvatarFontSize = 84.0f;
 int const CCRandomCircleAvatarTextOffset = 15;
+int const CCTopRowTableView = 0;
 
 @interface CCHistoryViewController (){
     NSIndexPath *selectedIndexPath;
@@ -38,21 +43,16 @@ int const CCRandomCircleAvatarTextOffset = 15;
     NSDate *cellForRowAtIndexPathTime;
     CCHistoryNavigationTitleView *navigationTitleView;
     UIView *navigationBottomBorder;
+    UIView *newMessageView;
+    NSString *currentOrgId;
+    NSArray *channelRoles;
 }
 
 @property (weak, nonatomic) IBOutlet UITextView *noCellMessage;
 @property (nonatomic, weak)   IBOutlet UITableView *tableView;
-@property (nonatomic, strong) NSMutableArray *ChatCenterChatHistories;
 @property (nonatomic, strong) NSMutableArray *ChatChannelIds;
-@property (nonatomic, strong) NSMutableArray *ChannelMyLastReadMessages;
 @property (nonatomic, strong) NSMutableArray *ChannelDisplayNames;
-@property (nonatomic, strong) NSMutableArray *ChannelLastMessages;
-@property (nonatomic, strong) NSMutableArray *ChannelLastMessageUpdateDates;
-@property (nonatomic, strong) NSMutableArray *ChannelLastUpdateDates;
-@property (nonatomic, strong) NSMutableArray *ChannelIconImages;
-@property (nonatomic, strong) NSMutableArray *ChannelStatuses;
 @property (nonatomic, strong) NSMutableArray *ChannelLabels;
-@property (nonatomic, strong) NSMutableArray *ChannelUnreadMessageNums;
 @property (nonatomic, strong) NSString *userId;
 @property (nonatomic, strong) NSString *token;
 @property (nonatomic, strong) NSString *channelId;
@@ -137,6 +137,12 @@ int const CCRandomCircleAvatarTextOffset = 15;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    currentOrgId = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
+    NSDictionary *privelege = [ud dictionaryForKey:kCCUserDefaults_privilege];
+    if(privelege[@"channel"] != nil) {
+        channelRoles = privelege[@"channel"];
+    }
     [self viewSetUp];
 }
 
@@ -278,11 +284,9 @@ int const CCRandomCircleAvatarTextOffset = 15;
     }else{
         [displayDF setDateFormat:CCLocalizedString(@"MM/dd")];
     }
-    if ([[ChatCenter sharedInstance] isLocaleJapanese] == YES) {
         ///This is bug of NSDateFormatter
         ///https://stackoverflow.com/questions/6169074/nsdateformatter-does-not-respect-12-24-hour-am-pm-system-setting-in-some-cir
-        displayDF.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
-    }
+    displayDF.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
     
     NSString *stringFromDate = [displayDF stringFromDate:labels[@"lastUpdatedAt"]];
     lastUpdateDate.text     = stringFromDate;
@@ -355,7 +359,145 @@ int const CCRandomCircleAvatarTextOffset = 15;
     }else{
         cell.LastMessageRightMargin.constant = 2.0f;
     }
+
+    //
+    // Action buttons
+    //
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
+    NSString *channelID = [self.ChatChannelIds objectAtIndex:indexPath.row];
+    // Delete button
+    CCMGSwipeButton *deleteButton = [CCMGSwipeButton buttonWithTitle:CCLocalizedString(@"Delete") backgroundColor:[UIColor colorWithRed:254.0/255 green:63.0/255 blue:53.0/255 alpha:1] callback:^BOOL(CCMGSwipeTableCell *sender) {
+        // handle delete
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"チャットを削除しますか？") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self removeChannelAtIndexPath:indexPath];
+            [[CCConnectionHelper sharedClient] deleteChannel:channelID completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+                if (error == nil) {
+                    [cell hideSwipeAnimated:YES];
+                }
+            }];
+        }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDefault handler:nil];
+        [alertVC addAction:cancelAction];
+        [alertVC addAction:okAction];
+        [self presentViewController:alertVC animated:YES completion:nil];
+        return YES;
+    }];
+    UIImageView *deleteIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CCicon-delete"]];
+    deleteIcon.contentMode = UIViewContentModeScaleAspectFit;
+    deleteIcon.frame = CGRectMake(deleteButton.frame.size.width / 2 - 10, deleteButton.frame.size.height - 10, 20, 20);
+    [deleteButton addSubview:deleteIcon];
+    UILabel *deleteLabel = [[UILabel alloc] init];
+    deleteLabel.text = CCLocalizedString(@"Delete");
+    deleteLabel.textAlignment = NSTextAlignmentCenter;
+    deleteLabel.textColor = [UIColor whiteColor];
+    deleteLabel.font = [UIFont systemFontOfSize:14];
+    deleteLabel.frame = CGRectMake(0, deleteButton.frame.size.height + 20, deleteButton.frame.size.width, 20);
+    [deleteButton addSubview:deleteLabel];
+    [deleteButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
     
+    // Assign button
+    CCMGSwipeButton *assignButton = [CCMGSwipeButton buttonWithTitle:CCLocalizedString(@"Assign") backgroundColor:[UIColor colorWithRed:246.0/255 green:166.0/255 blue:35.0/255 alpha:1] callback:^BOOL(CCMGSwipeTableCell *sender) {
+        // handle assign
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
+        CCAssignAssigneeViewController *vc = [storyboard  instantiateViewControllerWithIdentifier:@"assignAssigneeViewController"];;
+        vc.orgUid = currentOrgId;
+        vc.channelUid = [self.ChatChannelIds objectAtIndex:indexPath.row];
+        [self.navigationController pushViewController:vc animated:YES];
+        return YES;
+    }];
+    UIImageView *assignIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CCicon-assign"]];
+    assignIcon.contentMode = UIViewContentModeScaleAspectFit;
+    assignIcon.frame = CGRectMake(assignButton.frame.size.width / 2 - 10, assignButton.frame.size.height - 10, 20, 20);
+    [assignButton addSubview:assignIcon];
+    UILabel *assignLabel = [[UILabel alloc] init];
+    assignLabel.text = CCLocalizedString(@"Assign");
+    assignLabel.textAlignment = NSTextAlignmentCenter;
+    assignLabel.textColor = [UIColor whiteColor];
+    assignLabel.font = [UIFont systemFontOfSize:14];
+    assignLabel.frame = CGRectMake(0, assignButton.frame.size.height + 20, assignButton.frame.size.width, 20);
+    [assignButton addSubview:assignLabel];
+    [assignButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+
+    
+    // Close button
+    CCMGSwipeButton *closeButton = [CCMGSwipeButton buttonWithTitle:CCLocalizedString(@"Close") backgroundColor:[UIColor colorWithRed:126.0/255 green:211.0/255 blue:33.0/255 alpha:1] callback:^BOOL(CCMGSwipeTableCell *sender) {
+        // handle close
+        UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"チャットをクローズしますか？") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [self removeChannelAtIndexPath:indexPath];
+            [[CCConnectionHelper sharedClient] closeChannels:@[channelID] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+                if (error == nil) {
+                    [cell hideSwipeAnimated:YES];
+                }
+            }];
+        }];
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDefault handler:nil];
+        [alertVC addAction:cancelAction];
+        [alertVC addAction:okAction];
+        [self presentViewController:alertVC animated:YES completion:nil];
+                return YES;
+    }];
+    UIImageView *closeIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CCicon-close"]];
+    closeIcon.contentMode = UIViewContentModeScaleAspectFit;
+    closeIcon.frame = CGRectMake(closeButton.frame.size.width / 2 - 10, closeButton.frame.size.height - 10, 20, 20);
+    [closeButton addSubview:closeIcon];
+    UILabel *closeLabel = [[UILabel alloc] init];
+    closeLabel.text = CCLocalizedString(@"Close");
+    closeLabel.textAlignment = NSTextAlignmentCenter;
+    closeLabel.textColor = [UIColor whiteColor];
+    closeLabel.font = [UIFont systemFontOfSize:14];
+    closeLabel.frame = CGRectMake(0, closeButton.frame.size.height + 20, closeButton.frame.size.width, 20);
+    [closeButton addSubview:closeLabel];
+    [closeButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+
+    // Open button
+    CCMGSwipeButton *openButton = [CCMGSwipeButton buttonWithTitle:CCLocalizedString(@"Reopen") backgroundColor:[UIColor colorWithRed:126.0/255 green:211.0/255 blue:33.0/255 alpha:1] callback:^BOOL(CCMGSwipeTableCell *sender) {
+        [self removeChannelAtIndexPath:indexPath];
+        // handle close
+        [[CCConnectionHelper sharedClient] openChannels:@[channelID] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+            if (error == nil) {
+                [cell hideSwipeAnimated:YES];
+            }
+        }];
+        return YES;
+    }];
+    UIImageView *openIcon = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"CCicon-reopen"]];
+    openIcon.contentMode = UIViewContentModeScaleAspectFit;
+    openIcon.frame = CGRectMake(openButton.frame.size.width / 2 - 10, openButton.frame.size.height - 10, 20, 20);
+    [openButton addSubview:openIcon];
+    UILabel *openLabel = [[UILabel alloc] init];
+    openLabel.text = CCLocalizedString(@"Reopen");
+    openLabel.textAlignment = NSTextAlignmentCenter;
+    openLabel.textColor = [UIColor whiteColor];
+    openLabel.font = [UIFont systemFontOfSize:14];
+    openLabel.frame = CGRectMake(0, openButton.frame.size.height + 20, openButton.frame.size.width, 20);
+    [openButton addSubview:openLabel];
+    [openButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal];
+    
+
+    NSMutableArray *btnArray = [NSMutableArray array];
+    if (channelRoles != nil && [channelRoles containsObject:@"destroy"]) {
+        [btnArray addObject:deleteButton];
+    }
+    
+    if (channelRoles != nil && [channelRoles containsObject:@"close"] && (self.channelType == CCAllChannel || self.channelType == CCUnarchivedChannel)) {
+        [btnArray addObject:closeButton];
+    }
+
+    if (channelRoles != nil && [channelRoles containsObject:@"close"] && self.channelType == CCArchivedChannel) {
+        [btnArray addObject:openButton];
+    }
+    
+    if (channelRoles != nil && [channelRoles containsObject:@"assign"]) {
+        [btnArray addObject:assignButton];
+    }
+    
+    if ([CCConstants sharedInstance].isAgent) {
+        cell.rightButtons = btnArray;
+        cell.leftSwipeSettings.transition = CCMGSwipeTransitionDrag;
+    }
     return cell;
 }
 
@@ -428,7 +570,7 @@ int const CCRandomCircleAvatarTextOffset = 15;
         NSString *channelUid = [self.ChatChannelIds objectAtIndex:indexPath.row];
         NSArray *channelUids = [NSArray arrayWithObjects:[self.ChatChannelIds objectAtIndex:indexPath.row], nil];
         if ([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable || CCLocalDevelopmentMode) {
-            [[CCConnectionHelper sharedClient] closeChannels:channelUids completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [[CCConnectionHelper sharedClient] closeChannels:channelUids completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
                 if (result != nil) {
                     ///change status of channel in coredata
                     [[CCCoredataBase sharedClient] updateChannelUpdateAtAndStatusWithUid:channelUid updateAt:[NSDate date] status:@"closed"];
@@ -460,6 +602,14 @@ int const CCRandomCircleAvatarTextOffset = 15;
 titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     return  CCLocalizedString(@"Delete");
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.row == CCTopRowTableView) {
+        if (newMessageView != nil) {
+            [newMessageView removeFromSuperview];
+        }
+    }
 }
 
 #pragma mark - scroll view delegates
@@ -826,6 +976,18 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     if ([CCConstants sharedInstance].isAgent == YES && newChannel == YES){
         [self loadLocalData:NO];
     }
+    // Display new channel notification
+    BOOL shouldShowNewMessageButton = YES;
+    for (UITableViewCell *cell in [self.tableView visibleCells]) {
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+        if (indexPath.item == 0) {
+            shouldShowNewMessageButton = NO;
+            break;
+        }
+    }
+    if (shouldShowNewMessageButton) {
+        [self displayNotification:CCLocalizedString(@"New chat")];
+    }
 }
 
 - (void)receiveChannelOnlineFromWebSocket:(NSString *)channelUid user:(NSDictionary *)user {
@@ -840,8 +1002,26 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                date:(NSDate *)date
                         displayName:(NSString *)displayName
                         userIconUrl:(NSString *)userIconUrl
+                          userAdmin:(BOOL)userAdmin
                              answer:(NSDictionary *)answer
 {
+    BOOL shouldShowNewMessageButton = YES;
+    for (UITableViewCell *cell in [self.tableView visibleCells]) {
+        NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+        if (indexPath.item == 0) {
+            shouldShowNewMessageButton = NO;
+            break;
+        }
+    }
+    
+    if (![self.ChatChannelIds containsObject:channelId]) {
+        shouldShowNewMessageButton = NO;
+    }
+    
+    if (shouldShowNewMessageButton) {
+        [self showNewMessageButton:messageType uid:uid content:content channelId:channelId userUid:userUid date:date displayName:displayName userIconUrl:userIconUrl userAdmin:userAdmin answer:answer];
+    }
+    
     [self loadLocalChannles:NO lastUpdatedAt:nil];
     if([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES)
     {
@@ -853,6 +1033,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                                                           onDate:date
                                                                      displayName:displayName
                                                                      userIconUrl:userIconUrl
+                                                                       userAdmin:userAdmin
                                                                           answer:answer];
         }
     }
@@ -872,6 +1053,9 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 - (void)receiveFollowFromWebSocket:(NSString *)channelUid{
+    if (![self.ChatChannelIds containsObject:channelUid]) {
+        return;
+    }
     [self loadLocalChannles:NO lastUpdatedAt:nil];
     if([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES)
     {
@@ -882,6 +1066,9 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 - (void)receiveUnfollowFromWebSocket:(NSString *)channelUid{
+    if (![self.ChatChannelIds containsObject:channelUid]) {
+        return;
+    }
     [self loadLocalChannles:NO lastUpdatedAt:nil];
     if([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES)
     {
@@ -915,25 +1102,36 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     }
 }
 
-- (void)receiveDeleteChannelFromWebSocket {
-    [self loadLocalChannles:NO lastUpdatedAt:nil];
-    [self.tableView reloadData];
-    if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"Connection Failed") preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *okAction = [UIAlertAction
-                                   actionWithTitle:CCLocalizedString(@"OK")
-                                   style:UIAlertActionStyleDefault
-                                   handler:^(UIAlertAction *action) {
-                                       [self.chatAndHistoryViewController displayVoidViewController];
-                                   }];
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
+- (void)receiveDeleteChannelFromWebSocket:(NSString *)channelUid {
+    if ([self.ChatChannelIds containsObject:channelUid]) {
+        [self loadLocalChannles:NO lastUpdatedAt:nil];
     }
 }
+
+- (void)receiveCloseChannelFromWebSocket:(NSString *)channelUid {
+    if ([self.ChatChannelIds containsObject:channelUid]) {
+        [self loadLocalChannles:NO lastUpdatedAt:nil];
+    }
+}
+
+- (void)receiveMessageTypingFromWebSocket:(NSString *)channelUid user:(NSDictionary *)user {
+    if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
+        [self.chatAndHistoryViewController.chatViewController receiveMessageTypingFromWebSocket:channelUid user:user];
+    }
+}
+
+- (void)receiveAssignFromWebSocket:(NSString *)channelUid {
+    [self loadLocalChannles:NO lastUpdatedAt:nil];
+}
+
+- (void)receiveUnassignFromWebSocket:(NSString *)channelUid {
+    [self loadLocalChannles:NO lastUpdatedAt:nil];
+}
+
 #pragma mark - Load Data
 -(void)loadLocalChannles:(BOOL)isOrgChange lastUpdatedAt:(NSDate *)lastUpdatedAt{
     if (lastUpdatedAt == nil) [self initChatData];
-    
+
     NSArray *channelArray;
     if (lastUpdatedAt == nil) {
         channelArray = [[CCCoredataBase sharedClient] selectAllChannel:CCloadLoacalChannelLimit channelType:self.channelType];
@@ -942,6 +1140,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                                        lastUpdatedAt:lastUpdatedAt
                                                          channelType:self.channelType];
     }
+        
     int endMessageIndex, loadChannelNum;
     if (channelArray.count > CCloadLoacalChannelLimit) { ///coredata's setFetchBatchSize is not accurate, it may select more than it's limit
         endMessageIndex = (int)channelArray.count-(CCloadLoacalChannelLimit-1);
@@ -951,6 +1150,22 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         loadChannelNum = (int)channelArray.count;
     }
     int startIndex = (int)self.ChannelLabels.count-1;
+    
+    NSArray *messageStatus = [CCUserDefaultsUtil filterMessageStatus];
+    NSString *filteredStatus;
+    if (messageStatus.count > 0) {
+        for (NSString *status in messageStatus) {
+            if ([status isEqualToString:CCHistoryFilterMessagesStatusTypeClosed]) {
+                filteredStatus = @"closed";
+                break;
+            }
+            if ([status isEqualToString:CCHistoryFilterMessagesStatusTypeUnassigned]) {
+                filteredStatus = @"unassigned";
+                break;
+            }
+        }
+    }
+    
     for (int i = (int)channelArray.count-1; endMessageIndex <= i ; i--) {
         NSString *channelId;
         NSString *ChannelDisplayNames = @"";
@@ -976,6 +1191,11 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         NSArray *users          = [NSKeyedUnarchiver unarchiveObjectWithData:usersData];
         NSDictionary *displayName = [NSKeyedUnarchiver unarchiveObjectWithData:[object valueForKey:@"display_name"]];
         NSMutableArray *usersVideoChat = [[NSMutableArray alloc] init];
+        
+        // filter status
+        if (filteredStatus != nil && [filteredStatus isEqualToString:@"unassigned"] && ![status isEqualToString:filteredStatus]) {
+            continue;
+        }
         
         ///duplicate check
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"id = %@",uid];
@@ -1227,6 +1447,20 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     }
 }
 
+- (void) removeChannelAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger index = indexPath.row;
+    if (self.ChannelLabels.count > index) {
+        [self.ChannelLabels removeObjectAtIndex:index];
+    }
+    if (self.ChannelDisplayNames.count > index) {
+        [self.ChannelDisplayNames removeObjectAtIndex:index];
+    }
+    if (self.ChatChannelIds.count > index) {
+        [self.ChatChannelIds removeObjectAtIndex:index];
+    }
+    [self.tableView reloadData];
+}
+
 #pragma mark - Actions
 -(void)pressSwitchApp{
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
@@ -1354,7 +1588,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 -(void)reloadChannelsAndConnectWebSocket{
-    [[CCConnectionHelper sharedClient] loadChannelsAndConnectWebSocket:NO getChennelType:CCGetChannelsMine isOrgChange:NO org_uid:nil completionHandler:^(NSString *result,  NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadChannelsAndConnectWebSocket:NO getChennelType:CCGetChannelsMine isOrgChange:NO org_uid:nil completionHandler:^(NSString *result,  NSError *error, NSURLSessionDataTask *operation) {
         if (result != nil) {
             [self.refreshControl endRefreshing];
             [self loadLocalChannles:NO lastUpdatedAt:nil];
@@ -1371,7 +1605,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 -(void)reloadOrgsAndChannelsAndConnectWebSocket{
-    [[CCConnectionHelper sharedClient] loadOrgsAndChannelsAndConnectWebSocket:NO getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadOrgsAndChannelsAndConnectWebSocket:NO getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *operation) {
         [CCSVProgressHUD dismiss];
         if (result != nil) {
             [self.refreshControl endRefreshing];
@@ -1394,7 +1628,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                             org_uid:orgUid
                                               limit:CCloadChannelFirstLimit
                                       lastUpdatedAt:lastUpdatedAt
-                                  completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                  completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *operation)
     {
         if (result != nil) {
             NSLog(@"loadChannels success!");
@@ -1431,7 +1665,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                    providerExpiresAt:providerExpiresAtDate
                                          deviceToken:nil
                                         showProgress:YES
-                                   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                                   completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
         if (result != nil) {
             [[CCConnectionHelper sharedClient] refreshData];
         }else{
@@ -1467,7 +1701,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         [channelUids addObject:[self.ChatChannelIds objectAtIndex:indexPath.row]];
     }
     if ([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable || CCLocalDevelopmentMode) {
-        [[CCConnectionHelper sharedClient] closeChannels:channelUids completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) { ///TODO: Use nwe API when the API is ready
+        [[CCConnectionHelper sharedClient] closeChannels:channelUids completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) { ///TODO: Use nwe API when the API is ready
             if (result != nil) {
                 ///change status o channel in coredata
                 for (NSString* channelUid in channelUids)
@@ -1629,8 +1863,26 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 #pragma mark - CCHistoryFilterViewController delegate.
 
 - (void)pressFilterButton {
+    if (newMessageView != nil) {
+        [newMessageView removeFromSuperview];
+    }
     
     [navigationTitleView updateSearchLabel];
+    
+    // Update channel type
+    NSArray *messageStatus = [CCUserDefaultsUtil filterMessageStatus];
+    if (messageStatus.count > 0) {
+        for (NSString *status in messageStatus) {
+            if ([status isEqualToString:CCHistoryFilterMessagesStatusTypeAll] || [status isEqualToString:CCHistoryFilterMessagesStatusTypeUnassigned] || [status isEqualToString:CCHistoryFilterMessagesStatusTypeAssignedToMe]) {
+                self.channelType = CCAllChannel;
+                break;
+            }
+            if ([status isEqualToString:CCHistoryFilterMessagesStatusTypeClosed]) {
+                self.channelType = CCArchivedChannel;
+                break;
+            }
+        }
+    }
     
     [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
     
@@ -1650,6 +1902,89 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     vc.delegate = self;
     vc.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     [self presentViewController:vc animated:NO completion:nil];
+}
+
+- (void)showNewMessageButton:(NSString *)messageType
+                        uid:(NSNumber *)uid
+                    content:(NSDictionary *)content
+                  channelId:(NSString *)channelId
+                    userUid:(NSString *)userUid
+                       date:(NSDate *)date
+                displayName:(NSString *)displayName
+                userIconUrl:(NSString *)userIconUrl
+                  userAdmin:(BOOL)userAdmin
+                     answer:(NSDictionary *)answer {
+    CCJSQMessage *newMsg = [[CCJSQMessage messageObjectsOfType:messageType uid:uid content:content usersReadMessage:nil fromSender:userUid onDate:date displayName:displayName userIconUrl:userIconUrl userAdmin:userAdmin answer:answer status:CC_MESSAGE_STATUS_SEND_SUCCESS] objectAtIndex:0];
+    
+    NSString *buttonTitle;
+    if([messageType isEqualToString:CC_RESPONSETYPEMESSAGE]){
+        buttonTitle = newMsg.text;
+    }
+    else if ([messageType isEqualToString:CC_RESPONSETYPESTICKER]){
+        buttonTitle = [NSString stringWithFormat:@"%@:%@", newMsg.senderDisplayName, CCLocalizedString(@"Sent a sticker")];
+    }
+    else if([messageType isEqualToString:CC_RESPONSETYPECALL]){
+        buttonTitle = [NSString stringWithFormat:@"%@:%@", newMsg.senderDisplayName, CCLocalizedString(@"Missed call")];
+    } else if ([messageType isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+        buttonTitle = CCLocalizedString(@"New suggestion");
+    }
+    if(buttonTitle != nil) {
+        [self displayNotification:buttonTitle];
+    }
+}
+
+-(void)displayNotification:(NSString *)message {
+    [newMessageView removeFromSuperview];
+    NSUInteger paddingMessageLabel = 10.0f;
+    NSUInteger paddingMessageImage = 10.0f;
+    NSInteger imageSize = 12.0f;
+    NSUInteger MAX_WITH_MESSAGE = 165.0f;
+
+    NSDictionary *messageStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:12.0f]};
+    NSMutableAttributedString *messageAttributedString = [[NSMutableAttributedString alloc] initWithString:message attributes:messageStringAttributes];
+    NSUInteger messageWidth = messageAttributedString.size.width;
+    messageWidth = MIN(messageWidth, MAX_WITH_MESSAGE);
+    newMessageView = [[UIView alloc] initWithFrame: CGRectMake ( 0, 0,paddingMessageLabel + messageWidth + paddingMessageImage * 2 + imageSize, imageSize + paddingMessageImage * 2)];
+    newMessageView.backgroundColor = [UIColor colorWithRed:132.0f/255.0f
+                                                     green:132.0f/255.0f
+                                                      blue:132.0f/255.0f
+                                                     alpha:1.0f];
+    // Create border (bot-left and bot-right)
+    UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:newMessageView.bounds byRoundingCorners:(UIRectCornerBottomLeft | UIRectCornerBottomRight) cornerRadii:CGSizeMake(5.0, 5.0)];
+    CAShapeLayer *maskLayer = [[CAShapeLayer alloc] init];
+    maskLayer.frame = newMessageView.bounds;
+    maskLayer.path  = maskPath.CGPath;
+    newMessageView.layer.mask = maskLayer;
+    // Create button title label
+    UILabel *buttonTitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(paddingMessageLabel, 0, paddingMessageLabel + messageWidth, imageSize + paddingMessageImage * 2)];
+    buttonTitleLabel.text = message;
+    buttonTitleLabel.font= [UIFont systemFontOfSize:12.0f];
+    buttonTitleLabel.textColor=[UIColor whiteColor];
+    buttonTitleLabel.backgroundColor=[UIColor clearColor];
+    [newMessageView addSubview:buttonTitleLabel];
+    // Create icon button
+    UIButton *checkmarkButton =[UIButton buttonWithType:UIButtonTypeRoundedRect];
+    UIImage *btnImage = [[UIImage alloc] initWithCGImage: [UIImage SDKImageNamed:@"CCarrow-down"].CGImage
+                                                   scale: 1.0
+                                             orientation: UIImageOrientationDown];
+    [checkmarkButton setImage:btnImage forState:UIControlStateNormal];
+    checkmarkButton.tintColor = [UIColor whiteColor];
+    UIImageView *imageNewMessageView = [[UIImageView alloc] init];
+    checkmarkButton.frame = CGRectMake(paddingMessageLabel + messageWidth + paddingMessageImage, paddingMessageImage, imageSize, imageSize);
+    checkmarkButton.layer.cornerRadius = checkmarkButton.frame.size.height/2;
+    [imageNewMessageView addSubview:checkmarkButton];
+    [newMessageView addSubview:imageNewMessageView];
+    // Add new message view to super view
+    newMessageView.center = CGPointMake(self.view.bounds.size.width / 2, 64 + newMessageView.bounds.size.height/2);
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollToTop)];
+    [newMessageView addGestureRecognizer:tapGesture];
+    [self.view addSubview:newMessageView];
+    [self.view bringSubviewToFront:newMessageView];
+}
+
+-(void) scrollToTop {
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    [newMessageView removeFromSuperview];
 }
 
 @end

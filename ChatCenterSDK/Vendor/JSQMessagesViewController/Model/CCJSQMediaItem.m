@@ -4,7 +4,7 @@
 //
 //
 //  Documentation
-//  http://cocoadocs.org/docsets/JSQMessagesViewController
+//  http://cocoadocs.org/docsets/CCJSQMessagesViewController
 //
 //
 //  GitHub
@@ -55,7 +55,6 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    _cachedPlaceholderView = nil;
 }
 
 - (void)setAppliesMediaViewMaskAsOutgoing:(BOOL)appliesMediaViewMaskAsOutgoing
@@ -76,7 +75,7 @@
     [self clearCachedMediaViews];
 }
 
-#pragma mark - JSQMessageMediaData protocol
+#pragma mark - CCJSQMessageMediaData protocol
 
 - (UIView *)mediaView
 {

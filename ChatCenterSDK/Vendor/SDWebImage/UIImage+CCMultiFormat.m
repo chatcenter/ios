@@ -1,50 +1,56 @@
-//
-//  UIImage+MultiFormat.m
-//  SDWebImage
-//
-//  Created by Olivier Poitrey on 07/06/13.
-//  Copyright (c) 2013 Dailymotion. All rights reserved.
-//
+/*
+ * This file is part of the CCSDWebImage package.
+ * (c) Olivier Poitrey <rs@dailymotion.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 #import "UIImage+CCMultiFormat.h"
 #import "UIImage+CCGIF.h"
-#import "NSData+CCImageContentType.h"
+#import "NSData+ImageContentType.h"
 #import <ImageIO/ImageIO.h>
 
 #ifdef SD_WEBP
 #import "UIImage+WebP.h"
 #endif
 
-@implementation UIImage (CCMultiFormat)
+@implementation UIImage (MultiFormat)
 
-+ (UIImage *)sd_imageWithData:(NSData *)data {
++ (nullable UIImage *)sd_imageWithData:(nullable NSData *)data {
+    if (!data) {
+        return nil;
+    }
+    
     UIImage *image;
-    NSString *imageContentType = [NSData sd_contentTypeForImageData:data];
-    if ([imageContentType isEqualToString:@"image/gif"]) {
+    CCSDImageFormat imageFormat = [NSData sd_imageFormatForImageData:data];
+    if (imageFormat == CCSDImageFormatGIF) {
         image = [UIImage sd_animatedGIFWithData:data];
     }
 #ifdef SD_WEBP
-    else if ([imageContentType isEqualToString:@"image/webp"])
+    else if (imageFormat == CCSDImageFormatWebP)
     {
         image = [UIImage sd_imageWithWebPData:data];
     }
 #endif
     else {
         image = [[UIImage alloc] initWithData:data];
+#if SD_UIKIT || SD_WATCH
         UIImageOrientation orientation = [self sd_imageOrientationFromImageData:data];
         if (orientation != UIImageOrientationUp) {
             image = [UIImage imageWithCGImage:image.CGImage
                                         scale:image.scale
                                   orientation:orientation];
         }
+#endif
     }
 
 
     return image;
 }
 
-
-+(UIImageOrientation)sd_imageOrientationFromImageData:(NSData *)imageData {
+#if SD_UIKIT || SD_WATCH
++(UIImageOrientation)sd_imageOrientationFromImageData:(nonnull NSData *)imageData {
     UIImageOrientation result = UIImageOrientationUp;
     CGImageSourceRef imageSource = CGImageSourceCreateWithData((__bridge CFDataRef)imageData, NULL);
     if (imageSource) {
@@ -108,7 +114,48 @@
     }
     return orientation;
 }
+#endif
 
+- (nullable NSData *)sd_imageData {
+    return [self sd_imageDataAsFormat:CCSDImageFormatUndefined];
+}
+
+- (nullable NSData *)sd_imageDataAsFormat:(CCSDImageFormat)imageFormat {
+    NSData *imageData = nil;
+    if (self) {
+#if SD_UIKIT || SD_WATCH
+        int alphaInfo = CGImageGetAlphaInfo(self.CGImage);
+        BOOL hasAlpha = !(alphaInfo == kCGImageAlphaNone ||
+                          alphaInfo == kCGImageAlphaNoneSkipFirst ||
+                          alphaInfo == kCGImageAlphaNoneSkipLast);
+        
+        BOOL usePNG = hasAlpha;
+        
+        // the imageFormat param has priority here. But if the format is undefined, we relly on the alpha channel
+        if (imageFormat != CCSDImageFormatUndefined) {
+            usePNG = (imageFormat == CCSDImageFormatPNG);
+        }
+        
+        if (usePNG) {
+            imageData = UIImagePNGRepresentation(self);
+        } else {
+            imageData = UIImageJPEGRepresentation(self, (CGFloat)1.0);
+        }
+#else
+        NSBitmapImageFileType imageFileType = NSJPEGFileType;
+        if (imageFormat == CCSDImageFormatGIF) {
+            imageFileType = NSGIFFileType;
+        } else if (imageFormat == CCSDImageFormatPNG) {
+            imageFileType = NSPNGFileType;
+        }
+        
+        imageData = [NSBitmapImageRep representationOfImageRepsInArray:self.representations
+                                                             usingType:imageFileType
+                                                            properties:@{}];
+#endif
+    }
+    return imageData;
+}
 
 
 @end

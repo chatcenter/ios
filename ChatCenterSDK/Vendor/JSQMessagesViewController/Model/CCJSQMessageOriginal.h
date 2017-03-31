@@ -21,9 +21,9 @@
 #import "CCJSQMessageData.h"
 
 /**
- *  The `JSQMessage` class is a concrete class for message model objects that represents a single user message.
+ *  The `CCJSQMessage` class is a concrete class for message model objects that represents a single user message.
  *  The message can be a text message or media message, depending on how it is initialized.
- *  It implements the `JSQMessageData` protocol and it contains the senderId, senderDisplayName,
+ *  It implements the `CCJSQMessageData` protocol and it contains the senderId, senderDisplayName,
  *  and the date that the message was sent. If initialized as a media message it also contains a media attachment,
  *  otherwise it contains the message text.
  */
@@ -74,9 +74,9 @@
  *  @param displayName The display name for the user who sent the message. This value must not be `nil`.
  *  @param text        The body text of the message. This value must not be `nil`.
  *
- *  @discussion Initializing a `JSQMessage` with this method will set `isMediaMessage` to `NO`.
+ *  @discussion Initializing a `CCJSQMessage` with this method will set `isMediaMessage` to `NO`.
  *
- *  @return An initialized `JSQMessage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessage` object if successful, `nil` otherwise.
  */
 + (instancetype)messageWithSenderId:(NSString *)senderId
                         displayName:(NSString *)displayName
@@ -90,9 +90,9 @@
  *  @param date              The date that the message was sent. This value must not be `nil`.
  *  @param text              The body text of the message. This value must not be `nil`.
  *
- *  @discussion Initializing a `JSQMessage` with this method will set `isMediaMessage` to `NO`.
+ *  @discussion Initializing a `CCJSQMessage` with this method will set `isMediaMessage` to `NO`.
  *
- *  @return An initialized `JSQMessage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessage` object if successful, `nil` otherwise.
  */
 - (instancetype)initWithSenderId:(NSString *)senderId
                senderDisplayName:(NSString *)senderDisplayName
@@ -106,9 +106,9 @@
  *  @param displayName The display name for the user who sent the message. This value must not be `nil`.
  *  @param media       The media data for the message. This value must not be `nil`.
  *
- *  @discussion Initializing a `JSQMessage` with this method will set `isMediaMessage` to `YES`.
+ *  @discussion Initializing a `CCJSQMessage` with this method will set `isMediaMessage` to `YES`.
  *
- *  @return An initialized `JSQMessage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessage` object if successful, `nil` otherwise.
  */
 + (instancetype)messageWithSenderId:(NSString *)senderId
                         displayName:(NSString *)displayName
@@ -122,13 +122,18 @@
  *  @param date              The date that the message was sent. This value must not be `nil`.
  *  @param media             The media data for the message. This value must not be `nil`.
  *
- *  @discussion Initializing a `JSQMessage` with this method will set `isMediaMessage` to `YES`.
+ *  @discussion Initializing a `CCJSQMessage` with this method will set `isMediaMessage` to `YES`.
  *
- *  @return An initialized `JSQMessage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessage` object if successful, `nil` otherwise.
  */
 - (instancetype)initWithSenderId:(NSString *)senderId
                senderDisplayName:(NSString *)senderDisplayName
                             date:(NSDate *)date
                            media:(id<CCJSQMessageMediaData>)media;
+
+/**
+ *  Not a valid initializer.
+ */
+- (id)init NS_UNAVAILABLE;
 
 @end

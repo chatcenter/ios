@@ -441,7 +441,7 @@ typedef NS_ENUM(NSUInteger, CCHistoryFilterViewSectionType) {
         [[ChatCenterClient sharedClient]
          getChannelCount:nil
          funnelId:entity.funnelId
-         completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+         completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
              if (result) {
                  entity.countTitle = [weakSelf countTitleWithCount:[result[@"all"] integerValue]];
              }
@@ -455,7 +455,7 @@ typedef NS_ENUM(NSUInteger, CCHistoryFilterViewSectionType) {
     [[ChatCenterClient sharedClient]
      getChannelCount:nil
      funnelId:nil
-     completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+     completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
          if (result) {
              for (CCHistoryFilterCellEntity *entity in _messageStatusCells) {
                  if ([entity.itemTitle isEqualToString:CCHistoryFilterMessagesStatusTypeAll]) {

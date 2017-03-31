@@ -24,7 +24,7 @@
 @class CCJSQMessagesCollectionViewCell;
 
 /**
- *  The `JSQMessagesCollectionViewCellDelegate` protocol defines methods that allow you to manage
+ *  The `CCJSQMessagesCollectionViewCellDelegate` protocol defines methods that allow you to manage
  *  additional interactions within the collection view cell.
  */
 @protocol CCJSQMessagesCollectionViewCellDelegate <NSObject>
@@ -68,7 +68,7 @@
  *  @param action The action that has been performed.
  *  @param sender The object that initiated the action.
  *
- *  @see `JSQMessagesCollectionViewCell`
+ *  @see `CCJSQMessagesCollectionViewCell`
  */
 - (void)messagesCollectionViewCell:(CCJSQMessagesCollectionViewCell *)cell didPerformAction:(SEL)action withSender:(id)sender;
 
@@ -76,14 +76,14 @@
 
 
 /**
- *  The `JSQMessagesCollectionViewCell` is an abstract base class that presents the content for
+ *  The `CCJSQMessagesCollectionViewCell` is an abstract base class that presents the content for
  *  a single message data item when that item is within the collection view’s visible bounds.
  *  The layout and presentation of cells is managed by the collection view and its corresponding layout object.
  *
  *  @warning This class is intended to be subclassed. You should not use it directly.
  *
- *  @see JSQMessagesCollectionViewCellIncoming.
- *  @see JSQMessagesCollectionViewCellOutgoing.
+ *  @see CCJSQMessagesCollectionViewCellIncoming.
+ *  @see CCJSQMessagesCollectionViewCellOutgoing.
  */
 @interface CCJSQMessagesCollectionViewCell : UICollectionViewCell
 

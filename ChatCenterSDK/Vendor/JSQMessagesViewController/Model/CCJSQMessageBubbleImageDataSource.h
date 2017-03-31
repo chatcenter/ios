@@ -20,16 +20,16 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  The `JSQMessageBubbleImageDataSource` protocol defines the common interface through which
- *  a `JSQMessagesViewController` and `JSQMessagesCollectionView` interact with 
+ *  The `CCJSQMessageBubbleImageDataSource` protocol defines the common interface through which
+ *  a `CCJSQMessagesViewController` and `CCJSQMessagesCollectionView` interact with 
  *  message bubble image model objects.
  *
  *  It declares the required and optional methods that a class must implement so that instances
- *  of that class can be display properly within a `JSQMessagesCollectionViewCell`.
+ *  of that class can be display properly within a `CCJSQMessagesCollectionViewCell`.
  *
- *  A concrete class that conforms to this protocol is provided in the library. See `JSQMessagesBubbleImage`.
+ *  A concrete class that conforms to this protocol is provided in the library. See `CCJSQMessagesBubbleImage`.
  *
- *  @see JSQMessagesBubbleImage.
+ *  @see CCJSQMessagesBubbleImage.
  */
 @protocol CCJSQMessageBubbleImageDataSource <NSObject>
 

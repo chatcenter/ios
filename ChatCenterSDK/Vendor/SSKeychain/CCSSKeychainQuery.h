@@ -1,24 +1,36 @@
 //
-//  SSKeychainQuery.h
-//  SSKeychain
+//  CCSAMKeychainQuery.h
+//  CCSAMKeychain
 //
 //  Created by Caleb Davenport on 3/19/13.
 //  Copyright (c) 2013-2014 Sam Soffes. All rights reserved.
 //
 
+#if __has_feature(modules)
+@import Foundation;
+@import Security;
+#else
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
-
-#if __IPHONE_7_0 || __MAC_10_9
-	// Keychain synchronization available at compile time
-	#define SSKEYCHAIN_SYNCHRONIZATION_AVAILABLE 1
 #endif
 
-#ifdef SSKEYCHAIN_SYNCHRONIZATION_AVAILABLE
-typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
-	SSKeychainQuerySynchronizationModeAny,
-	SSKeychainQuerySynchronizationModeNo,
-	SSKeychainQuerySynchronizationModeYes
+NS_ASSUME_NONNULL_BEGIN
+
+#if __IPHONE_7_0 || __MAC_10_9
+// Keychain synchronization available at compile time
+#define SAMKEYCHAIN_SYNCHRONIZATION_AVAILABLE 1
+#endif
+
+#if __IPHONE_3_0 || __MAC_10_9
+// Keychain access group available at compile time
+#define SAMKEYCHAIN_ACCESS_GROUP_AVAILABLE 1
+#endif
+
+#ifdef SAMKEYCHAIN_SYNCHRONIZATION_AVAILABLE
+typedef NS_ENUM(NSUInteger, SAMKeychainQuerySynchronizationMode) {
+    SAMKeychainQuerySynchronizationModeAny,
+    SAMKeychainQuerySynchronizationModeNo,
+    SAMKeychainQuerySynchronizationModeYes
 };
 #endif
 
@@ -28,38 +40,38 @@ typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
 @interface CCSSKeychainQuery : NSObject
 
 /** kSecAttrAccount */
-@property (nonatomic, copy) NSString *account;
+@property (nonatomic, copy, nullable) NSString *account;
 
 /** kSecAttrService */
-@property (nonatomic, copy) NSString *service;
+@property (nonatomic, copy, nullable) NSString *service;
 
 /** kSecAttrLabel */
-@property (nonatomic, copy) NSString *label;
+@property (nonatomic, copy, nullable) NSString *label;
 
-#if __IPHONE_3_0 && TARGET_OS_IPHONE
+#ifdef SAMKEYCHAIN_ACCESS_GROUP_AVAILABLE
 /** kSecAttrAccessGroup (only used on iOS) */
-@property (nonatomic, copy) NSString *accessGroup;
+@property (nonatomic, copy, nullable) NSString *accessGroup;
 #endif
 
-#ifdef SSKEYCHAIN_SYNCHRONIZATION_AVAILABLE
+#ifdef SAMKEYCHAIN_SYNCHRONIZATION_AVAILABLE
 /** kSecAttrSynchronizable */
-@property (nonatomic) SSKeychainQuerySynchronizationMode synchronizationMode;
+@property (nonatomic) SAMKeychainQuerySynchronizationMode synchronizationMode;
 #endif
 
 /** Root storage for password information */
-@property (nonatomic, copy) NSData *passwordData;
+@property (nonatomic, copy, nullable) NSData *passwordData;
 
 /**
  This property automatically transitions between an object and the value of
  `passwordData` using NSKeyedArchiver and NSKeyedUnarchiver.
  */
-@property (nonatomic, copy) id<NSCoding> passwordObject;
+@property (nonatomic, copy, nullable) id<NSCoding> passwordObject;
 
 /**
  Convenience accessor for setting and getting a password string. Passes through
  to `passwordData` using UTF-8 string encoding.
  */
-@property (nonatomic, copy) NSString *password;
+@property (nonatomic, copy, nullable) NSString *password;
 
 
 ///------------------------
@@ -69,18 +81,18 @@ typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
 /**
  Save the receiver's attributes as a keychain item. Existing items with the
  given account, service, and access group will first be deleted.
-
+ 
  @param error Populated should an error occur.
-
+ 
  @return `YES` if saving was successful, `NO` otherwise.
  */
 - (BOOL)save:(NSError **)error;
 
 /**
  Delete keychain items that match the given account, service, and access group.
-
+ 
  @param error Populated should an error occur.
-
+ 
  @return `YES` if saving was successful, `NO` otherwise.
  */
 - (BOOL)deleteItem:(NSError **)error;
@@ -93,23 +105,23 @@ typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
 /**
  Fetch all keychain items that match the given account, service, and access
  group. The values of `password` and `passwordData` are ignored when fetching.
-
+ 
  @param error Populated should an error occur.
-
+ 
  @return An array of dictionaries that represent all matching keychain items or
  `nil` should an error occur.
  The order of the items is not determined.
  */
-- (NSArray *)fetchAll:(NSError **)error;
+- (nullable NSArray<NSDictionary<NSString *, id> *> *)fetchAll:(NSError **)error;
 
 /**
  Fetch the keychain item that matches the given account, service, and access
  group. The `password` and `passwordData` properties will be populated unless
  an error occurs. The values of `password` and `passwordData` are ignored when
  fetching.
-
+ 
  @param error Populated should an error occur.
-
+ 
  @return `YES` if fetching was successful, `NO` otherwise.
  */
 - (BOOL)fetch:(NSError **)error;
@@ -119,10 +131,10 @@ typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
 /// @name Synchronization Status
 ///-----------------------------
 
-#ifdef SSKEYCHAIN_SYNCHRONIZATION_AVAILABLE
+#ifdef SAMKEYCHAIN_SYNCHRONIZATION_AVAILABLE
 /**
- Returns a boolean indicating if keychain synchronization is available on the device at runtime. The #define 
- SSKEYCHAIN_SYNCHRONIZATION_AVAILABLE is only for compile time. If you are checking for the presence of synchronization,
+ Returns a boolean indicating if keychain synchronization is available on the device at runtime. The #define
+ SAMKEYCHAIN_SYNCHRONIZATION_AVAILABLE is only for compile time. If you are checking for the presence of synchronization,
  you should use this method.
  
  @return A value indicating if keychain synchronization is available
@@ -131,3 +143,5 @@ typedef NS_ENUM(NSUInteger, SSKeychainQuerySynchronizationMode) {
 #endif
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -50,7 +50,7 @@
 
 -(void)reloadData: (NSString *) orgUid {
     [[CCConnectionHelper sharedClient] loadFixedPhrase:orgUid showProgress:NO
-                                completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation)
      {
          if(result != nil) {
              //Received list of phrases, show them on tableview             

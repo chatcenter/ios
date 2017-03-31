@@ -110,6 +110,7 @@
                         removedUser:(NSDictionary *)removedUser
                        lastUpdateAt:(NSDate *)lastUpdateAt;
 - (BOOL)updateChannelWithUnreadMessage:(NSString *)uid unreadMessage:(NSString *)unreadMessages;
+- (BOOL)updateChannelWithChannelStatus:(NSString *)uid status:(NSString *)status;
 - (BOOL)deleteChannelWithUid:(NSString *)uid;
 - (BOOL)deleteAllChannel;
 ///Org

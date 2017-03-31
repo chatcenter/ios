@@ -29,6 +29,7 @@ const int CCInputTextLimit = 2000;
 const int CCWidgetInputTitleLimit = 100;
 const int CCWidgetInputChoiceTextLimit = 100;
 const int CCWidgetInputNumberChoiceLimit = 10;
+const int CCNoteInputtextLimit = 500;
 
 const int CCImageMaxSize = 100 * 1024; //Kilobytes
 
@@ -42,6 +43,7 @@ NSString *const kCCUserDefaults_userDisplayName = @"ChatCenterUserdefaults_curre
 NSString *const kCCUserDefaults_userIconUrl = @"ChatCenterUserdefaults_currentIconUrl";
 NSString *const kCCUserDefaults_userId = @"ChatCenterUserdefaults_currentUserUid";
 NSString *const kCCUserDefaults_userEmail = @"ChatCenterUserdefaults_currentEmail";
+NSString *const kCCUserDefaults_privilege = @"ChatCenterUserdefaults_privelege";
 
 NSString *const kCCUserDefaults_liveLocationDuration = @"ChatCenterUserdefaults_liveLocationDuration";
 

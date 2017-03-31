@@ -20,19 +20,19 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  The `JSQMessageMediaData` protocol defines the common interface through which
- *  a `JSQMessagesViewController` and `JSQMessagesCollectionView` interact with media message model objects.
+ *  The `CCJSQMessageMediaData` protocol defines the common interface through which
+ *  a `CCJSQMessagesViewController` and `CCJSQMessagesCollectionView` interact with media message model objects.
  *
  *  It declares the required and optional methods that a class must implement so that instances of that class
- *  can be displayed properly within a `JSQMessagesCollectionViewCell`.
+ *  can be displayed properly within a `CCJSQMessagesCollectionViewCell`.
  *
  *  This library provides a few concrete classes that conform to this protocol. You may use them as-is,
  *  but they will likely require some modifications or extensions to conform to your particular data models.
- *  These concrete media items are: `JSQPhotoMediaItem`, `JSQLocationMediaItem`, `JSQVideoMediaItem`.
+ *  These concrete media items are: `CCJSQPhotoMediaItem`, `CCJSQLocationMediaItem`, `CCJSQVideoMediaItem`.
  *
- *  @see JSQPhotoMediaItem.
- *  @see JSQLocationMediaItem.
- *  @see JSQVideoMediaItem.
+ *  @see CCJSQPhotoMediaItem.
+ *  @see CCJSQLocationMediaItem.
+ *  @see CCJSQVideoMediaItem.
  */
 @protocol CCJSQMessageMediaData <NSObject>
 
@@ -46,10 +46,10 @@
 - (UIView *)mediaView;
 
 /**
- *  @return The frame size for the mediaView when displayed in a `JSQMessagesCollectionViewCell`. 
+ *  @return The frame size for the mediaView when displayed in a `CCJSQMessagesCollectionViewCell`. 
  *
  *  @discussion You should return an appropriate size value to be set for the mediaView's frame
- *  based on the contents of the view, and the frame and layout of the `JSQMessagesCollectionViewCell`
+ *  based on the contents of the view, and the frame and layout of the `CCJSQMessagesCollectionViewCell`
  *  in which mediaView will be displayed.
  *
  *  @warning You must return a size with non-zero, positive width and height values.
@@ -62,11 +62,11 @@
  *  this placeholder view will be used until mediaView is not `nil`.
  *
  *  @discussion If you do not need support for a placeholder view, then you may simply return the
- *  same value here as mediaView. Otherwise, consider using `JSQMessagesMediaPlaceholderView`.
+ *  same value here as mediaView. Otherwise, consider using `CCJSQMessagesMediaPlaceholderView`.
  *
  *  @warning You must not return `nil` from this method.
  *
- *  @see JSQMessagesMediaPlaceholderView.
+ *  @see CCJSQMessagesMediaPlaceholderView.
  */
 - (UIView *)mediaPlaceholderView;
 

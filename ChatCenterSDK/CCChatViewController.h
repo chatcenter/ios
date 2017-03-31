@@ -67,6 +67,7 @@
                onDate:(NSDate *)date
           displayName:(NSString *)displayName
           userIconUrl:(NSString *)userIconUrl
+            userAdmin:(BOOL)userAdmin
                answer:(NSDictionary *)answer;
 - (void)receiveFollowFromWebSocket:(NSString *)channelUid;
 - (void)receiveUnfollowFromWebSocket:(NSString *)channelUid;

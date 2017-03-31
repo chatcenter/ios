@@ -25,8 +25,8 @@
 
 
 /**
- *  The `JSQMessagesInputToolbarDelegate` protocol defines methods for interacting with
- *  a `JSQMessagesInputToolbar` object.
+ *  The `CCJSQMessagesInputToolbarDelegate` protocol defines methods for interacting with
+ *  a `CCJSQMessagesInputToolbar` object.
  */
 @protocol CCJSQMessagesInputToolbarDelegate <UIToolbarDelegate>
 
@@ -54,7 +54,7 @@
 
 
 /**
- *  An instance of `JSQMessagesInputToolbar` defines the input toolbar for
+ *  An instance of `CCJSQMessagesInputToolbar` defines the input toolbar for
  *  composing a new message. It is displayed above and follow the movement of the system keyboard.
  */
 @interface CCJSQMessagesInputToolbar : UIToolbar
@@ -103,7 +103,7 @@
  *
  *  @discussion Override this method to provide a custom content view for the toolbar.
  *
- *  @return An initialized `JSQMessagesToolbarContentView` if successful, otherwise `nil`.
+ *  @return An initialized `CCJSQMessagesToolbarContentView` if successful, otherwise `nil`.
  */
 - (CCJSQMessagesToolbarContentView *)loadToolbarContentView;
 

@@ -81,7 +81,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
 
 -(void)reloadData: (NSString *) orgUid {
     [[CCConnectionHelper sharedClient] loadFixedPhrase:orgUid showProgress:YES
-                                     completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                     completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
      {
          if(result != nil) {
              //Received list of phrases, show them on tableview

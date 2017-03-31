@@ -15,7 +15,7 @@
 
 @class CCIDMPhotoBrowser, CCIDMPhoto, CCIDMCaptionView;
 
-@interface CCIDMZoomingScrollView : UIScrollView <UIScrollViewDelegate, IDMTapDetectingImageViewDelegate, IDMTapDetectingViewDelegate> {
+@interface CCIDMZoomingScrollView : UIScrollView <UIScrollViewDelegate, CCIDMTapDetectingImageViewDelegate, CCIDMTapDetectingViewDelegate> {
 	
 	CCIDMPhotoBrowser *__weak _photoBrowser;
     id<CCIDMPhoto> _photo;
@@ -31,6 +31,7 @@
 @property (nonatomic, strong) CCIDMTapDetectingImageView *photoImageView;
 @property (nonatomic, strong) CCIDMCaptionView *captionView;
 @property (nonatomic, strong) id<CCIDMPhoto> photo;
+@property (nonatomic) CGFloat maximumDoubleTapZoomScale;
 
 - (id)initWithPhotoBrowser:(CCIDMPhotoBrowser *)browser;
 - (void)displayImage;

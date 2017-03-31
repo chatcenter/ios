@@ -84,13 +84,13 @@
 
 #pragma mark - Actions
 - (IBAction)reject:(id)sender {
-    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id":@([uid integerValue])}  completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id":@([uid integerValue])}  completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }];
 }
 
 - (IBAction)acceptVideo:(id)sender {
-    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if (error == nil) {
             CCOpenTokVideoCallViewController *videoCallVC = [[CCOpenTokVideoCallViewController alloc] initWithNibName:@"CCOpenTokVideoCallViewController" bundle:SDK_BUNDLE];
             videoCallVC.isCaller = NO;
@@ -116,7 +116,7 @@
 }
 
 - (IBAction)acceptAudio:(id)sender {
-    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] acceptCall:self.channelUid messageId:self.messageId user:@{@"user_id":@([uid integerValue])}   completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if (error == nil) {
             CCOpenTokVideoCallViewController *videoCallVC = [[CCOpenTokVideoCallViewController alloc] initWithNibName:@"CCOpenTokVideoCallViewController" bundle:SDK_BUNDLE];
             videoCallVC.isCaller = NO;

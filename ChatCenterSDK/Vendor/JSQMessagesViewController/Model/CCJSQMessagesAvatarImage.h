@@ -22,11 +22,11 @@
 #import "CCJSQMessageAvatarImageDataSource.h"
 
 /**
- *  A `JSQMessagesAvatarImage` model object represents an avatar image.
- *  This is a concrete class that implements the `JSQMessageAvatarImageDataSource` protocol.
+ *  A `CCJSQMessagesAvatarImage` model object represents an avatar image.
+ *  This is a concrete class that implements the `CCJSQMessageAvatarImageDataSource` protocol.
  *  It contains a regular avatar image, a highlighted avatar image, and a placeholder avatar image.
  *
- *  @see JSQMessagesAvatarImageFactory.
+ *  @see CCJSQMessagesAvatarImageFactory.
  */
 @interface CCJSQMessagesAvatarImage : NSObject <CCJSQMessageAvatarImageDataSource, NSCopying>
 
@@ -52,7 +52,7 @@
  *  properties: avatarImage, avatarHighlightedImage, avatarPlaceholderImage;
  *  This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesAvatarImage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesAvatarImage` object if successful, `nil` otherwise.
  */
 + (instancetype)avatarWithImage:(UIImage *)image;
 
@@ -61,7 +61,7 @@
  *
  *  @param placeholderImage The placeholder image for this avatar image. This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesAvatarImage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesAvatarImage` object if successful, `nil` otherwise.
  */
 + (instancetype)avatarImageWithPlaceholder:(UIImage *)placeholderImage;
 
@@ -72,10 +72,15 @@
  *  @param highlightedImage The avatar image for a highlighted display state.
  *  @param placeholderImage The placeholder image for this avatar image. This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesAvatarImage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesAvatarImage` object if successful, `nil` otherwise.
  */
 - (instancetype)initWithAvatarImage:(UIImage *)avatarImage
                    highlightedImage:(UIImage *)highlightedImage
-                   placeholderImage:(UIImage *)placeholderImage;
+                   placeholderImage:(UIImage *)placeholderImage NS_DESIGNATED_INITIALIZER;
+
+/**
+ *  Not a valid initializer.
+ */
+- (id)init NS_UNAVAILABLE;
 
 @end

@@ -19,7 +19,7 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  A `JSQMessagesCollectionViewFlowLayoutInvalidationContext` object specifies properties for 
+ *  A `CCJSQMessagesCollectionViewFlowLayoutInvalidationContext` object specifies properties for 
  *  determining whether to recompute the size of items or their position in the layout. 
  *  The flow layout object creates instances of this class when it needs to invalidate its contents 
  *  in response to changes. You can also create instances when invalidating the flow layout manually.
@@ -34,10 +34,10 @@
 @property (nonatomic, assign) BOOL invalidateFlowLayoutMessagesCache;
 
 /**
- *  Creates and returns a new `JSQMessagesCollectionViewFlowLayoutInvalidationContext` object.
+ *  Creates and returns a new `CCJSQMessagesCollectionViewFlowLayoutInvalidationContext` object.
  *
- *  @discussion When you need to invalidate the `JSQMessagesCollectionViewFlowLayout` object for your
- *  `JSQMessagesViewController` subclass, you should use this method to instantiate a new invalidation 
+ *  @discussion When you need to invalidate the `CCJSQMessagesCollectionViewFlowLayout` object for your
+ *  `CCJSQMessagesViewController` subclass, you should use this method to instantiate a new invalidation 
  *  context and pass this object to `invalidateLayoutWithContext:`.
  *
  *  @return An initialized invalidation context object if successful, otherwise `nil`.

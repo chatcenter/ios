@@ -18,6 +18,7 @@
     NSMutableArray *selectedAgentIndex;
     NSMutableArray *followingAgents;
     NSMutableArray * _followingAgents;
+    NSArray *channelRoles;
 }
 
 @end
@@ -35,12 +36,23 @@
 }
 
 -(void)viewSetup{
+    ///
+    /// Channel roles
+    ///
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    NSDictionary *privelege = [ud dictionaryForKey:kCCUserDefaults_privilege];
+    if(privelege[@"channel"] != nil) {
+        channelRoles = privelege[@"channel"];
+    }
+    
     UIBarButtonItem *rightMenuButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(pressSave)];
     
     UIBarButtonItem *rightSpacer = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     rightSpacer.width = 10;
     
-    self.navigationItem.rightBarButtonItems = @[rightSpacer, rightMenuButton];
+    if (channelRoles != nil && [channelRoles containsObject:@"follow"]) {
+        self.navigationItem.rightBarButtonItems = @[rightSpacer, rightMenuButton];
+    }
     
     UIBarButtonItem *closeBtn = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"CCBackArrow"] style:UIBarButtonItemStylePlain target:self action:@selector(closeModal)];
     self.navigationItem.leftBarButtonItem = closeBtn;
@@ -187,7 +199,7 @@
         if (remove == YES) {
             NSString *agentId = followingAgents[i][@"id"];
             NSLog(@"Agent ID will be removed is %@", agentId);
-            [[CCConnectionHelper sharedClient] removeFollowerFromChannel:self.channelUid agentID:agentId completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [[CCConnectionHelper sharedClient] removeFollowerFromChannel:self.channelUid agentID:agentId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
                 if (selectedAgentIndex.count == 0 && i == followingAgents.count - 1) {
                     [CCSVProgressHUD dismiss];
                     [self.navigationController popViewControllerAnimated:YES];
@@ -201,7 +213,7 @@
         NSDictionary *agentData = self.agents[selectedIndexPath.row];
         NSString *agentId = agentData[@"id"];
         NSLog(@"Agent ID will be assigned is %@", agentId);
-        [[CCConnectionHelper sharedClient] setFollowerForChannel:self.channelUid agentID:agentId completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+        [[CCConnectionHelper sharedClient] setFollowerForChannel:self.channelUid agentID:agentId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation) {
             if (i == selectedAgentIndex.count - 1) {
                 NSLog(@"Result === %@", result);
                 [self updateData:result];

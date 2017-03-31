@@ -226,7 +226,7 @@ NSString *THContactPickerContactCellReuseID = @"THContactPickerContactCell";
                                                     directMessage:self.isDirectMessage
                                                         groupName:nil
                                               channelInformations:nil
-                                                completionHandler:^(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation)
+                                                completionHandler:^(NSString *channelId, NSError *error, NSURLSessionDataTask *task)
         {
             if (channelId != nil && self.closeContactPickerViewCallback != nil) {
                 self.closeContactPickerViewCallback(channelId);
@@ -236,7 +236,7 @@ NSString *THContactPickerContactCellReuseID = @"THContactPickerContactCell";
 }
 
 - (void)loadUsers{
-    [[CCConnectionHelper sharedClient] loadUsers:YES completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadUsers:YES completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         NSLog(@"loadUsers");
         if (result != nil) {
             NSMutableArray *newContacts = [NSMutableArray array];

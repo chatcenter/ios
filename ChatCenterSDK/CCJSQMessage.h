@@ -15,6 +15,7 @@
 @property (copy, nonatomic) NSString *type;
 @property (copy, nonatomic) NSDictionary *answer;
 @property (nonatomic) NSInteger status;
+@property (nonatomic) BOOL isAgent;
 
 + (instancetype)messageWithSenderId:(NSString *)senderId
                         displayName:(NSString *)displayName
@@ -32,6 +33,7 @@
                                           onDate:(NSDate *)date
                                      displayName:(NSString *)displayName
                                      userIconUrl:(NSString *)userIconUrl
+                                       userAdmin:(BOOL)userAdmin
                                           answer:(NSDictionary *)answer
                                           status:(NSInteger)status;
 

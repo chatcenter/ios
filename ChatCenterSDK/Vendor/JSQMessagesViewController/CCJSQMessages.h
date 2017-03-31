@@ -29,9 +29,12 @@
 #import "CCJSQMessagesLoadEarlierHeaderView.h"
 
 //  Layout
+#import "CCJSQMessagesBubbleSizeCalculating.h"
+#import "CCJSQMessagesBubblesSizeCalculator.h"
 #import "CCJSQMessagesCollectionViewFlowLayout.h"
 #import "CCJSQMessagesCollectionViewLayoutAttributes.h"
 #import "CCJSQMessagesCollectionViewFlowLayoutInvalidationContext.h"
+#import "CCJSQAudioMediaViewAttributes.h"
 
 //  Toolbar
 #import "CCJSQMessagesComposerTextView.h"
@@ -42,12 +45,15 @@
 #import "CCJSQMessageOriginal.h"
 
 #import "CCJSQMediaItem.h"
+#import "CCJSQAudioMediaItem.h"
 #import "CCJSQPhotoMediaItem.h"
 #import "CCJSQLocationMediaItem.h"
 #import "CCJSQVideoMediaItem.h"
 
 #import "CCJSQMessagesBubbleImage.h"
 #import "CCJSQMessagesAvatarImage.h"
+
+#import "CCJSQAudioMediaViewAttributes.h"
 
 //  Protocols
 #import "CCJSQMessageData.h"
@@ -65,7 +71,7 @@
 #import "CCJSQMessagesToolbarButtonFactory.h"
 
 //  Categories
-#import "JSQSystemSoundPlayer+CCJSQMessages.h"
+#import "CCJSQSystemSoundPlayer+CCJSQMessages.h"
 #import "NSString+CCJSQMessages.h"
 #import "UIColor+CCJSQMessages.h"
 #import "UIImage+CCJSQMessages.h"

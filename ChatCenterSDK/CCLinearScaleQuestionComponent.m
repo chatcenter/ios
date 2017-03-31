@@ -42,7 +42,7 @@ static const CGFloat cellHeight = 125;
     self.maxLabel.text = lbl2;
     [self setDefaultStyleToLabel:self.minLabel];
     [self setDefaultStyleToLabel:self.maxLabel];
-
+    selectedIndex = -1;
     
     UINib *nib = [UINib nibWithNibName:@"CCLinearScaleQuestionComponentCell" bundle:SDK_BUNDLE];
     [self.collectionView registerNib:nib forCellWithReuseIdentifier:@"cell"];
@@ -97,7 +97,8 @@ static const CGFloat cellHeight = 125;
     [self setDefaultStyleToLabel:cell.label];
     
     if(row<actionData.count) {
-        NSString *text = [[actionData objectAtIndex:row] objectForKey:@"label"];
+        id textObj = [[actionData objectAtIndex:row] objectForKey:@"label"];
+        NSString *text = [textObj respondsToSelector:@selector(stringValue)] ? [textObj stringValue]: textObj;
         cell.label.text = text;
         if (!text) {
             NSLog(@"label is empty");

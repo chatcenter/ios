@@ -16,6 +16,8 @@
 
 @interface CCCommonWidgetPreviewViewController ()
 @property (weak, nonatomic) IBOutlet UIScrollView *widgetContainer;
+@property CCCommonStickerPreviewCollectionViewCell *previewCell;
+
 
 @end
 
@@ -34,6 +36,10 @@
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Send")
                                                style:UIBarButtonItemStyleDone target:self action:@selector(sendMessage:)];
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(deviceOrientationDidChange:) name: UIDeviceOrientationDidChangeNotification object: nil];
+    }
     
 }
 
@@ -62,30 +68,42 @@
     [self createPreviewView];
 }
 
-- (UIView *)createPreviewView {
+- (void)deviceOrientationDidChange:(NSNotification *)notification {
+    [self updateWidgetPreview];
+}
+
+-(void)updateWidgetPreview {
+    [_previewCell removeFromSuperview];
     UIScreen *screen = [UIScreen mainScreen];
     float width = screen.bounds.size.width;
     float height = screen.bounds.size.height;
-
+    [self createWidgetCell:width withheight:height];
+}
+-(void)createWidgetCell: (float) width withheight: (float) height{
+    
     CGSize previewCellSize = [CCCommonStickerPreviewCollectionViewCell estimateSizeForMessage:message atIndexPath:nil hasPreviousMessage:nil options:0 withListUser:nil];
-    CCCommonStickerPreviewCollectionViewCell *previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
+    _previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
     CCStickerCollectionViewCellOptions options = 0;
     options |= CCStickerCollectionViewCellOptionShowAsWidget;
     if(![[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:channelId]) {
         options |= CCStickerCollectionViewCellOptionShowLiveIcon;
     }
+    float previewFrameY = height / 2 - previewCellSize.height / 2 - 64> 0 ? height / 2 - previewCellSize.height / 2 - 64: 0;
+    _previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, previewFrameY, previewCellSize.width, previewCellSize.height);
     
-    float previewFrameY = height / 2 - previewCellSize.height / 2 - 64> 0 ? height / 2 - previewCellSize.height / 2 - 64: 0; // 64 for navigation
+    [_previewCell setupWithIndex:nil message:message avatar:nil delegate:nil options:options];
+    _previewCell.userInteractionEnabled = NO;
     
-    previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, previewFrameY, previewCellSize.width, previewCellSize.height);
-    
-    [previewCell setupWithIndex:nil message:message avatar:nil delegate:nil options:options];
-    previewCell.userInteractionEnabled = NO;
-    
-    [_widgetContainer addSubview:previewCell];
-    
+    [_widgetContainer addSubview:_previewCell];
     _widgetContainer.contentSize = CGSizeMake(previewCellSize.width, previewCellSize.height);
     _widgetContainer.contentInset = UIEdgeInsetsZero;
+}
+- (UIView *)createPreviewView {
+    UIScreen *screen = [UIScreen mainScreen];
+    float width = screen.bounds.size.width;
+    float height = screen.bounds.size.height;
+    
+    [self createWidgetCell:width withheight:height];
     return _widgetContainer;
 }
 

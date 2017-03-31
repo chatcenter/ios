@@ -1,6 +1,6 @@
 //
-//  IDMCaptionView.m
-//  IDMPhotoBrowser
+//  CCIDMCaptionView.m
+//  CCIDMPhotoBrowser
 //
 //  Created by Michael Waterfall on 30/12/2011.
 //  Copyright (c) 2011 __MyCompanyName__. All rights reserved.

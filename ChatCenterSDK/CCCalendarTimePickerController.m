@@ -22,7 +22,6 @@
     NSInteger crtWeekIndex;
     NSDate *seletedDate;
     NSDateFormatter *dateFormatter;
-    BOOL isShowingPreview;
     BOOL isRotating;
 }
 @end
@@ -94,19 +93,6 @@ const int VIEW_COUNT = 3;
     [self.calendarTimeScrollView awakeFromNib];
     [self.calendarTimeScrollView updateSelections:self.calendarTimeScrollView.selectedHourTimes];
     [self.calendarTimeScrollView scrollRectToVisible:self.calendarTimeScrollView.frame animated:YES];
-    // redraw preview
-    if(isShowingPreview) {
-        for (int i = 0; i < self.view.subviews.count; i++) {
-            if([[self.view.subviews objectAtIndex:i] isKindOfClass:[CCCalendarPreview class]]) {
-                NSLog(@"remove old preview!");
-                [[self.view.subviews objectAtIndex:i] removeFromSuperview];
-            }
-        }
-        NSLog(@"add new preview!");
-        preview = [[CCCalendarPreview alloc] initWithFrameAndData:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) selectedDateTimes:[self aggregateSelectedDateTimes]];
-        preview.delegate = self;
-        [self.view addSubview:preview];
-    }
     isRotating = NO;
 }
 
@@ -176,7 +162,8 @@ const int VIEW_COUNT = 3;
     flags = NSYearCalendarUnit | NSMonthCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit;
 #endif
     NSDateComponents *crtComponents = [[NSCalendar currentCalendar] components:flags fromDate:crtDate];
-    NSInteger crtYear = crtComponents.year;
+    NSInteger year = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] component:NSCalendarUnitYear fromDate:crtDate];
+    NSInteger crtYear = year;
     NSInteger crtMonth = crtComponents.month;
     NSInteger crtWeekDay = crtComponents.weekday;
     NSInteger crtDay = crtComponents.day;
@@ -828,13 +815,11 @@ const int VIEW_COUNT = 3;
 #pragma mark - Preview
 
 - (void)calendarPreviewDidTapClose{
-    isShowingPreview = NO;
     [preview removeFromSuperview];
     self.closeCalendarTimePickerCallback(nil);
 }
 
 - (void)calendarPreviewDidTapSend{
-    isShowingPreview = NO;
     [preview removeFromSuperview];
     NSMutableArray *sendDateTimes = [NSMutableArray array];
     for (CCDateTimes *dateTimes in preview.selectedDateTimes) {
@@ -900,7 +885,6 @@ const int VIEW_COUNT = 3;
     [previewController setMessage:msg];
     previewController.delegate = self.delegate;
     [self.navigationController pushViewController:previewController animated:YES];
-    isShowingPreview = YES;
 }
 
 - (CCJSQMessage *)createMessageStickerFromDateTimes:(NSArray *)selectedDateTimes {

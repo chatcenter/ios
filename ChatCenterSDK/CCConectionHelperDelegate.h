@@ -21,6 +21,7 @@
                                    date:(NSDate *)date
                             displayName:(NSString *)displayName
                             userIconUrl:(NSString *)userIconUrl
+                              userAdmin:(BOOL)userAdmin
                                  answer:(NSDictionary *)answer;
     - (void)receiveReceiptFromWebSocket:(NSString *)channelUid
                                messages:(NSArray *)messages
@@ -34,7 +35,9 @@
     - (void)receiveCallEvent:(NSString *)messageId content:(NSDictionary *) content;
     - (void)closeChatView;
     - (void)reloadLocalDataWhenComeOnline;
-    - (void)receiveDeleteChannelFromWebSocket;
+    - (void)receiveMessageTypingFromWebSocket:(NSString *)channelUid user:(NSDictionary *)user;
+    - (void)receiveDeleteChannelFromWebSocket:(NSString *)channelUid;
+    - (void)receiveCloseChannelFromWebSocket:(NSString *)channelUid;
  @optional
     - (void)initView;
     - (void)pressClose:(id)sender;

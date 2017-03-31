@@ -20,14 +20,14 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  An instance of `JSQMessagesTimestampFormatter` is a singleton object that provides an efficient means 
+ *  An instance of `CCJSQMessagesTimestampFormatter` is a singleton object that provides an efficient means 
  *  for creating attributed and non-attributed string representations of `NSDate` objects. 
- *  It is intended to be used as the method by which you display timestamps in a `JSQMessagesCollectionView`.
+ *  It is intended to be used as the method by which you display timestamps in a `CCJSQMessagesCollectionView`.
  */
 @interface CCJSQMessagesTimestampFormatter : NSObject
 
 /**
- *  Returns the cached date formatter object used by the `JSQMessagesTimestampFormatter` shared instance.
+ *  Returns the cached date formatter object used by the `CCJSQMessagesTimestampFormatter` shared instance.
  */
 @property (strong, nonatomic, readonly) NSDateFormatter *dateFormatter;
 

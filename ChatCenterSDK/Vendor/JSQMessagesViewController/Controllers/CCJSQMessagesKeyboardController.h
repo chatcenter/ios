@@ -28,7 +28,7 @@
 
 /**
  *  Posted when the system keyboard frame changes.
- *  The object of the notification is the `JSQMessagesKeyboardController` object. 
+ *  The object of the notification is the `CCJSQMessagesKeyboardController` object.
  *  The `userInfo` dictionary contains the new keyboard frame for key
  *  `JSQMessagesKeyboardControllerUserInfoKeyKeyboardDidChangeFrame`.
  */
@@ -47,7 +47,7 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
  *  A `JSQMessagesKeyboardController` object also posts the `JSQMessagesKeyboardControllerNotificationKeyboardDidChangeFrame`
  *  in response to frame change events of the system keyboard.
  */
-@protocol JSQMessagesKeyboardControllerDelegate <NSObject>
+@protocol CCJSQMessagesKeyboardControllerDelegate <NSObject>
 
 @required
 
@@ -75,7 +75,7 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
 /**
  *  The object that acts as the delegate of the keyboard controller.
  */
-@property (weak, nonatomic) id<JSQMessagesKeyboardControllerDelegate> delegate;
+@property (weak, nonatomic) id<CCJSQMessagesKeyboardControllerDelegate> delegate;
 
 /**
  *  The text view in which the user is editing with the system keyboard.
@@ -111,6 +111,11 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
 @property (assign, nonatomic, readonly) CGRect currentKeyboardFrame;
 
 /**
+ *  Not a valid initializer.
+ */
+- (id)init NS_UNAVAILABLE;
+
+/**
  *  Creates a new keyboard controller object with the specified textView, contextView, panGestureRecognizer, and delegate.
  *
  *  @param textView             The text view in which the user is editing with the system keyboard. This value must not be `nil`.
@@ -123,7 +128,7 @@ FOUNDATION_EXPORT NSString * const JSQMessagesKeyboardControllerUserInfoKeyKeybo
 - (instancetype)initWithTextView:(UITextView *)textView
                      contextView:(UIView *)contextView
             panGestureRecognizer:(UIPanGestureRecognizer *)panGestureRecognizer
-                        delegate:(id<JSQMessagesKeyboardControllerDelegate>)delegate;
+                        delegate:(id<CCJSQMessagesKeyboardControllerDelegate>)delegate NS_DESIGNATED_INITIALIZER;
 
 /**
  *  Tells the keyboard controller that it should begin listening for system keyboard notifications.

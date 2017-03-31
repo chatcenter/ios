@@ -9,6 +9,7 @@
 #import "CCNoteEditorViewController.h"
 #import "ChatCenterPrivate.h"
 #import "CCConnectionHelper.h"
+#import "CCConstants.h"
 
 @interface CCNoteEditorViewController ()
 
@@ -29,6 +30,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    self.noteTextView.delegate = self;
     self.noteTextView.layer.borderWidth = 1;
     self.noteTextView.layer.borderColor = [[UIColor lightGrayColor] CGColor];
     if (self.noteContent != nil) {
@@ -41,7 +43,7 @@
 }
 
 - (void) pressSave {
-    [[CCConnectionHelper sharedClient] updateChannel:self.channelId channelInformations:nil note:self.noteTextView.text completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] updateChannel:self.channelId channelInformations:nil note:self.noteTextView.text completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [self.navigationController popViewControllerAnimated:YES];
     }];
 }
@@ -50,4 +52,9 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    return textView.text.length + (text.length - range.length) <= CCNoteInputtextLimit;
+}
+
 @end

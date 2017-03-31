@@ -15,8 +15,10 @@
 
 // Delgate
 @class CCIDMPhotoBrowser;
-@protocol IDMPhotoBrowserDelegate <NSObject>
+@protocol CCIDMPhotoBrowserDelegate <NSObject>
 @optional
+- (void)willAppearPhotoBrowser:(CCIDMPhotoBrowser *)photoBrowser;
+- (void)willDisappearPhotoBrowser:(CCIDMPhotoBrowser *)photoBrowser;
 - (void)photoBrowser:(CCIDMPhotoBrowser *)photoBrowser didShowPhotoAtIndex:(NSUInteger)index;
 - (void)photoBrowser:(CCIDMPhotoBrowser *)photoBrowser didDismissAtPageIndex:(NSUInteger)index;
 - (void)photoBrowser:(CCIDMPhotoBrowser *)photoBrowser willDismissAtPageIndex:(NSUInteger)index;
@@ -25,10 +27,10 @@
 @end
 
 // IDMPhotoBrowser
-@interface CCIDMPhotoBrowser : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate> 
+@interface CCIDMPhotoBrowser : UIViewController <UIScrollViewDelegate, UIActionSheetDelegate>
 
 // Properties
-@property (nonatomic, strong) id <IDMPhotoBrowserDelegate> delegate;
+@property (nonatomic, strong) id <CCIDMPhotoBrowserDelegate> delegate;
 
 // Toolbar customization
 @property (nonatomic) BOOL displayToolbar;
@@ -38,7 +40,7 @@
 @property (nonatomic, strong) NSArray *actionButtonTitles;
 @property (nonatomic, weak) UIImage *leftArrowImage, *leftArrowSelectedImage;
 @property (nonatomic, weak) UIImage *rightArrowImage, *rightArrowSelectedImage;
-///Fixed by AppSocially Inc.20150716
+@property (nonatomic, weak) UIImage *actionButtonImage, *actionButtonSelectedImage;
 @property (nonatomic) CGRect doneButtonBounds;
 
 // View customization
@@ -55,22 +57,28 @@
 @property (nonatomic) BOOL usePopAnimation;
 @property (nonatomic) BOOL disableVerticalSwipe;
 
-// defines zooming of the background (default 1.0)
+@property (nonatomic) BOOL dismissOnTouch;
+
+// Default value: true
+// Set to false to tell the photo viewer not to hide the interface when scrolling
+@property (nonatomic) BOOL autoHideInterface;
+
+// Defines zooming of the background (default 1.0)
 @property (nonatomic) float backgroundScaleFactor;
 
-// animation time (default .28)
+// Animation time (default .28)
 @property (nonatomic) float animationDuration;
 
 // Init
 - (id)initWithPhotos:(NSArray *)photosArray;
 
-// Init (animated)
+// Init (animated from view)
 - (id)initWithPhotos:(NSArray *)photosArray animatedFromView:(UIView*)view;
 
 // Init with NSURL objects
 - (id)initWithPhotoURLs:(NSArray *)photoURLsArray;
 
-// Init with NSURL objects (animated)
+// Init with NSURL objects (animated from view)
 - (id)initWithPhotoURLs:(NSArray *)photoURLsArray animatedFromView:(UIView*)view;
 
 // Reloads the photo browser and refetches data

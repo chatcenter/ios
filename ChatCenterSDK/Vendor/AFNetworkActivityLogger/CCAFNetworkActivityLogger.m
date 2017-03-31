@@ -1,6 +1,6 @@
-// AFNetworkActivityLogger.h
+// CCAFNetworkActivityLogger.h
 //
-// Copyright (c) 2013 AFNetworking (http://afnetworking.com/)
+// Copyright (c) 2015 CCAFNetworking (http://CCAFnetworking.com/)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,39 +21,25 @@
 // THE SOFTWARE.
 
 #import "CCAFNetworkActivityLogger.h"
-#import "CCAFURLConnectionOperation.h"
 #import "CCAFURLSessionManager.h"
-
+#import "CCAFNetworkActivityConsoleLogger.h"
 #import <objc/runtime.h>
 
-static NSURLRequest * AFNetworkRequestFromNotification(NSNotification *notification) {
-    NSURLRequest *request = nil;
-    if ([[notification object] respondsToSelector:@selector(originalRequest)]) {
-        request = [[notification object] originalRequest];
-    } else if ([[notification object] respondsToSelector:@selector(request)]) {
-        request = [[notification object] request];
-    }
-
-    return request;
-}
-
-static NSError * AFNetworkErrorFromNotification(NSNotification *notification) {
+static NSError * CCAFNetworkErrorFromNotification(NSNotification *notification) {
     NSError *error = nil;
-    if ([[notification object] isKindOfClass:[CCAFURLConnectionOperation class]]) {
-        error = [(CCAFURLConnectionOperation *)[notification object] error];
-    }
-    
-#if __IPHONE_OS_VERSION_MIN_REQUIRED >= 70000
     if ([[notification object] isKindOfClass:[NSURLSessionTask class]]) {
         error = [(NSURLSessionTask *)[notification object] error];
         if (!error) {
             error = notification.userInfo[CCAFNetworkingTaskDidCompleteErrorKey];
         }
     }
-#endif
-    
     return error;
 }
+
+@interface CCAFNetworkActivityLogger ()
+@property (nonatomic, strong) NSMutableSet *mutableLoggers;
+
+@end
 
 @implementation CCAFNetworkActivityLogger
 
@@ -74,25 +60,34 @@ static NSError * AFNetworkErrorFromNotification(NSNotification *notification) {
         return nil;
     }
 
-    self.level = AFLoggerLevelInfo;
+    self.mutableLoggers = [NSMutableSet set];
+
+    CCAFNetworkActivityConsoleLogger *consoleLogger = [CCAFNetworkActivityConsoleLogger new];
+    [self addLogger:consoleLogger];
 
     return self;
+}
+
+- (NSSet *)loggers {
+    return self.mutableLoggers;
 }
 
 - (void)dealloc {
     [self stopLogging];
 }
 
+- (void)addLogger:(id<CCAFNetworkActivityLoggerProtocol>)logger {
+    [self.mutableLoggers addObject:logger];
+}
+
+- (void)removeLogger:(id<CCAFNetworkActivityLoggerProtocol>)logger {
+    [self.mutableLoggers removeObject:logger];
+}
+
 - (void)startLogging {
     [self stopLogging];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkRequestDidStart:) name:CCAFNetworkingOperationDidStartNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkRequestDidFinish:) name:CCAFNetworkingOperationDidFinishNotification object:nil];
-
-#if (defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 70000) || (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 1090)
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkRequestDidStart:) name:CCAFNetworkingTaskDidResumeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkRequestDidFinish:) name:CCAFNetworkingTaskDidCompleteNotification object:nil];
-#endif
 }
 
 - (void)stopLogging {
@@ -101,88 +96,50 @@ static NSError * AFNetworkErrorFromNotification(NSNotification *notification) {
 
 #pragma mark - NSNotification
 
-static void * AFNetworkRequestStartDate = &AFNetworkRequestStartDate;
+static void * CCAFNetworkRequestStartDate = &CCAFNetworkRequestStartDate;
 
 - (void)networkRequestDidStart:(NSNotification *)notification {
-    NSURLRequest *request = AFNetworkRequestFromNotification(notification);
+    NSURLSessionTask *task = [notification object];
+    NSURLRequest *request = task.originalRequest;
 
     if (!request) {
         return;
     }
 
-    if (request && self.filterPredicate && [self.filterPredicate evaluateWithObject:request]) {
-        return;
-    }
+    objc_setAssociatedObject(notification.object, CCAFNetworkRequestStartDate, [NSDate date], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
-    objc_setAssociatedObject(notification.object, AFNetworkRequestStartDate, [NSDate date], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    for (id <CCAFNetworkActivityLoggerProtocol> logger in self.loggers) {
+        if (request && logger.filterPredicate && [logger.filterPredicate evaluateWithObject:request]) {
+            return;
+        }
 
-    NSString *body = nil;
-    if ([request HTTPBody]) {
-        body = [[NSString alloc] initWithData:[request HTTPBody] encoding:NSUTF8StringEncoding];
-    }
-
-    switch (self.level) {
-        case AFLoggerLevelDebug:
-            NSLog(@"%@ '%@': %@ %@", [request HTTPMethod], [[request URL] absoluteString], [request allHTTPHeaderFields], body);
-            break;
-        case AFLoggerLevelInfo:
-            NSLog(@"%@ '%@'", [request HTTPMethod], [[request URL] absoluteString]);
-            break;
-        default:
-            break;
+        [logger URLSessionTaskDidStart:task];
     }
 }
 
 - (void)networkRequestDidFinish:(NSNotification *)notification {
-    NSURLRequest *request = AFNetworkRequestFromNotification(notification);
-    NSURLResponse *response = [notification.object response];
-    NSError *error = AFNetworkErrorFromNotification(notification);
+    NSURLSessionTask *task = [notification object];
+    NSURLRequest *request = task.originalRequest;
+    NSURLResponse *response = task.response;
+    NSError *error = CCAFNetworkErrorFromNotification(notification);
 
     if (!request && !response) {
         return;
     }
 
-    if (request && self.filterPredicate && [self.filterPredicate evaluateWithObject:request]) {
-        return;
-    }
-
-    NSUInteger responseStatusCode = 0;
-    NSDictionary *responseHeaderFields = nil;
-    if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
-        responseStatusCode = (NSUInteger)[(NSHTTPURLResponse *)response statusCode];
-        responseHeaderFields = [(NSHTTPURLResponse *)response allHeaderFields];
-    }
-
     id responseObject = nil;
-    if ([[notification object] respondsToSelector:@selector(responseString)]) {
-        responseObject = [[notification object] responseString];
-    } else if (notification.userInfo) {
+    if (notification.userInfo) {
         responseObject = notification.userInfo[CCAFNetworkingTaskDidCompleteSerializedResponseKey];
     }
 
-    NSTimeInterval elapsedTime = [[NSDate date] timeIntervalSinceDate:objc_getAssociatedObject(notification.object, AFNetworkRequestStartDate)];
+    NSTimeInterval elapsedTime = [[NSDate date] timeIntervalSinceDate:objc_getAssociatedObject(notification.object, CCAFNetworkRequestStartDate)];
 
-    if (error) {
-        switch (self.level) {
-            case AFLoggerLevelDebug:
-            case AFLoggerLevelInfo:
-            case AFLoggerLevelWarn:
-            case AFLoggerLevelError:
-                NSLog(@"[Error] %@ '%@' (%ld) [%.04f s]: %@", [request HTTPMethod], [[response URL] absoluteString], (long)responseStatusCode, elapsedTime, error);
-            default:
-                break;
+    for (id <CCAFNetworkActivityLoggerProtocol> logger in self.loggers) {
+        if (request && logger.filterPredicate && [logger.filterPredicate evaluateWithObject:request]) {
+            return;
         }
-    } else {
-        switch (self.level) {
-            case AFLoggerLevelDebug:
-                NSLog(@"%ld '%@' [%.04f s]: %@ %@", (long)responseStatusCode, [[response URL] absoluteString], elapsedTime, responseHeaderFields, responseObject);
-                break;
-            case AFLoggerLevelInfo:
-                NSLog(@"%ld '%@' [%.04f s]", (long)responseStatusCode, [[response URL] absoluteString], elapsedTime);
-                break;
-            default:
-                break;
-        }
+
+        [logger URLSessionTaskDidFinish:task withResponseObject:responseObject inElapsedTime:elapsedTime withError:error];
     }
 }
 

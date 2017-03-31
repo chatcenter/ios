@@ -226,10 +226,11 @@
         id orgUid       = [argument valueForKeyPath:@"org_uid"];
         id created      = [argument valueForKeyPath:@"created"];
         id uid          = [argument valueForKeyPath:@"id"];
-        id user, displayName, userUid, userIconUrl, answer, question;
+        id user, displayName, userUid, userIconUrl, userAdmin, answer, question;
         if (![messageType isEqualToString:CC_RESPONSETYPEINFORMATION] && ![messageType isEqualToString:CC_RESPONSETYPEPROPERTY]) {
             user         = [argument valueForKeyPath:@"user"];
             displayName  = [argument valueForKeyPath:@"user.display_name"];
+            userAdmin    = [argument valueForKeyPath:@"user.admin"];
             userUid      = [argument valueForKeyPath:@"user.id"];
             if ([argument valueForKeyPath:@"user.icon_url"] != nil
                 && ![[argument valueForKeyPath:@"user.icon_url"] isEqual:[NSNull null]]) {
@@ -271,7 +272,7 @@
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:interval];
         NSNumber *uidNum = uid;
         NSString *userUidStr = (userUid != nil && userUid != [NSNull null]) ? [userUid stringValue] : nil;
-        
+        BOOL userAdminBool = [userAdmin boolValue];
         //invite callback
         if (self.didReceiveInviteCallCallback && [messageType isEqualToString:CC_RESPONSETYPECALLINVITE])
         {
@@ -418,13 +419,13 @@
             {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     
-                    self.didReceiveMessageCallback(messageType, uidNum, content, blockChannelUid, userUidStr, date, displayName, userIconUrl, answer);
+                    self.didReceiveMessageCallback(messageType, uidNum, content, blockChannelUid, userUidStr, date, displayName, userIconUrl, userAdminBool, answer);
                 });
             }
         }else{
             ///No duplicate
             ///get the channel
-            [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:channelUid completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:channelUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                 if (self.didReceiveJoinCallback)
                 {
                     if (error == nil) {
@@ -432,7 +433,7 @@
                         if (self.didReceiveMessageCallback)
                         {
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                self.didReceiveMessageCallback(messageType, uidNum, content, blockChannelUid, userUidStr, date, displayName, userIconUrl, answer);
+                                self.didReceiveMessageCallback(messageType, uidNum, content, blockChannelUid, userUidStr, date, displayName, userIconUrl, userAdminBool, answer);
                             });
                         }
                     }
@@ -474,7 +475,7 @@
         }else{
             ///No duplicate
             ///get the channel
-            [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:channelUid completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:channelUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                 if (self.didReceiveJoinCallback)
                 {
                     if (error == nil) {
@@ -519,7 +520,7 @@
             NSLog(@"insertChannel Error or already existed!");
             [[CCConnectionHelper sharedClient] updateChannel:NO
                                                   channelUid:channelUid
-                                           completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                           completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
              {
                  NSLog(@"Update Channel online");
              }];
@@ -561,7 +562,7 @@
             NSLog(@"insertChannel Error or already existed!");
             [[CCConnectionHelper sharedClient] updateChannel:NO
                                                   channelUid:channelUid
-                                           completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                           completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
              {
                   NSLog(@"Update Channel offline");
              }];
@@ -674,7 +675,21 @@
         }else{
             NSLog(@"update answer Error!");
         }
-    }else if([arguments[0] isEqualToString:@"channel:followed"]) {
+    } else if([arguments[0] isEqualToString:@"message:typing"]) {
+        NSDictionary *argument = arguments[1];
+        if ([argument[@"channel_uid"] isEqual:[NSNull null]]
+            || ![argument[@"user"] isKindOfClass:[NSDictionary class]]) {
+            return;
+        }
+                 
+        NSString *channelUid = [argument valueForKeyPath:@"channel_uid"];
+        NSDictionary *user = [argument valueForKeyPath:@"user"];
+        if (self.didReceiveTypingCallback) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.didReceiveTypingCallback(channelUid, user);
+            });
+        }
+    } else if([arguments[0] isEqualToString:@"channel:followed"]) {
         if (![arguments[1] isKindOfClass:[NSDictionary class]] || [arguments[1] isEqual:[NSNull null]])
         {
             return;
@@ -737,6 +752,23 @@
         }else{
             NSLog(@"update channel with new user Error!");
         }
+    } else if ([arguments[0] isEqualToString:@"channel:closed"]) {
+        if (![arguments[1] isKindOfClass:[NSDictionary class]] || [arguments[1] isEqual:[NSNull null]]) {
+            return;
+        }
+        NSDictionary *argument = arguments[1];
+        if (![argument[@"uid"] isKindOfClass:[NSString class]]
+            || [argument[@"uid"] isEqual:[NSNull null]]) {
+            return;
+        }
+        NSString *channelUid = argument[@"uid"];
+        BOOL isClosed = [[CCCoredataBase sharedClient] updateChannelWithChannelStatus:channelUid status:@"closed"];
+        if (isClosed == YES && self.didReceiveCloseChannelCallback) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.didReceiveCloseChannelCallback(channelUid);
+            });
+        }
+
     } else if([arguments[0] isEqualToString:@"channel:deleted"]) {
         if (![arguments[1] isKindOfClass:[NSDictionary class]] || [arguments[1] isEqual:[NSNull null]]) {
             return;
@@ -750,7 +782,7 @@
         BOOL isDeleted = [[CCCoredataBase sharedClient] deleteChannelWithUid:channelUid];
         if (isDeleted == YES && self.didReceiveDeleteChannelCallback) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.didReceiveDeleteChannelCallback();
+                self.didReceiveDeleteChannelCallback(channelUid);
             });
         }
     } else if ([arguments[0] rangeOfString:@"message:"].location != NSNotFound){
@@ -785,7 +817,7 @@
         id displayName  = [argument valueForKeyPath:@"user.display_name"];
         id userUid      = [argument valueForKeyPath:@"user.id"];
         id userIconUrl  = [argument valueForKeyPath:@"user.icon_url"];
-        
+        BOOL userAdmin    = [[argument valueForKeyPath:@"user.admin"] boolValue];
         id answer, question;
         if ([argument valueForKeyPath:@"answer"] != nil) {
             answer = [argument valueForKeyPath:@"answer"];
@@ -863,7 +895,7 @@
         {
             dispatch_async(dispatch_get_main_queue(), ^{
                 
-                self.didReceiveMessageCallback(messageType, uidNum, content, channelUid, userUidStr, date, displayName, userIconUrl, answer);
+                self.didReceiveMessageCallback(messageType, uidNum, content, channelUid, userUidStr, date, displayName, userIconUrl, userAdmin, answer);
             });
         }
     }
@@ -881,4 +913,7 @@
     _webSocket = nil;
 }
 
+- (void)sendMessage:(NSString *)message {
+    [_webSocket send:message];
+}
 @end

@@ -99,7 +99,7 @@ int const CCMaxLoadOrg = 10000;
     [self.tableView reloadData];
     
     // reload org
-    [[CCConnectionHelper sharedClient] loadOrg:NO completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[CCConnectionHelper sharedClient] loadOrg:NO completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task) {
         [self loadSettingList];
         [self.tableView reloadData];
     }];
@@ -349,7 +349,7 @@ int const CCMaxLoadOrg = 10000;
                                                         getChennelType:CCGetChannels
                                                            isOrgChange:YES
                                                                org_uid:orgUid
-                                                     completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                                     completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task)
     {
         [self dismissViewControllerAnimated:YES completion:nil];
         NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
@@ -654,7 +654,7 @@ int const CCMaxLoadOrg = 10000;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
     float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     if(osVersion >= 9.0) {
-        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL entersReaderIfAvailable:YES];
+        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL];
         webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
         [self presentViewController:webViewController animated:YES completion:nil];
         return;

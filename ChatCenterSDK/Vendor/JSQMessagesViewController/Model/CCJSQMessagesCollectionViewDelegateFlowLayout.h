@@ -26,7 +26,7 @@
 
 
 /**
-*  The `JSQMessagesCollectionViewDelegateFlowLayout` protocol defines methods that allow you to
+*  The `CCJSQMessagesCollectionViewDelegateFlowLayout` protocol defines methods that allow you to
 *  manage additional layout information for the collection view and respond to additional actions on its items.
 *  The methods of this protocol are all optional.
 */
@@ -43,7 +43,7 @@
  *
  *  @return The height of the `cellTopLabel` for the item at indexPath.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 - (CGFloat)collectionView:(CCJSQMessagesCollectionView *)collectionView
                    layout:(CCJSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath;
@@ -57,7 +57,7 @@
  *
  *  @return The height of the `messageBubbleTopLabel` for the item at indexPath.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 - (CGFloat)collectionView:(CCJSQMessagesCollectionView *)collectionView
                    layout:(CCJSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath;
@@ -71,7 +71,7 @@
  *
  *  @return The height of the `cellBottomLabel` for the item at indexPath.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 - (CGFloat)collectionView:(CCJSQMessagesCollectionView *)collectionView
                    layout:(CCJSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellBottomLabelAtIndexPath:(NSIndexPath *)indexPath;

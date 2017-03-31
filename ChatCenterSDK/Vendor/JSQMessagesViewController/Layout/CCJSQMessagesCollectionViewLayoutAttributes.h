@@ -19,33 +19,33 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  A `JSQMessagesCollectionViewLayoutAttributes` is an object that manages the layout-related attributes
- *  for a given `JSQMessagesCollectionViewCell` in a `JSQMessagesCollectionView`.
+ *  A `CCJSQMessagesCollectionViewLayoutAttributes` is an object that manages the layout-related attributes
+ *  for a given `CCJSQMessagesCollectionViewCell` in a `CCJSQMessagesCollectionView`.
  */
 @interface CCJSQMessagesCollectionViewLayoutAttributes : UICollectionViewLayoutAttributes <NSCopying>
 
 /**
- *  The font used to display the body of a text message in a message bubble within a `JSQMessagesCollectionViewCell`.
+ *  The font used to display the body of a text message in a message bubble within a `CCJSQMessagesCollectionViewCell`.
  *  This value must not be `nil`.
  */
 @property (strong, nonatomic) UIFont *messageBubbleFont;
 
 /**
- *  The width of the `messageBubbleContainerView` of a `JSQMessagesCollectionViewCell`.
+ *  The width of the `messageBubbleContainerView` of a `CCJSQMessagesCollectionViewCell`.
  *  This value should be greater than `0.0`.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 @property (assign, nonatomic) CGFloat messageBubbleContainerViewWidth;
 
 /**
- *  The inset of the text container's layout area within the text view's content area in a `JSQMessagesCollectionViewCell`. 
+ *  The inset of the text container's layout area within the text view's content area in a `CCJSQMessagesCollectionViewCell`. 
  *  The specified inset values should be greater than or equal to `0.0`.
  */
 @property (assign, nonatomic) UIEdgeInsets textViewTextContainerInsets;
 
 /**
- *  The inset of the frame of the text view within a `JSQMessagesCollectionViewCell`. 
+ *  The inset of the frame of the text view within a `CCJSQMessagesCollectionViewCell`. 
  *  
  *  @discussion The inset values should be greater than or equal to `0.0` and are applied in the following ways:
  *
@@ -64,42 +64,42 @@
 @property (assign, nonatomic) UIEdgeInsets textViewFrameInsets;
 
 /**
- *  The size of the `avatarImageView` of a `JSQMessagesCollectionViewCellIncoming`.
+ *  The size of the `avatarImageView` of a `CCJSQMessagesCollectionViewCellIncoming`.
  *  The size values should be greater than or equal to `0.0`.
  *
- *  @see JSQMessagesCollectionViewCellIncoming.
+ *  @see CCJSQMessagesCollectionViewCellIncoming.
  */
 @property (assign, nonatomic) CGSize incomingAvatarViewSize;
 
 /**
- *  The size of the `avatarImageView` of a `JSQMessagesCollectionViewCellOutgoing`.
+ *  The size of the `avatarImageView` of a `CCJSQMessagesCollectionViewCellOutgoing`.
  *  The size values should be greater than or equal to `0.0`.
  *
- *  @see `JSQMessagesCollectionViewCellOutgoing`.
+ *  @see `CCJSQMessagesCollectionViewCellOutgoing`.
  */
 @property (assign, nonatomic) CGSize outgoingAvatarViewSize;
 
 /**
- *  The height of the `cellTopLabel` of a `JSQMessagesCollectionViewCell`.
+ *  The height of the `cellTopLabel` of a `CCJSQMessagesCollectionViewCell`.
  *  This value should be greater than or equal to `0.0`.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 @property (assign, nonatomic) CGFloat cellTopLabelHeight;
 
 /**
- *  The height of the `messageBubbleTopLabel` of a `JSQMessagesCollectionViewCell`.
+ *  The height of the `messageBubbleTopLabel` of a `CCJSQMessagesCollectionViewCell`.
  *  This value should be greater than or equal to `0.0`.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 @property (assign, nonatomic) CGFloat messageBubbleTopLabelHeight;
 
 /**
- *  The height of the `cellBottomLabel` of a `JSQMessagesCollectionViewCell`.
+ *  The height of the `cellBottomLabel` of a `CCJSQMessagesCollectionViewCell`.
  *  This value should be greater than or equal to `0.0`.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 @property (assign, nonatomic) CGFloat cellBottomLabelHeight;
 

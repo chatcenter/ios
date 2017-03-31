@@ -18,9 +18,27 @@
 
 #import <UIKit/UIKit.h>
 
+@class CCJSQMessagesComposerTextView;
+
 /**
- *  An instance of `JSQMessagesComposerTextView` is a subclass of `UITextView` that is styled and used 
- *  for composing messages in a `JSQMessagesViewController`. It is a subview of a `JSQMessagesToolbarContentView`.
+ *  A delegate object used to notify the receiver of paste events from a `CCJSQMessagesComposerTextView`.
+ */
+@protocol CCJSQMessagesComposerTextViewPasteDelegate <NSObject>
+
+/**
+ *  Asks the delegate whether or not the `textView` should use the original implementation of `-[UITextView paste]`.
+ *
+ *  @discussion Use this delegate method to implement custom pasting behavior. 
+ *  You should return `NO` when you want to handle pasting. 
+ *  Return `YES` to defer functionality to the `textView`.
+ */
+- (BOOL)composerTextView:(CCJSQMessagesComposerTextView *)textView shouldPasteWithSender:(id)sender;
+
+@end
+
+/**
+ *  An instance of `CCJSQMessagesComposerTextView` is a subclass of `UITextView` that is styled and used 
+ *  for composing messages in a `CCJSQMessagesViewController`. It is a subview of a `CCJSQMessagesToolbarContentView`.
  */
 @interface CCJSQMessagesComposerTextView : UITextView
 
@@ -33,6 +51,11 @@
  *  The color of the place holder text. The default value is `[UIColor lightGrayColor]`.
  */
 @property (strong, nonatomic) UIColor *placeHolderTextColor;
+
+/**
+ *  The object that acts as the paste delegate of the text view.
+ */
+@property (weak, nonatomic) id<CCJSQMessagesComposerTextViewPasteDelegate> pasteDelegate;
 
 /**
  *  Determines whether or not the text view contains text after trimming white space 

@@ -66,6 +66,11 @@
     options = inOptions;
     self.avatarImage.image = avatar.avatarImage;
 
+    if (([CCConstants sharedInstance].isAgent && (options & CCStickerCollectionViewCellOptionShowAsAgent))
+        || (![CCConstants sharedInstance].isAgent && !(options & CCStickerCollectionViewCellOptionShowAsAgent))) {
+        options |= CCStickerCollectionViewCellOptionShowAsMyself;
+    }
+    
     //
     // Set color
     //
@@ -108,7 +113,7 @@
     
     if(options & CCStickerCollectionViewCellOptionShowDate) {
         self.cellTopLabelHeight.constant = CC_STICKER_DATE_HEIGHT;
-        self.cellTopLabel.attributedText = [[CCJSQMessagesTimestampFormatter sharedFormatter] attributedTimestampForDate:msg.date];
+        self.cellTopLabel.text = [[CCJSQMessagesTimestampFormatter sharedFormatter] relativeDateForDate:msg.date];
     } else {
         self.cellTopLabelHeight.constant = 0;
     }
@@ -120,12 +125,17 @@
     
     //------------------------------
     //
-    // Part B: Sender name
+    // Part B: Sender name and time
     //
     
     if (options & CCStickerCollectionViewCellOptionShowName) {
         self.stickerTopLabelHeight.constant = 20;
-        self.stickerTopLabel.text = msg.senderDisplayName;
+        if (([CCConstants sharedInstance].isAgent && (options & CCStickerCollectionViewCellOptionShowAsAgent))
+            || (![CCConstants sharedInstance].isAgent && !(options & CCStickerCollectionViewCellOptionShowAsAgent))) {
+            self.stickerTopLabel.text = [NSString stringWithFormat:@"%@  %@", [[CCJSQMessagesTimestampFormatter sharedFormatter] timeForDate:msg.date], msg.senderDisplayName];
+        } else {
+            self.stickerTopLabel.text = [NSString stringWithFormat:@"%@  %@", msg.senderDisplayName, [[CCJSQMessagesTimestampFormatter sharedFormatter] timeForDate:msg.date]];
+        }
     }else{
         self.stickerTopLabelHeight.constant = 0;
     }
@@ -249,7 +259,7 @@
             //
             // Set image URL to imageView
             //
-            [imageView sd_setImageWithURL:[NSURL URLWithString:[msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            [imageView sd_setImageWithURL:[NSURL URLWithString:[msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]] completed:^(UIImage *image, NSError *error, CCSDImageCacheType cacheType, NSURL *imageURL) {
                 [indicator stopAnimating];
                 [indicator removeFromSuperview];
             }];
@@ -322,7 +332,7 @@
         //
         // Set image URL to imageView
         //
-        [imageView sd_setImageWithURL:[NSURL URLWithString:[[[msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] stringByReplacingOccurrencesOfString:@"|" withString:@""] ]  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+        [imageView sd_setImageWithURL:[NSURL URLWithString:[[[msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]] stringByReplacingOccurrencesOfString:@"|" withString:@""] ]  completed:^(UIImage *image, NSError *error, CCSDImageCacheType cacheType, NSURL *imageURL) {
             [indicator stopAnimating];
             [indicator removeFromSuperview];
         }];

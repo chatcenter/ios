@@ -19,8 +19,8 @@
 #import "CCJSQMessagesCollectionViewCell.h"
 
 /**
- *  A `JSQMessagesCollectionViewCellOutgoing` object is a concrete instance 
- *  of `JSQMessagesCollectionViewCell` that represents an outgoing message data item.
+ *  A `CCJSQMessagesCollectionViewCellOutgoing` object is a concrete instance 
+ *  of `CCJSQMessagesCollectionViewCell` that represents an outgoing message data item.
  */
 @interface CCJSQMessagesCollectionViewCellOutgoing : CCJSQMessagesCollectionViewCell
 

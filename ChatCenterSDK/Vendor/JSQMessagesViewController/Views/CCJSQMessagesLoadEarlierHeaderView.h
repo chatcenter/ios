@@ -21,12 +21,12 @@
 @class CCJSQMessagesLoadEarlierHeaderView;
 
 /**
- *  A constant defining the default height of a `JSQMessagesLoadEarlierHeaderView`.
+ *  A constant defining the default height of a `CCJSQMessagesLoadEarlierHeaderView`.
  */
 FOUNDATION_EXPORT const CGFloat kJSQMessagesLoadEarlierHeaderViewHeight;
 
 /**
- *  The `JSQMessagesLoadEarlierHeaderViewDelegate` defines methods that allow you to
+ *  The `CCJSQMessagesLoadEarlierHeaderViewDelegate` defines methods that allow you to
  *  respond to interactions within the header view.
  */
 @protocol CCJSQMessagesLoadEarlierHeaderViewDelegate <NSObject>
@@ -45,8 +45,8 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesLoadEarlierHeaderViewHeight;
 
 
 /**
- *  The `JSQMessagesLoadEarlierHeaderView` class implements a reusable view that can be placed
- *  at the top of a `JSQMessagesCollectionView`. This view contains a "load earlier messages" button
+ *  The `CCJSQMessagesLoadEarlierHeaderView` class implements a reusable view that can be placed
+ *  at the top of a `CCJSQMessagesCollectionView`. This view contains a "load earlier messages" button
  *  and can be used as a way for the user to load previously sent messages.
  */
 @interface CCJSQMessagesLoadEarlierHeaderView : UICollectionReusableView

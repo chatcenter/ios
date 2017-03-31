@@ -212,12 +212,14 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
 - (void)setHighlighted:(BOOL)highlighted
 {
     [super setHighlighted:highlighted];
+    self.avatarImageView.highlighted = highlighted;
     self.messageBubbleImageView.highlighted = highlighted;
 }
 
 - (void)setSelected:(BOOL)selected
 {
     [super setSelected:selected];
+    self.avatarImageView.highlighted = selected;
     self.messageBubbleImageView.highlighted = selected;
 }
 
@@ -247,10 +249,13 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
     return [super respondsToSelector:aSelector];
 }
 
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+}
+
 - (void)forwardInvocation:(NSInvocation *)anInvocation
 {
     if ([jsqMessagesCollectionViewCellActions containsObject:NSStringFromSelector(anInvocation.selector)]) {
-        id sender;
+        __unsafe_unretained id sender;
         [anInvocation getArgument:&sender atIndex:0];
         [self.delegate messagesCollectionViewCell:self didPerformAction:anInvocation.selector withSender:sender];
     }
@@ -383,7 +388,7 @@ static NSMutableSet *jsqMessagesCollectionViewCellActions = nil;
         return CGRectContainsPoint(self.messageBubbleContainerView.frame, touchPt);
     }
     
-    return YES;
+    return NO;
 }
 
 @end

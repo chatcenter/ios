@@ -19,7 +19,6 @@
 #import "CCCoredataBase.h"
 #import "ChatCenterPrivate.h"
 #import "CCSSKeychain.h"
-#import "CCAFHTTPRequestOperationManager.h"
 #import "CCAFNetworkActivityLogger.h"
 #import "CCHistoryFilterUtil.h"
 
@@ -58,7 +57,6 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
 {
     #if CC_DEBUG
         [[CCAFNetworkActivityLogger sharedLogger] startLogging];
-        [[CCAFNetworkActivityLogger sharedLogger] setLevel:AFLoggerLevelDebug];
     #endif
     self.isLoadingUserToken = NO;
     self.twoColumnLayoutMode = NO;
@@ -99,8 +97,8 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
         }
     }];
     
-    [[CCSRWebSocket sharedInstance] setDidReceiveMessageCallback:^(NSString *messageType, NSNumber *uid, NSDictionary *content, NSString *channelId, NSString *userUid, NSDate *date, NSString *displayName, NSString *userIconUrl, NSDictionary *answer){ //recieve message callback
-        if ([self.delegate respondsToSelector:@selector(receiveMessageFromWebSocket:uid:content:channelId:userUid:date:displayName:userIconUrl:answer:)]){
+    [[CCSRWebSocket sharedInstance] setDidReceiveMessageCallback:^(NSString *messageType, NSNumber *uid, NSDictionary *content, NSString *channelId, NSString *userUid, NSDate *date, NSString *displayName, NSString *userIconUrl, BOOL userAdmin, NSDictionary *answer){ //recieve message callback
+        if ([self.delegate respondsToSelector:@selector(receiveMessageFromWebSocket:uid:content:channelId:userUid:date:displayName:userIconUrl:userAdmin:answer:)]){
             [self.delegate receiveMessageFromWebSocket:messageType
                                                    uid:uid
                                                content:content
@@ -109,6 +107,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                                   date:date
                                            displayName:displayName
                                            userIconUrl:userIconUrl
+                                             userAdmin:userAdmin
                                                 answer:answer];
         }
     }];
@@ -121,17 +120,11 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
         }
     }];
     [[CCSRWebSocket sharedInstance] setDidReceiveAssignedCallback:^(NSString *channelUid){
-        if ([self.delegate respondsToSelector:@selector(loadLocalChannels)]){
-            [self.delegate loadLocalChannels];
-        }
         if ([self.delegate respondsToSelector:@selector(receiveAssignFromWebSocket:)]) {
             [self.delegate receiveAssignFromWebSocket:channelUid];
         }
     }];
     [[CCSRWebSocket sharedInstance] setDidReceiveUnassignedCallback:^(NSString *channelUid){
-        if ([self.delegate respondsToSelector:@selector(loadLocalChannels)]) {
-            [self.delegate loadLocalChannels];
-        }
         if ([self.delegate respondsToSelector:@selector(receiveUnassignFromWebSocket:)]) {
             [self.delegate receiveUnassignFromWebSocket:channelUid];
         }
@@ -156,11 +149,23 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             [self.delegate receiveCallEvent:messageId content:content];
         }
     }];
-    [[CCSRWebSocket sharedInstance] setDidReceiveDeleteChannelCallback:^(void) {
-        if ([self.delegate respondsToSelector:@selector(receiveDeleteChannelFromWebSocket)]){
-            [self.delegate receiveDeleteChannelFromWebSocket];
+    [[CCSRWebSocket sharedInstance] setDidReceiveDeleteChannelCallback:^(NSString *channelUid) {
+        if ([self.delegate respondsToSelector:@selector(receiveDeleteChannelFromWebSocket:)]) {
+            [self.delegate receiveDeleteChannelFromWebSocket:channelUid];
         }
     }];
+    [[CCSRWebSocket sharedInstance] setDidReceiveTypingCallback:^(NSString *channelUid, NSDictionary *user) {
+        if ([self.delegate respondsToSelector:@selector(receiveMessageTypingFromWebSocket:user:)]) {
+            [self.delegate receiveMessageTypingFromWebSocket:channelUid user:user];
+        }
+    }];
+    
+    [[CCSRWebSocket sharedInstance] setDidReceiveCloseChannelCallback:^(NSString *channelUid) {
+        if ([self.delegate respondsToSelector:@selector(receiveCloseChannelFromWebSocket:)]){
+            [self.delegate receiveCloseChannelFromWebSocket:channelUid];
+        }
+    }];
+
     
     self.shareLocationTasks = [[NSMutableDictionary alloc] init];
 }
@@ -172,7 +177,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             org_uid:(NSString *)org_uid
               limit:(int)limit
       lastUpdatedAt:(NSDate *)lastUpdatedAt
-  completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+  completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channels from server, store channels to local
     __block NSDate *blockLastUpdatedAt = lastUpdatedAt;
     if(showProgress == YES && self.currentView != nil){
@@ -182,7 +187,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                         org_uid:org_uid
                                           limit:limit
                                   lastUpdatedAt:lastUpdatedAt
-                              completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                              completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task)
     {
         if(result != nil){
             if(showProgress == YES && self.currentView != nil){
@@ -285,26 +290,26 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                 }
             }
             [[ChatCenter sharedInstance] setUnreadMessages:unreadMessagesDic];
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")]; ///This method is "channel load" but from user this is message load
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 -(void)loadChannel:(BOOL)showProgress
         channelUid:(NSString *)channelUid
- completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channel from server and store it into coredata
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
     }
     [[ChatCenterClient sharedClient] getChannel:channelUid
-                              completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                              completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
      {
          if(result != nil){
              if(showProgress == YES && self.currentView != nil){
@@ -397,26 +402,26 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                  }
              }
              [[ChatCenter sharedInstance] setUnreadMessages:unreadMessagesDic];
-             if(completionHandler != nil) completionHandler(result, nil, operation);
+             if(completionHandler != nil) completionHandler(result, nil, task);
          }else{
              if(showProgress == YES && self.currentView != nil){
                  [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")]; ///This method is "channel load" but from user this is message load
              }
              [self checkNetworkStatus];
-             if(completionHandler != nil) completionHandler(nil, error, operation);
+             if(completionHandler != nil) completionHandler(nil, error, task);
          }
      }];
 }
 
 -(void)updateChannel:(BOOL)showProgress
           channelUid:(NSString *)channelUid
-   completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channel from server and store it into coredata
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
     }
     [[ChatCenterClient sharedClient] getChannel:channelUid
-                              completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                              completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
      {
          if(result != nil){
              if(showProgress == YES && self.currentView != nil){
@@ -504,18 +509,18 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                  }
              }
              [[ChatCenter sharedInstance] setUnreadMessages:unreadMessagesDic];
-             if(completionHandler != nil) completionHandler(result, nil, operation);
+             if(completionHandler != nil) completionHandler(result, nil, task);
          }else{
              if(showProgress == YES && self.currentView != nil){
                  [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")]; ///This method is "channel load" but from user this is message load
              }
              [self checkNetworkStatus];
-             if(completionHandler != nil) completionHandler(nil, error, operation);
+             if(completionHandler != nil) completionHandler(nil, error, task);
          }
      }];
 }
 
-- (void)updateChannel:(NSString *)channelId channelInformations:(NSDictionary *)channelInformations note:(NSString *)note completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+- (void)updateChannel:(NSString *)channelId channelInformations:(NSDictionary *)channelInformations note:(NSString *)note completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] updateChannel:channelId channelInformations:channelInformations note:note completionHandler:completionHandler];
 }
 
@@ -523,13 +528,13 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
        showProgress:(BOOL)showProgress
               limit:(int)limit
              lastId:(NSNumber *)lastId
-  completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+  completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get messages from server, store messages to local
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
     }
     __block NSNumber *blockLastId = lastId;
-    [[ChatCenterClient sharedClient] getMessage:channelUid limit:limit lastId:lastId completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getMessage:channelUid limit:limit lastId:lastId completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD dismiss];
@@ -613,18 +618,18 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                     }
                 }
             }
-            if(completionHandler != nil) completionHandler(@"success", nil, operation);
+            if(completionHandler != nil) completionHandler(@"success", nil, task);
         }else{
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
-- (void)loadChannelsAndConnectWebSocket:(BOOL)showProgress getChennelType:(int)getChennelType isOrgChange:(BOOL)isOrgChange org_uid:(NSString *)org_uid completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+- (void)loadChannelsAndConnectWebSocket:(BOOL)showProgress getChennelType:(int)getChennelType isOrgChange:(BOOL)isOrgChange org_uid:(NSString *)org_uid completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if ([[CCConstants sharedInstance] getKeychainToken] == nil) {
         self.isRefreshingData = NO;
         return;
@@ -638,14 +643,14 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                org_uid:org_uid
                  limit:CCloadChannelFirstLimit
          lastUpdatedAt:nil
-     completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation)
+     completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task)
      {
          [self hideToast];
          if (result != nil) {
              [self setIsDataSynchronized:YES];
              [self connectWebSocket];
              if (self.ChatChannelIds.count > 0) {
-                 if (completionHandler != nil) completionHandler(@"Success",nil, operation);
+                 if (completionHandler != nil) completionHandler(@"Success",nil, task);
                  if ([self.delegate respondsToSelector:@selector(loadLocalData:)]){
                      [self.delegate loadLocalData:isOrgChange];
                  }
@@ -659,7 +664,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                  if(showProgress == YES && self.currentView != nil){
                      [CCSVProgressHUD showSuccessWithStatus:CCLocalizedString(@"No Channel yet")];
                  }
-                 if(completionHandler != nil) completionHandler(@"No Channel yet",nil, operation);
+                 if(completionHandler != nil) completionHandler(@"No Channel yet",nil, task);
                  if ([self.delegate respondsToSelector:@selector(loadLocalData:)]){
                      [self.delegate loadLocalData:isOrgChange];
                  }
@@ -671,7 +676,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
              }
              [self makeToast:@"Can not load data" message:CCLocalizedString(@"Can not load data") duration:99999 backgroundColor:[UIColor redColor]];
              NSLog(@"Load channel Error");
-             if(completionHandler != nil) completionHandler(nil, error, operation);
+             if(completionHandler != nil) completionHandler(nil, error, task);
          }
      }];
 }
@@ -687,7 +692,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     providerExpiresAt:(NSDate *)providerExpiresAt
           deviceToken:(NSString *)deviceToken
          showProgress:(BOOL)showProgress
-    completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+    completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     self.isLoadingUserToken = YES;
     if (showProgress == YES && self.currentView != nil) {
         [CCSVProgressHUD showWithStatus:@"Checking Account..." maskType:SVProgressHUDMaskTypeBlack];
@@ -701,7 +706,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                                 providerCreatedAt:providerCreatedAt
                                 providerExpiresAt:providerExpiresAt
                                       deviceToken:deviceToken
-                                completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+                                completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(error == nil && result[@"token"] != nil
            && ![result[@"token"] isEqual:[NSNull null]]
            && result[@"id"] != nil
@@ -733,7 +738,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             if ([self.delegate respondsToSelector:@selector(finishedLoadingUserToken)]){
                 [self.delegate finishedLoadingUserToken];
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD dismiss]; //Don't show message because when user is not allowed, displaying alert view
@@ -744,7 +749,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                 [self.delegate finishedLoadingUserToken];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -760,7 +765,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
    providerExpiresAt:(NSDate *)providerExpiresAt
          deviceToken:(NSString *)deviceToken
         showProgress:(BOOL)showProgress
-   completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     self.isLoadingUserToken = YES;
     
     if (showProgress == YES && self.currentView != nil) {
@@ -775,7 +780,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
                                 providerCreatedAt:providerCreatedAt
                                 providerExpiresAt:providerExpiresAt
                                       deviceToken:deviceToken
-                                completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
         if(error == nil && result[@"token"] != nil
            && ![result[@"token"] isEqual:[NSNull null]]
@@ -814,7 +819,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
             if ([self.delegate respondsToSelector:@selector(finishedLoadingUserToken)]){
                 [self.delegate finishedLoadingUserToken];
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES) {
                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Loading Failed")];
@@ -824,16 +829,16 @@ providerRefreshToken:(NSString *)providerRefreshToken
                 [self.delegate finishedLoadingUserToken];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
-- (void)loadOrg:(BOOL)showProgress completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{ //get channels from server, store channels to local, connect channels,get messages from server, store messages to local
+- (void)loadOrg:(BOOL)showProgress completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler{ //get channels from server, store channels to local, connect channels,get messages from server, store messages to local
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Organizations...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getOrg:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getOrg:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil && result.count > 0){
             if(showProgress == YES){
                 [CCSVProgressHUD dismiss]; //Don't show message because "loadUserToken" is always used with "loadChannelsAndConnectWebSocket"
@@ -864,17 +869,17 @@ providerRefreshToken:(NSString *)providerRefreshToken
                     if(showProgress == YES && self.currentView != nil){
                         [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Organization Failed")];
                     }
-                    if(completionHandler != nil) completionHandler(nil, error, operation);
+                    if(completionHandler != nil) completionHandler(nil, error, task);
                 }
             }
             [self setCurrentOrg];
-            if(completionHandler != nil) completionHandler(@"success", nil, operation);
+            if(completionHandler != nil) completionHandler(@"success", nil, task);
         }else{
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Organization Failed")];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -882,7 +887,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
 - (void)loadUserTokenAndOrg:(NSString*)email
                    password:(NSString*)password
                showProgress:(BOOL)showProgress
-          completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+          completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     __block NSString *blockPassword = password;
     [self loadUserToken:email
                password:password
@@ -894,7 +899,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
       providerExpiresAt:nil
             deviceToken:nil
            showProgress:showProgress
-      completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+      completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
         if(result != nil && result[@"id"] != nil && ![result[@"id"] isEqual:[NSNull null]] && result[@"email"] != nil && ![result[@"email"] isEqual:[NSNull null]] && result[@"token"] != nil && ![result[@"token"] isEqual:[NSNull null]]){
             NSLog(@"Success!");
@@ -916,71 +921,71 @@ providerRefreshToken:(NSString *)providerRefreshToken
             if (showProgress == YES) {
                 [CCSVProgressHUD dismiss]; //Don't show message because "loadUserToken" is always used with "loadChannelsAndConnectWebSocket"
             }
-            [self loadOrg:showProgress completionHandler:^(NSString *loadOrgResult, NSError *loadOrgError, CCAFHTTPRequestOperation *operation){
+            [self loadOrg:showProgress completionHandler:^(NSString *loadOrgResult, NSError *loadOrgError, NSURLSessionDataTask *task){
                 if(loadOrgResult != nil){
-                    if(completionHandler != nil) completionHandler(result, nil, operation);
+                    if(completionHandler != nil) completionHandler(result, nil, task);
                 }else{
-                    if(completionHandler != nil) completionHandler(nil, error, operation);
+                    if(completionHandler != nil) completionHandler(nil, error, task);
                 }
             }];
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 - (void)loadUser:(BOOL)showProgress
          userUid:(NSString*)userUid
-completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getUser:userUid completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getUser:userUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             NSLog(@"Success!");
             if (showProgress == YES) {
                 [CCSVProgressHUD dismiss];
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD dismiss];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 - (void)loadUsers:(BOOL)showProgress
-completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Users...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getUsers:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getUsers:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             NSLog(@"Success!");
             if (showProgress == YES) {
                 [CCSVProgressHUD dismiss];
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD dismiss];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 - (void)loadUserMe:(BOOL)showProgress
- completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getUserMe:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getUserMe:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             NSLog(@"Success!");
             if (showProgress == YES) {
@@ -1003,40 +1008,45 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                 && ![result[@"email"] isEqual:[NSNull null]]){
                 email = result[@"email"];
             }
+            NSDictionary *privilege;
+            if (result[@"privilege"] != nil) {
+                privilege = result[@"privilege"];
+            }
             NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
             [ud setValue:userId forKey:kCCUserDefaults_userId];
             [ud setValue:displayName forKey:kCCUserDefaults_userDisplayName];
             [ud setValue:iconUrl forKey:kCCUserDefaults_userIconUrl];
             [ud setValue:email forKey:kCCUserDefaults_userEmail];
+            [ud setValue:privilege forKey:kCCUserDefaults_privilege];
             [ud synchronize];
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD dismiss];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
-- (void)loadFixedPhrase: (NSString *)orgUid showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+- (void)loadFixedPhrase: (NSString *)orgUid showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getFixedPhrases:orgUid withHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getFixedPhrases:orgUid withHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             NSLog(@"Success!");
             if (showProgress == YES) {
                 [CCSVProgressHUD dismiss];
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD dismiss];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -1044,28 +1054,28 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 - (void)loadOrgsAndChannelsAndConnectWebSocket:(BOOL)showProgress
                                            getChennelType:(int)getChennelType
                                               isOrgChange:(BOOL)isOrgChange
-                                        completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+                                        completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channels from server, store
-    [self loadOrg:showProgress completionHandler:^(NSString *loadOrgResult, NSError *loadOrgError, CCAFHTTPRequestOperation *operation){
+    [self loadOrg:showProgress completionHandler:^(NSString *loadOrgResult, NSError *loadOrgError, NSURLSessionDataTask *task){
         if(loadOrgResult != nil){
             NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
             NSString *orgUid = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
-            [self loadChannelsAndConnectWebSocket:showProgress getChennelType:getChennelType isOrgChange:NO org_uid:orgUid completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [self loadChannelsAndConnectWebSocket:showProgress getChennelType:getChennelType isOrgChange:NO org_uid:orgUid completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task) {
                 if (result != nil) {
-                    if(completionHandler != nil) completionHandler(result, nil, operation);
+                    if(completionHandler != nil) completionHandler(result, nil, task);
                 }else{
-                    if(completionHandler != nil) completionHandler(nil, error, operation);
+                    if(completionHandler != nil) completionHandler(nil, error, task);
                 }
             }];
         }else{
-            if(completionHandler != nil) completionHandler(nil, loadOrgError, operation);
+            if(completionHandler != nil) completionHandler(nil, loadOrgError, task);
         }
     }];
 }
 
 // Get org online status
 - (void)getOrgOnlineStatus:orgUid completeHandler:(void (^)(BOOL isOnline))completionHandler {
-    [[ChatCenterClient sharedClient] getOrgOnlineStatus:orgUid completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[ChatCenterClient sharedClient] getOrgOnlineStatus:orgUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil && [result objectForKey:@"online"] != nil) {
             if (completionHandler != nil) completionHandler([[result objectForKey:@"online"] boolValue]);
         }else {
@@ -1102,7 +1112,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 }
 
 - (void)setCurrentApp:(void (^)(BOOL success))completionHandler{
-    [self getApps:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [self getApps:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if(result != nil && result.count > 0){
             [self setAppToken:result completionHandler:^{
                 if(completionHandler != nil) completionHandler(YES);
@@ -1167,12 +1177,12 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 
 #pragma mark - Business funnels
 -(void)loadBusinessFunnels:(BOOL)showProgress
-         completionHandler:(void (^)(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+         completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     if(showProgress == YES && self.currentView != nil){
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient] getBusinessFunnels:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] getBusinessFunnels:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD dismiss];
@@ -1189,18 +1199,18 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
             }];
             [CCConstants sharedInstance].businessFunnels = result;
             NSLog(@"Success!");
-            if(completionHandler != nil) completionHandler(@"success", nil, operation);
+            if(completionHandler != nil) completionHandler(@"success", nil, task);
         }else{
             if(showProgress == YES && self.currentView != nil){
                 [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
             }
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
--(void)setBusinessFunnelToChannel:(NSString *)channelId funnelId:(NSString *)funnelId showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+-(void)setBusinessFunnelToChannel:(NSString *)channelId funnelId:(NSString *)funnelId showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] setBusinessFunnelToChannel:channelId funnelId:funnelId showProgress:showProgress completionHandler:completionHandler];
 }
 
@@ -1230,7 +1240,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                                    providerExpiresAt:providerExpiresAt
                                  channelInformations:channelInformations
                                          deviceToken:(NSString *)deviceToken
-                                   completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){
+                                   completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil
            && result[@"uid"] != nil
            && ![result[@"uid"] isEqual:[NSNull null]]
@@ -1353,10 +1363,10 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
 
 -(void)createChannelAndConnectWebSocket:(NSString *)orgUid
                     channelInformations:(NSDictionary *)channelInformations
-                      completionHandler:(void (^)(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{ //create a channel, connect the channel
+                      completionHandler:(void (^)(NSString *channelId, NSError *error, NSURLSessionDataTask *task))completionHandler{ //create a channel, connect the channel
     [[ChatCenterClient sharedClient] createChannel:orgUid
                                channelInformations:channelInformations
-                                 completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation){ //create Channel
+                                 completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){ //create Channel
         if(result != nil
            && result[@"uid"] != nil
            && ![result[@"uid"] isEqual:[NSNull null]]
@@ -1422,10 +1432,10 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                 [self.ChatChannelIds addObject:channelUid];
             }
             [CCSVProgressHUD dismiss];
-            if(completionHandler != nil) completionHandler(channelUid,nil, operation);
+            if(completionHandler != nil) completionHandler(channelUid,nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -1436,13 +1446,13 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                 directMessage:(BOOL)directMessage
                     groupName:(NSString *)groupName
           channelInformations:(NSDictionary *)channelInformations
-            completionHandler:(void (^)(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{ //create a channel, connect the channel
+            completionHandler:(void (^)(NSString *channelId, NSError *error, NSURLSessionDataTask *task))completionHandler{ //create a channel, connect the channel
     [[ChatCenterClient sharedClient] createChannel:orgUid
                                            userIds:userIds
                                      directMessage:directMessage
                                          groupName:groupName
                                channelInformations:channelInformations
-                                 completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                 completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
      {
          //create Channel
          if(result != nil
@@ -1509,10 +1519,10 @@ completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOper
                  [self.ChatChannelIds addObject:channelUid];
              }
              [CCSVProgressHUD dismiss];
-             if(completionHandler != nil) completionHandler(channelUid,nil, operation);
+             if(completionHandler != nil) completionHandler(channelUid,nil, task);
          }else{
              [self checkNetworkStatus];
-             if(completionHandler != nil) completionHandler(nil, error, operation);
+             if(completionHandler != nil) completionHandler(nil, error, task);
          }
      }];
 }
@@ -1530,7 +1540,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
  channelInformations:(NSDictionary *)channelInformations
          deviceToken:(NSString *)deviceToken
         showProgress:(BOOL)showProgress
-   completionHandler:(void (^)(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+   completionHandler:(void (^)(NSString *channelId, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if (deviceToken != nil ///need registering devicetoken
         || [provider isEqualToString:@"twitter"]
         || ([[CCConstants sharedInstance] getKeychainToken] == nil) ///User not exist
@@ -1578,18 +1588,18 @@ providerRefreshToken:(NSString *)providerRefreshToken
             if (showProgress == YES && self.currentView != nil) {
                 [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
             }
-            [self createChannelAndConnectWebSocket:orgUid channelInformations:channelInformations completionHandler:^(NSString *channelId, NSError *error, CCAFHTTPRequestOperation *operation) {
+            [self createChannelAndConnectWebSocket:orgUid channelInformations:channelInformations completionHandler:^(NSString *channelId, NSError *error, NSURLSessionDataTask *task) {
                 if (channelId != nil) {
                     if (showProgress == YES) {
                         [CCSVProgressHUD dismiss];
                     }
                     [[CCConnectionHelper sharedClient] refreshData];
-                    if(completionHandler != nil) completionHandler(channelId,nil, operation);
+                    if(completionHandler != nil) completionHandler(channelId,nil, task);
                 }else{
                     if (showProgress == YES && self.currentView != nil) {
                         [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Loading Failed")];
                     }
-                    if(completionHandler != nil) completionHandler(nil,error, operation);
+                    if(completionHandler != nil) completionHandler(nil,error, task);
                 }
             }];
         }else{
@@ -1608,12 +1618,12 @@ providerRefreshToken:(NSString *)providerRefreshToken
 - (void)sendMessage:(NSDictionary *)content
           channelId:(NSString *)channelId
                type:(NSString *)type
-  completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     [[ChatCenterClient sharedClient] sendMessage:content
                                        channelId:channelId
                                             type:type
-                               completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                               completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
             ///POST assign me
             NSArray *channelArray = [[CCCoredataBase sharedClient] selectChannelWithUid:CCloadLoacalChannelLimit uid:channelId];
@@ -1636,33 +1646,33 @@ providerRefreshToken:(NSString *)providerRefreshToken
                         NSString *userUid = [[CCConstants sharedInstance] getKeychainUid];
                         [[ChatCenterClient sharedClient] assignChannel:channelId
                                                                userUid:userUid
-                                                     completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                                     completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
                         {
                             if (result != nil) {
-                                if(completionHandler != nil) completionHandler(result,nil, operation);
+                                if(completionHandler != nil) completionHandler(result,nil, task);
                             }else{
-                                if(completionHandler != nil) completionHandler(nil,error, operation);
+                                if(completionHandler != nil) completionHandler(nil,error, task);
                             }
                         }];
                     }else{
-                        if(completionHandler != nil) completionHandler(result,nil, operation);
+                        if(completionHandler != nil) completionHandler(result,nil, task);
                     }
                 }
             }
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil,error, operation);
+            if(completionHandler != nil) completionHandler(nil,error, task);
         }
     }];
 }
 
 - (void)sendFile:(NSString *)channelId
            files:(NSArray *)files
-completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     [[ChatCenterClient sharedClient] sendFile:channelId
                                         files:files
-                            completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                            completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
                                    if (result != nil) {
                                        ///POST assign me
@@ -1684,32 +1694,32 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
                                                }
                                                if (alreadyAssigned == NO) { ///Need to assign me
                                                    NSString *userUid = [[CCConstants sharedInstance] getKeychainUid];
-                                                   [[ChatCenterClient sharedClient] assignChannel:channelId userUid:userUid completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                                                   [[ChatCenterClient sharedClient] assignChannel:channelId userUid:userUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                                                        if (result != nil) {
-                                                           if(completionHandler != nil) completionHandler(result,nil, operation);
+                                                           if(completionHandler != nil) completionHandler(result,nil, task);
                                                        }else{
-                                                           if(completionHandler != nil) completionHandler(nil,error, operation);
+                                                           if(completionHandler != nil) completionHandler(nil,error, task);
                                                        }
                                                    }];
                                                }else{
-                                                   if(completionHandler != nil) completionHandler(result,nil, operation);
+                                                   if(completionHandler != nil) completionHandler(result,nil, task);
                                                }
                                            }
                                        }
                                    }else{
                                        [self checkNetworkStatus];
-                                       if(completionHandler != nil) completionHandler(nil,error, operation);
+                                       if(completionHandler != nil) completionHandler(nil,error, task);
                                    }
                                }];
 }
 
 -(void)sendMessageReceivedStatus:(NSString *)channelId messageIds:(NSArray *)messageIds{ //send receive status to server
     //TODO Check network status and push que in Offline
-    [[ChatCenterClient sharedClient] sendMessageStatus:channelId messageIds:messageIds completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation){
+    [[ChatCenterClient sharedClient] sendMessageStatus:channelId messageIds:messageIds completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
             NSLog(@"sendMessagetatus Success!");
         }else{
-            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:task] == YES){
                 if ([self.delegate respondsToSelector:@selector(closeChatView)]){
                     [self displayAuthenticationErrorAlert];
                 }
@@ -1725,47 +1735,47 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
                messageId:(NSNumber *)messageId
              answer_type:(NSNumber *)answer_type
              question_id:(NSString *)question_id
-       completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+       completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     [[ChatCenterClient sharedClient] sendMessageAnswer:channelId
                                             message_id:messageId
                                            answer_type:answer_type
                                            question_id:question_id
-                                     completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                                     completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                                          if (result != nil && result[@"answer"] != nil) {
                                              [CCSVProgressHUD showSuccessWithStatus:CCLocalizedString(@"Answered!")];
                                          }
-                                         if(completionHandler != nil) completionHandler(result, error, operation);
+                                         if(completionHandler != nil) completionHandler(result, error, task);
                                          [self checkNetworkStatus];
                                      }];
 }
 
 - (void)closeChannels:(NSArray*)channelUids
-   completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     [[ChatCenterClient sharedClient] closeChannels:channelUids completionHandler:completionHandler];
 }
 
 - (void)openChannels:(NSArray*)channelUids
-    completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
+    completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     [[ChatCenterClient sharedClient] openChannels:channelUids completionHandler:completionHandler];
 }
 
-- (void)deleteChannel:(NSString *)channelUid completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler{
+- (void)deleteChannel:(NSString *)channelUid completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler{
     [[ChatCenterClient sharedClient] deleteChannel:channelUid completionHandler:completionHandler];
 }
 
-- (void)setAssigneeForChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+- (void)setAssigneeForChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] setAssigneeForChannel:channelID agentID:agentID completionHandler:completionHandler];
 }
 
-- (void) removeAssigneeFromChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+- (void) removeAssigneeFromChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] removeAssigneeFromChannel:channelID agentID:agentID completionHandler:completionHandler];
 }
 
-- (void)setFollowerForChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+- (void)setFollowerForChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] setFollowerForChannel:channelID agentID:agentID completionHandler:completionHandler];
 }
 
-- (void)removeFollowerFromChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
+- (void)removeFollowerFromChannel:(NSString *)channelID agentID:(NSString *)agentID completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     [[ChatCenterClient sharedClient] removeFollowerFromChannel:channelID agentID:agentID completionHandler:completionHandler];
 }
 
@@ -1816,9 +1826,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
 
 # pragma mark - Refresh data
 - (void)reloadChannelsAndConnectWebSocket{
-    [self loadChannelsAndConnectWebSocket:YES getChennelType:CCGetChannelsMine isOrgChange:NO org_uid:nil completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [self loadChannelsAndConnectWebSocket:YES getChennelType:CCGetChannelsMine isOrgChange:NO org_uid:nil completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task) {
         if (error != nil) {
-            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:task] == YES){
                 if ([self.delegate respondsToSelector:@selector(closeChatView)]){
                     [self displayAuthenticationErrorAlert];
                 }
@@ -1837,9 +1847,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
         return;
     }
     
-    [self loadOrgsAndChannelsAndConnectWebSocket:YES getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [self loadOrgsAndChannelsAndConnectWebSocket:YES getChennelType:CCGetChannels isOrgChange:NO completionHandler:^(NSString *result, NSError *error, NSURLSessionDataTask *task) {
         if (error != nil) {
-            if ([[CCConnectionHelper sharedClient] isAuthenticationError:operation] == YES){
+            if ([[CCConnectionHelper sharedClient] isAuthenticationError:task] == YES){
                 if ([self.delegate respondsToSelector:@selector(closeChatView)]){
                     [self displayAuthenticationErrorAlert];
                 }
@@ -1849,6 +1859,11 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
         }
         self.isRefreshingData = NO;
     }];
+}
+
+- (void)sendMessageViaWebsocket:(NSString *)wsChannel content:(NSString *)content {
+    NSString *message = [NSString stringWithFormat:@"[\"%@\", %@]",wsChannel, content];
+    [[CCSRWebSocket sharedInstance] sendMessage:message];
 }
 
 - (void)refreshData{
@@ -1898,8 +1913,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
 }
 
 # pragma mark - Authentication
-- (BOOL)isAuthenticationError:(CCAFHTTPRequestOperation *)operation{
-    NSInteger statusCode = [operation.response statusCode];
+- (BOOL)isAuthenticationError:(NSURLSessionDataTask *)task{
+    NSHTTPURLResponse *response = (NSHTTPURLResponse *)task.response;
+    NSInteger statusCode = [response statusCode];
     if (statusCode == 401) {
         [[CCConnectionHelper sharedClient] signOut];
         return YES;
@@ -1907,8 +1923,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
     return NO;
 }
 
-- (BOOL)isAuthenticationErrorWithEmptyuser:(CCAFHTTPRequestOperation *)operation{
-    NSInteger statusCode = [operation.response statusCode];
+- (BOOL)isAuthenticationErrorWithEmptyuser:(NSURLSessionDataTask *)task{
+    NSHTTPURLResponse *response = (NSHTTPURLResponse *)task.response;
+    NSInteger statusCode = [response statusCode];
     if (statusCode == 405) {
         return YES;
     }
@@ -1953,7 +1970,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
                      completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler
 {
     [[ChatCenterClient sharedClient] signInDeviceTokenWithAuthToken:deviceToken
-                                                  completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                                  completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
         if(completionHandler != nil) completionHandler(result, error);
     }];
@@ -1963,7 +1980,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
          completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler
 {
     [[ChatCenterClient sharedClient] signOutDeviceToken:deviceToken
-                                      completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation)
+                                      completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
         if(completionHandler != nil) completionHandler(result, error);
     }];
@@ -1992,10 +2009,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
         textView.font = [UIFont boldSystemFontOfSize:14];
         textView.editable = NO;
         [toastView addSubview:textView];
-        [self.currentView.view showToast:toastView
-                                duration:duration
-                                position:CSToastPositionTop
-         ];
+        [self.currentView.view showToast:toastView duration:duration position:CSToastPositionTop completion:nil];
         CGFloat layoutTopConstant;
         if([[CCConstants sharedInstance] headerTranslucent] == YES){
             layoutTopConstant = 64;
@@ -2030,6 +2044,11 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
                                        layoutWidth,
                                        layoutHeight];
         [toastView setTranslatesAutoresizingMaskIntoConstraints:NO];
+        if (![self.currentView.view.subviews containsObject:toastView]) {
+            NSTimer *timer = [NSTimer timerWithTimeInterval:3.0 target:self selector:@selector(hideToast) userInfo:nil repeats:NO];
+            [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
+            [self.currentView.view addSubview:toastView];
+        }
         [self.currentView.view addConstraints:layoutConstraints];
         
         NSLayoutConstraint *textViewLayoutTop =
@@ -2199,25 +2218,25 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
     }
 }
 
-- (void)getApps:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler{
-    [[ChatCenterClient sharedClient] getApps:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+- (void)getApps:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
+    [[ChatCenterClient sharedClient] getApps:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
             [CCConstants sharedInstance].apps = result;
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 - (void)getAppManifest:(BOOL)showProgress
-     completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler
+     completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     if (showProgress == YES && self.currentView != nil) {
         [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
     }
-    [[ChatCenterClient sharedClient]getAppManifest:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+    [[ChatCenterClient sharedClient]getAppManifest:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if(showProgress == YES && self.currentView != nil){
             [CCSVProgressHUD dismiss];
         }
@@ -2243,44 +2262,44 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
                     }
                 }
             }
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
-- (void)sendMessageResponseForChannel:(NSString *)channelId answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler {
-    [[ChatCenterClient sharedClient] sendMessageResponseForChannel:channelId answer:answer answerLabel:answerLabel replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+- (void)sendMessageResponseForChannel:(NSString *)channelId answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    [[ChatCenterClient sharedClient] sendMessageResponseForChannel:channelId answer:answer answerLabel:answerLabel replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
-            if (completionHandler != nil) completionHandler(result, nil, operation);
+            if (completionHandler != nil) completionHandler(result, nil, task);
         }else {
             [self checkNetworkStatus];
-            if (completionHandler != nil) completionHandler(nil, error, operation);
+            if (completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
--(void)sendSuggestionMessage:(NSString *)channelId answer:(NSObject *)answer text:(NSString *)text replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *, NSError *, CCAFHTTPRequestOperation *))completionHandler {
-    [[ChatCenterClient sharedClient] sendSuggestionMessage:channelId answer:answer text:text replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+-(void)sendSuggestionMessage:(NSString *)channelId answer:(NSObject *)answer text:(NSString *)text replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *, NSError *, NSURLSessionDataTask *))completionHandler {
+    [[ChatCenterClient sharedClient] sendSuggestionMessage:channelId answer:answer text:text replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
-            if (completionHandler != nil) completionHandler(result, nil, operation);
+            if (completionHandler != nil) completionHandler(result, nil, task);
         }else {
             [self checkNetworkStatus];
-            if (completionHandler != nil) completionHandler(nil, error, operation);
+            if (completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
 
 #pragma mark - Video Call
-- (void)getCallIdentity:(NSString *)channelId callerInfo:(NSDictionary *)callerInfo receiverInfo:(NSArray *)receiversInfo actionCall:(NSString *)actionCall completeHandler:(void (^)(NSDictionary *, NSError *, CCAFHTTPRequestOperation *))completeHandler {
-    [[ChatCenterClient sharedClient] getCallIdentity:channelId callerInfo:callerInfo receiverInfo:receiversInfo callAction:actionCall completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+- (void)getCallIdentity:(NSString *)channelId callerInfo:(NSDictionary *)callerInfo receiverInfo:(NSArray *)receiversInfo actionCall:(NSString *)actionCall completeHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completeHandler {
+    [[ChatCenterClient sharedClient] getCallIdentity:channelId callerInfo:callerInfo receiverInfo:receiversInfo callAction:actionCall completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [CCSVProgressHUD dismiss];
         if (result != nil) {
-            if(completeHandler != nil) completeHandler(result, nil, operation);
+            if(completeHandler != nil) completeHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completeHandler != nil) completeHandler(nil, error, operation);
+            if(completeHandler != nil) completeHandler(nil, error, task);
         }
     }];
 }
@@ -2288,14 +2307,14 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
 - (void)acceptCall:(NSString *)channelId
          messageId:(NSString *)messageId
               user:(NSDictionary *)user
- completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler {
-    [[ChatCenterClient sharedClient] acceptCall:channelId messageId:messageId user:user completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    [[ChatCenterClient sharedClient] acceptCall:channelId messageId:messageId user:user completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [CCSVProgressHUD dismiss];
         if (result != nil) {
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -2304,14 +2323,14 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
          messageId:(NSString *)messageId
             reason:(NSDictionary *)reason
               user:(NSDictionary *)user
- completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler {
-    [[ChatCenterClient sharedClient] rejectCall:channelId messageId:messageId reason:reason user:user completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    [[ChatCenterClient sharedClient] rejectCall:channelId messageId:messageId reason:reason user:user completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [CCSVProgressHUD dismiss];
         if (result != nil) {
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }
@@ -2319,14 +2338,14 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPReques
 - (void)hangupCall:(NSString *)channelId
                               messageId:(NSString *)messageId
                                 user:(NSDictionary *)user
-                   completionHandler:(void (^)(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation))completionHandler {
-    [[ChatCenterClient sharedClient] hangupCall:channelId messageId:messageId user:user completionHandler:^(NSDictionary *result, NSError *error, CCAFHTTPRequestOperation *operation) {
+                   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    [[ChatCenterClient sharedClient] hangupCall:channelId messageId:messageId user:user completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
         [CCSVProgressHUD dismiss];
         if (result != nil) {
-            if(completionHandler != nil) completionHandler(result, nil, operation);
+            if(completionHandler != nil) completionHandler(result, nil, task);
         }else{
             [self checkNetworkStatus];
-            if(completionHandler != nil) completionHandler(nil, error, operation);
+            if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
 }

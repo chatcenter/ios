@@ -23,33 +23,35 @@
 
 #import <UIKit/UIKit.h>
 
+#import "CCJSQMessagesBubbleSizeCalculating.h"
+
 @class CCJSQMessagesCollectionView;
 
 
 /**
- *  A constant that describes the default height for all label subviews in a `JSQMessagesCollectionViewCell`.
+ *  A constant that describes the default height for all label subviews in a `CCJSQMessagesCollectionViewCell`.
  *
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewCellLabelHeightDefault;
 
 /**
- *  A constant that describes the default size for avatar images in a `JSQMessagesCollectionViewFlowLayout`.
+ *  A constant that describes the default size for avatar images in a `CCJSQMessagesCollectionViewFlowLayout`.
  */
 FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 
 
 
 /**
- *  The `JSQMessagesCollectionViewFlowLayout` is a concrete layout object that inherits 
+ *  The `CCJSQMessagesCollectionViewFlowLayout` is a concrete layout object that inherits 
  *  from `UICollectionViewFlowLayout` and organizes message items in a vertical list.
- *  Each `JSQMessagesCollectionViewCell` in the layout can display messages of arbitrary sizes and avatar images, 
+ *  Each `CCJSQMessagesCollectionViewCell` in the layout can display messages of arbitrary sizes and avatar images, 
  *  as well as metadata such as a timestamp and sender.
  *  You can easily customize the layout via its properties or its delegate methods 
- *  defined in `JSQMessagesCollectionViewDelegateFlowLayout`.
+ *  defined in `CCJSQMessagesCollectionViewDelegateFlowLayout`.
  *
- *  @see JSQMessagesCollectionViewDelegateFlowLayout.
- *  @see JSQMessagesCollectionViewCell.
+ *  @see CCJSQMessagesCollectionViewDelegateFlowLayout.
+ *  @see CCJSQMessagesCollectionViewCell.
  */
 @interface CCJSQMessagesCollectionViewFlowLayout : UICollectionViewFlowLayout
 
@@ -64,11 +66,17 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 #pragma clang diagnostic pop
 
 /**
+ *  The object that the layout uses to calculate bubble sizes.
+ *  The default value is an instance of `CCJSQMessagesBubblesSizeCalculator`.
+ */
+@property (strong, nonatomic) id<CCJSQMessagesBubbleSizeCalculating> bubbleSizeCalculator;
+
+/**
  *  Specifies whether or not the layout should enable spring behavior dynamics for its items using `UIDynamics`.
  *
  *  @discussion The default value is `NO`, which disables "springy" or "bouncy" items in the layout. 
  *  Set to `YES` if you want items to have spring behavior dynamics. You *must* set this property from `viewDidAppear:`
- *  in your `JSQMessagesViewController` subclass.
+ *  in your `CCJSQMessagesViewController` subclass.
  *
  *  @warning Though this feature is mostly stable, it is still considered an experimental feature.
  */
@@ -90,14 +98,14 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 
 /**
  *  The font used to display the body a text message in the message bubble of each 
- *  `JSQMessagesCollectionViewCell` in the collectionView. 
+ *  `CCJSQMessagesCollectionViewCell` in the collectionView. 
  *  
  *  @discussion The default value is the preferred system font for `UIFontTextStyleBody`. This value must not be `nil`.
  */
 @property (strong, nonatomic) UIFont *messageBubbleFont;
 
 /**
- *  The horizontal spacing used to lay out the `messageBubbleContainerView` frame within each `JSQMessagesCollectionViewCell`.
+ *  The horizontal spacing used to lay out the `messageBubbleContainerView` frame within each `CCJSQMessagesCollectionViewCell`.
  *  This container view holds the message bubble image and message contents of a cell.
  *
  *  This value specifies the horizontal spacing between the `messageBubbleContainerView` and
@@ -113,13 +121,13 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
  *  @warning This value may not be exact when the layout object finishes laying out its items, due to the constraints it must satisfy. 
  *  This value should be considered more of a recommendation or suggestion to the layout, not an exact value.
  *
- *  @see JSQMessagesCollectionViewCellIncoming.
- *  @see JSQMessagesCollectionViewCellOutgoing.
+ *  @see CCJSQMessagesCollectionViewCellIncoming.
+ *  @see CCJSQMessagesCollectionViewCellOutgoing.
  */
 @property (assign, nonatomic) CGFloat messageBubbleLeftRightMargin;
 
 /**
- *  The inset of the frame of the text view within the `messageBubbleContainerView` of each `JSQMessagesCollectionViewCell`.
+ *  The inset of the frame of the text view within the `messageBubbleContainerView` of each `CCJSQMessagesCollectionViewCell`.
  *  The inset values should be positive and are applied in the following ways:
  *  
  *  1. The right value insets the text view frame on the side adjacent to the avatar image 
@@ -144,7 +152,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 @property (assign, nonatomic) UIEdgeInsets messageBubbleTextViewFrameInsets;
 
 /**
- *  The inset of the text container's layout area within the text view's content area in each `JSQMessagesCollectionViewCell`. 
+ *  The inset of the text container's layout area within the text view's content area in each `CCJSQMessagesCollectionViewCell`. 
  *  The specified inset values should be positive.
  *
  *  @discussion The default value is `{7.0f, 14.0f, 7.0f, 14.0f}`.
@@ -160,7 +168,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
  *  The size of the avatar image view for incoming messages.
  *
  *  @discussion The default value is `(30.0f, 30.0f)`. Set to `CGSizeZero` to remove incoming avatars.
- *  You may use `kJSQMessagesCollectionViewAvatarSizeDefault` to size your avatars to the default value.
+ *  You may use `kCCJSQMessagesCollectionViewAvatarSizeDefault` to size your avatars to the default value.
  */
 @property (assign, nonatomic) CGSize incomingAvatarViewSize;
 
@@ -168,7 +176,7 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
  *  The size of the avatar image view for outgoing messages.
  *
  *  @discussion The default value is `(30.0f, 30.0f)`. Set to `CGSizeZero` to remove outgoing avatars.
- *  You may use `kJSQMessagesCollectionViewAvatarSizeDefault` to size your avatars to the default value.
+ *  You may use `kCCJSQMessagesCollectionViewAvatarSizeDefault` to size your avatars to the default value.
  */
 @property (assign, nonatomic) CGSize outgoingAvatarViewSize;
 
@@ -180,13 +188,16 @@ FOUNDATION_EXPORT const CGFloat kJSQMessagesCollectionViewAvatarSizeDefault;
 @property (assign, nonatomic) NSUInteger cacheLimit;
 
 /**
- *  Computes and returns the size of the `messageBubbleImageView` property of a `JSQMessagesCollectionViewCell`
- *  at the specified indexPath. The returned size contains the required dimensions to display the entire message contents. 
- *  Note, this is *not* the entire cell, but only its message bubble.
+ *  Computes and returns the size of the `messageBubbleImageView` property of a `CCJSQMessagesCollectionViewCell`
+ *  at the specified indexPath.
  *
  *  @param indexPath The index path of the item to be displayed.
  *
  *  @return The size of the message bubble for the item displayed at indexPath.
+ *
+ *  @discussion The layout uses its `bubbleSizeCalculator` object to perform this computation.
+ *  The returned size contains the required dimensions to display the entire message contents.
+ *  Note, this is *not* the entire cell, but only its message bubble.
  */
 - (CGSize)messageBubbleSizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 

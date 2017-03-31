@@ -5,7 +5,7 @@
 //  Created by Michael Waterfall on 17/10/2010.
 //  Copyright 2010 d3i. All rights reserved.
 //
-#import <UIKit/UIKit.h>
+
 #import "CCIDMPhoto.h"
 #import "CCIDMPhotoBrowser.h"
 
@@ -135,28 +135,20 @@ caption = _caption;
             // Load async from file
             [self performSelectorInBackground:@selector(loadImageFromFileAsync) withObject:nil];
         } else if (_photoURL) {
-            // Load async from web (using AFNetworking)
-            NSURLRequest *request = [[NSURLRequest alloc] initWithURL:_photoURL
-                                                          cachePolicy:NSURLRequestReturnCacheDataElseLoad
-                                                      timeoutInterval:0];
-            
-            CCAFHTTPRequestOperation *op = [[CCAFHTTPRequestOperation alloc] initWithRequest:request];
-            op.responseSerializer = [CCAFImageResponseSerializer serializer];
-
-            [op setCompletionBlockWithSuccess:^(CCAFHTTPRequestOperation *operation, id responseObject) {
-                UIImage *image = responseObject;
-                self.underlyingImage = image;
-                [self performSelectorOnMainThread:@selector(imageLoadingComplete) withObject:nil waitUntilDone:NO];
-            } failure:^(CCAFHTTPRequestOperation *operation, NSError *error) { }];
-            
-            [op setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
-                CGFloat progress = ((CGFloat)totalBytesRead)/((CGFloat)totalBytesExpectedToRead);
+            // Load async from web (using SDWebImageManager)
+            CCSDWebImageManager *manager = [CCSDWebImageManager sharedManager];
+            [manager loadImageWithURL:_photoURL options:CCSDWebImageRetryFailed|CCSDWebImageHandleCookies progress:^(NSInteger receivedSize, NSInteger expectedSize, NSURL * _Nullable targetURL) {
+                CGFloat progress = ((CGFloat)receivedSize)/((CGFloat)expectedSize);
                 if (self.progressUpdateBlock) {
                     self.progressUpdateBlock(progress);
                 }
+            } completed:^(UIImage * _Nullable image, NSData * _Nullable data, NSError * _Nullable error, CCSDImageCacheType cacheType, BOOL finished, NSURL * _Nullable imageURL) {
+                if (image) {
+                    self.underlyingImage = image;
+                    [self performSelectorOnMainThread:@selector(imageLoadingComplete) withObject:nil waitUntilDone:NO];
+                }
             }];
-            
-            [[NSOperationQueue mainQueue] addOperation:op];
+
         } else {
             // Failed - no source
             self.underlyingImage = nil;
@@ -209,8 +201,7 @@ caption = _caption;
 }*/
 
 - (UIImage *)decodedImageWithImage:(UIImage *)image {
-    if (image.images)
-    {
+    if (image.images) {
         // Do not decode animated images
         return image;
     }

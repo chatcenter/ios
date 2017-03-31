@@ -18,14 +18,6 @@
 
 #import "CCJSQMessagesLabel.h"
 
-
-@interface CCJSQMessagesLabel ()
-
-- (void)jsq_configureLabel;
-
-@end
-
-
 @implementation CCJSQMessagesLabel
 
 #pragma mark - Initialization

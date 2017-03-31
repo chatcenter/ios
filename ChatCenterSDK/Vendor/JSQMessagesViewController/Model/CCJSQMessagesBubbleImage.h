@@ -22,11 +22,11 @@
 #import "CCJSQMessageBubbleImageDataSource.h"
 
 /**
- *  A `JSQMessagesBubbleImage` model object represents a message bubble image, and is immutable. 
- *  This is a concrete class that implements the `JSQMessageBubbleImageDataSource` protocol.
+ *  A `CCJSQMessagesBubbleImage` model object represents a message bubble image, and is immutable. 
+ *  This is a concrete class that implements the `CCJSQMessageBubbleImageDataSource` protocol.
  *  It contains a regular message bubble image and a highlighted message bubble image.
  *
- *  @see JSQMessagesBubbleImageFactory.
+ *  @see CCJSQMessagesBubbleImageFactory.
  */
 @interface CCJSQMessagesBubbleImage : NSObject <CCJSQMessageBubbleImageDataSource, NSCopying>
 
@@ -46,10 +46,15 @@
  *  @param image            The regular message bubble image. This value must not be `nil`.
  *  @param highlightedImage The highlighted message bubble image. This value must not be `nil`.
  *
- *  @return An initialized `JSQMessagesBubbleImage` object if successful, `nil` otherwise.
+ *  @return An initialized `CCJSQMessagesBubbleImage` object if successful, `nil` otherwise.
  *
- *  @see JSQMessagesBubbleImageFactory.
+ *  @see CCJSQMessagesBubbleImageFactory.
  */
-- (instancetype)initWithMessageBubbleImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage;
+- (instancetype)initWithMessageBubbleImage:(UIImage *)image highlightedImage:(UIImage *)highlightedImage NS_DESIGNATED_INITIALIZER;
+
+/**
+ *  Not a valid initializer.
+ */
+- (id)init NS_UNAVAILABLE;
 
 @end

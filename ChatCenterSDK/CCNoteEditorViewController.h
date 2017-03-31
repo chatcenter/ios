@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface CCNoteEditorViewController : UIViewController
+@interface CCNoteEditorViewController : UIViewController<UITextViewDelegate>
 @property (nonatomic, strong) NSString *channelId;
 @property (nonatomic, strong) NSString *noteContent;
 @property (strong, nonatomic) IBOutlet UITextView *noteTextView;

@@ -1,5 +1,5 @@
 /*
-  ChatCenterSDK.strings Version 1.1.0
+  ChatCenterSDK.strings Version 1.1.1
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -288,3 +288,12 @@
 "ChatCenter iO for iOS" = "ChatCenter iO for iOS";
 "Version" = "バージョン";
 "Open Dashboard" = "ダッシュボードを開く";
+"is typing" = "が入力中";
+"Delete" = "削除";
+"Close" = "終了";
+"Reopen" = "再開";
+"Assign" = "担当";
+"チャットを削除しますか？" = "チャットを削除しますか？";
+"チャットをクローズしますか？" = "チャットをクローズしますか？";
+"New chat" = "新規チャット";
+"New suggestion" = "新規サジェスチョン";

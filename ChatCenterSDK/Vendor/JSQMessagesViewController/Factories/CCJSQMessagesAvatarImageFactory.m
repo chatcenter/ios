@@ -21,22 +21,6 @@
 #import "UIColor+CCJSQMessages.h"
 
 
-@interface CCJSQMessagesAvatarImageFactory ()
-
-+ (UIImage *)jsq_circularImage:(UIImage *)image
-                  withDiameter:(NSUInteger)diameter
-              highlightedColor:(UIColor *)highlightedColor;
-
-+ (UIImage *)jsq_imageWitInitials:(NSString *)initials
-                  backgroundColor:(UIColor *)backgroundColor
-                        textColor:(UIColor *)textColor
-                             font:(UIFont *)font
-                         diameter:(NSUInteger)diameter;
-
-@end
-
-
-
 @implementation CCJSQMessagesAvatarImageFactory
 
 #pragma mark - Public

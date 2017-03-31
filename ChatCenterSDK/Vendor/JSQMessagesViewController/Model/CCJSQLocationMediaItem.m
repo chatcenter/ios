@@ -28,10 +28,6 @@
 
 @property (strong, nonatomic) UIImageView *cachedMapImageView;
 
-- (void)createMapViewSnapshotForLocation:(CLLocation *)location
-                        coordinateRegion:(MKCoordinateRegion)region
-                   withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion;
-
 @end
 
 
@@ -46,13 +42,6 @@
         [self setLocation:location withCompletionHandler:nil];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    _location = nil;
-    _cachedMapSnapshotImage = nil;
-    _cachedMapImageView = nil;
 }
 
 - (void)clearCachedMediaViews
@@ -77,12 +66,12 @@
 
 #pragma mark - Map snapshot
 
-- (void)setLocation:(CLLocation *)location withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion
+- (void)setLocation:(CLLocation *)location withCompletionHandler:(CCJSQLocationMediaItemCompletionBlock)completion
 {
     [self setLocation:location region:MKCoordinateRegionMakeWithDistance(location.coordinate, 500.0, 500.0) withCompletionHandler:completion];
 }
 
-- (void)setLocation:(CLLocation *)location region:(MKCoordinateRegion)region withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion
+- (void)setLocation:(CLLocation *)location region:(MKCoordinateRegion)region withCompletionHandler:(CCJSQLocationMediaItemCompletionBlock)completion
 {
     _location = [location copy];
     _cachedMapSnapshotImage = nil;
@@ -99,7 +88,7 @@
 
 - (void)createMapViewSnapshotForLocation:(CLLocation *)location
                         coordinateRegion:(MKCoordinateRegion)region
-                   withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion
+                   withCompletionHandler:(CCJSQLocationMediaItemCompletionBlock)completion
 {
     NSParameterAssert(location != nil);
     
@@ -112,7 +101,7 @@
     
     [snapShotter startWithQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
               completionHandler:^(MKMapSnapshot *snapshot, NSError *error) {
-                  if (error) {
+                  if (snapshot == nil) {
                       NSLog(@"%s Error creating map snapshot: %@", __PRETTY_FUNCTION__, error);
                       return;
                   }
@@ -120,6 +109,9 @@
                   MKAnnotationView *pin = [[MKPinAnnotationView alloc] initWithAnnotation:nil reuseIdentifier:nil];
                   CGPoint coordinatePoint = [snapshot pointForCoordinate:location.coordinate];
                   UIImage *image = snapshot.image;
+                  
+                  coordinatePoint.x += pin.centerOffset.x - (CGRectGetWidth(pin.bounds) / 2.0);
+                  coordinatePoint.y += pin.centerOffset.y - (CGRectGetHeight(pin.bounds) / 2.0);
                   
                   UIGraphicsBeginImageContextWithOptions(image.size, YES, image.scale);
                   {
@@ -142,7 +134,7 @@
     return self.location.coordinate;
 }
 
-#pragma mark - JSQMessageMediaData protocol
+#pragma mark - CCJSQMessageMediaData protocol
 
 - (UIView *)mediaView
 {

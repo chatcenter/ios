@@ -28,20 +28,20 @@
 
 
 /**
- *  The `JSQMessagesCollectionView` class manages an ordered collection of message data items and presents
+ *  The `CCJSQMessagesCollectionView` class manages an ordered collection of message data items and presents
  *  them using a specialized layout for messages.
  */
 @interface CCJSQMessagesCollectionView : UICollectionView <CCJSQMessagesCollectionViewCellDelegate>
 
 /**
  *  The object that provides the data for the collection view.
- *  The data source must adopt the `JSQMessagesCollectionViewDataSource` protocol.
+ *  The data source must adopt the `CCJSQMessagesCollectionViewDataSource` protocol.
  */
 @property (weak, nonatomic) id<CCJSQMessagesCollectionViewDataSource> dataSource;
 
 /**
  *  The object that acts as the delegate of the collection view. 
- *  The delegate must adpot the `JSQMessagesCollectionViewDelegateFlowLayout` protocol.
+ *  The delegate must adopt the `CCJSQMessagesCollectionViewDelegateFlowLayout` protocol.
  */
 @property (weak, nonatomic) id<CCJSQMessagesCollectionViewDelegateFlowLayout> delegate;
 
@@ -56,7 +56,7 @@
  *  The default value is `YES`, meaning that the typing indicator will display on the left side of the
  *  collection view for incoming messages.
  *
- *  @discussion If your `JSQMessagesViewController` subclass displays messages for right-to-left
+ *  @discussion If your `CCJSQMessagesViewController` subclass displays messages for right-to-left
  *  languages, such as Arabic, set this property to `NO`.
  *
  */
@@ -78,23 +78,23 @@
 @property (strong, nonatomic) UIColor *loadEarlierMessagesHeaderTextColor;
 
 /**
- *  Returns a `JSQMessagesTypingIndicatorFooterView` object for the specified index path
+ *  Returns a `CCJSQMessagesTypingIndicatorFooterView` object for the specified index path
  *  that is configured using the collection view's properties:
  *  typingIndicatorDisplaysOnLeft, typingIndicatorMessageBubbleColor, typingIndicatorEllipsisColor.
  *
  *  @param indexPath The index path specifying the location of the supplementary view in the collection view. This value must not be `nil`.
  *
- *  @return A valid `JSQMessagesTypingIndicatorFooterView` object.
+ *  @return A valid `CCJSQMessagesTypingIndicatorFooterView` object.
  */
 - (CCJSQMessagesTypingIndicatorFooterView *)dequeueTypingIndicatorFooterViewForIndexPath:(NSIndexPath *)indexPath;
 
 /**
- *  Returns a `JSQMessagesLoadEarlierHeaderView` object for the specified index path
+ *  Returns a `CCJSQMessagesLoadEarlierHeaderView` object for the specified index path
  *  that is configured using the collection view's loadEarlierMessagesHeaderTextColor property.
  *
  *  @param indexPath The index path specifying the location of the supplementary view in the collection view. This value must not be `nil`.
  *
- *  @return A valid `JSQMessagesLoadEarlierHeaderView` object.
+ *  @return A valid `CCJSQMessagesLoadEarlierHeaderView` object.
  */
 - (CCJSQMessagesLoadEarlierHeaderView *)dequeueLoadEarlierMessagesViewHeaderForIndexPath:(NSIndexPath *)indexPath;
 

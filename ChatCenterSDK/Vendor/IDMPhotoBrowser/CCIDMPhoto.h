@@ -1,6 +1,6 @@
 //
-//  IDMPhoto.h
-//  IDMPhotoBrowser
+//  CCIDMPhoto.h
+//  CCIDMPhotoBrowser
 //
 //  Created by Michael Waterfall on 17/10/2010.
 //  Copyright 2010 d3i. All rights reserved.
@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "CCIDMPhotoProtocol.h"
-#import "CCAFNetworking.h"
+#import "CCSDWebImageManager.h"
 
 // This class models a photo/image and it's caption
 // If you want to handle photos, caching, decompression
@@ -17,12 +17,12 @@
 @interface CCIDMPhoto : NSObject <CCIDMPhoto>
 
 // Progress download block, used to update the circularView
-typedef void (^IDMProgressUpdateBlock)(CGFloat progress);
+typedef void (^CCIDMProgressUpdateBlock)(CGFloat progress);
 
 // Properties
 @property (nonatomic, strong) NSString *caption;
 @property (nonatomic, strong) NSURL *photoURL;
-@property (nonatomic, strong) IDMProgressUpdateBlock progressUpdateBlock;
+@property (nonatomic, strong) CCIDMProgressUpdateBlock progressUpdateBlock;
 @property (nonatomic, strong) UIImage *placeholderImage;
 
 // Class

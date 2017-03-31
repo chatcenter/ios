@@ -20,15 +20,15 @@
 #import <UIKit/UIKit.h>
 
 /**
- *  The `JSQMessageAvatarImageDataSource` protocol defines the common interface through which
- *  a `JSQMessagesViewController` and `JSQMessagesCollectionView` interact with avatar image model objects.
+ *  The `CCJSQMessageAvatarImageDataSource` protocol defines the common interface through which
+ *  a `CCJSQMessagesViewController` and `CCJSQMessagesCollectionView` interact with avatar image model objects.
  *
  *  It declares the required and optional methods that a class must implement so that instances
- *  of that class can be display properly within a `JSQMessagesCollectionViewCell`.
+ *  of that class can be display properly within a `CCJSQMessagesCollectionViewCell`.
  *
- *  A concrete class that conforms to this protocol is provided in the library. See `JSQMessagesAvatarImage`.
+ *  A concrete class that conforms to this protocol is provided in the library. See `CCJSQMessagesAvatarImage`.
  *
- *  @see JSQMessagesAvatarImage.
+ *  @see CCJSQMessagesAvatarImage.
  */
 @protocol CCJSQMessageAvatarImageDataSource <NSObject>
 

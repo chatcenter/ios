@@ -5,21 +5,21 @@
 //  Created by Michael Waterfall on 04/11/2009.
 //  Copyright 2009 d3i. All rights reserved.
 //
-#import <UIKit/UIKit.h>
+
 #import <Foundation/Foundation.h>
 
-@protocol IDMTapDetectingImageViewDelegate;
+@protocol CCIDMTapDetectingImageViewDelegate;
 
 @interface CCIDMTapDetectingImageView : UIImageView {
-	id <IDMTapDetectingImageViewDelegate> __weak tapDelegate;
+	id <CCIDMTapDetectingImageViewDelegate> __weak tapDelegate;
 }
-@property (nonatomic, weak) id <IDMTapDetectingImageViewDelegate> tapDelegate;
+@property (nonatomic, weak) id <CCIDMTapDetectingImageViewDelegate> tapDelegate;
 - (void)handleSingleTap:(UITouch *)touch;
 - (void)handleDoubleTap:(UITouch *)touch;
 - (void)handleTripleTap:(UITouch *)touch;
 @end
 
-@protocol IDMTapDetectingImageViewDelegate <NSObject>
+@protocol CCIDMTapDetectingImageViewDelegate <NSObject>
 @optional
 - (void)imageView:(UIImageView *)imageView singleTapDetected:(UITouch *)touch;
 - (void)imageView:(UIImageView *)imageView doubleTapDetected:(UITouch *)touch;

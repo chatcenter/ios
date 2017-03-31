@@ -145,7 +145,7 @@ static const float TOP_VIEW_HEIGHT = 255;
     NSString *inputText = [textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     long textLenght = inputText.length;
     if (textLenght > CCWidgetInputTitleLimit) {
-        textView.text = [inputText substringToIndex:textLenght - 1];
+        textView.text = [inputText substringToIndex:CCWidgetInputTitleLimit];
     }
 }
 
