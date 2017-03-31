@@ -181,7 +181,7 @@ Please insert the following code in a convenient place.
 PresentViewController a chat view with NavigationControlloer.
 To add to existing NavigationControlloer, please use getChatView which returns standalone chat view.
 
-The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.
+The following are the parameters. Bold is mandatory. If other parameters are not required, please specify nil.<br>
 **Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
 <table>
 	<tr>
@@ -293,7 +293,7 @@ Ex)
 Call history view to display chat history list.  
 <p align="center"><img src="InstallationImages/historyview_en.PNG" width="375" height="667"></p>
 
-Please insert the following code in a convenient place.
+Please insert the following code in a convenient place.<br>
 **Note: In case of no authentication, user will be logged out automatically 30 days after login. Also, we do not currently support to link authentication processing afterwards**  
 
 ```
@@ -656,11 +656,6 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 <td colspan="2">Please specify url related to creating channel as below ``Ex @{@"url":@"https://app.asana.com"}``</td>
 <td>Please specify nil</td>
 </tr>
-<tr>
-<td>completionHandler</td>
-<td colspan="2">Please specify call back processing after communication. Communication result is included</td>
-<td>Please specify nil</td>
-</tr>
 </table>
 
 ```
@@ -689,7 +684,6 @@ Please insert the following code in a convenient place.
 
 ``-(void)isOrgOnline:(CDVInvokedUrlCommand *)command;``
 
-Boldface is a required parameter. If other parameters are not required, please specify nil.
 <table>
 <tr>
 <th>Name of parameter</th>
@@ -698,10 +692,6 @@ Boldface is a required parameter. If other parameters are not required, please s
 <tr>
 <td><b>orgUid:(NSString *)</b></td>
 <td><b>Please specify team ID you want to get online / offline</b></td>
-</tr>
-<tr>
-<td>completeHandler</td>
-<td>Please specify call back processing after communication. Communication result is included.</td>
 </tr>
 </table>
 
@@ -720,7 +710,7 @@ getOnLine: function() {
              // Method
              "isOrgOnline",
              // Arguments
-             []
+             ["Org_Name"]
         );
     }
 
