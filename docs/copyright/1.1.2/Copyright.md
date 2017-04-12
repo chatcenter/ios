@@ -1,3 +1,6 @@
+---
+layout: default
+---
 
 ### SWTableViewCell
 Copyright 2013 Christopher Wendel 
