@@ -766,6 +766,67 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
     }
 }
 
+- (void)getChannels: (NSString *) orgUid channelName:(NSString *) channelName limit:(int)limit lastUpdatedAt:(NSDate *)lastUpdatedAt completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    
+    NSString *url = [NSString stringWithFormat:@"/api/channels/"];
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    NSString *authentication = [NSString stringWithFormat:@"%@", token];
+    NSMutableDictionary *param;
+    if (lastUpdatedAt == nil){
+        param = @{@"org_uid":orgUid, @"channel_name": channelName, @"limit": [NSNumber numberWithInteger: limit]}.mutableCopy;
+    }else{
+        NSTimeInterval lastUpdatedAtInterval = [lastUpdatedAt timeIntervalSince1970];
+        NSNumber *lastUpdatedAtNumber = [NSNumber numberWithDouble:lastUpdatedAtInterval];
+        param = @{@"org_uid":orgUid, @"channel_name": channelName, @"limit": [NSNumber numberWithInteger: limit], @"last_updated_at": lastUpdatedAtNumber}.mutableCopy;
+    }
+    // Business funnel.
+    NSDictionary *filterBusinessFunnel = [CCUserDefaultsUtil filterBusinessFunnel];
+    if (filterBusinessFunnel != nil) {
+        [param setObject:[filterBusinessFunnel objectForKey:@"id"] forKey:@"funnel_id"];
+    }
+    // Message status.
+    NSArray <NSString *> *filterMessageStatus = [CCUserDefaultsUtil filterMessageStatus];
+    NSMutableArray <NSString *> *statuses = [[NSMutableArray alloc] init];
+    if(filterMessageStatus != nil){
+        for (NSString *itemTitle in filterMessageStatus) {
+            if ([itemTitle isEqualToString:CCHistoryFilterMessagesStatusTypeUnassigned]) {
+                [statuses addObject:@"0"];
+            } else if ([itemTitle isEqualToString:CCHistoryFilterMessagesStatusTypeAssignedToMe]) {
+                [statuses addObject:@"1"];
+                NSString *uid  = [[CCConstants sharedInstance] getKeychainUid];
+                [param setObject:uid forKey:@"assignee_id"];
+            } else if ([itemTitle isEqualToString:CCHistoryFilterMessagesStatusTypeClosed]) {
+                [statuses addObject:@"2"];
+            } else if ([itemTitle isEqualToString:CCHistoryFilterMessagesStatusTypeAll]) {
+                [statuses addObject:@"0"];
+                [statuses addObject:@"1"];
+            }
+        }
+    }
+    else{
+        [statuses addObject:@"0"];
+        [statuses addObject:@"1"];
+    }
+    if (statuses.count > 0) {
+        [param setObject:statuses forKey:@"status"];
+    }
+    
+    [self.requestSerializer setValue:authentication forHTTPHeaderField:@"Authentication"];
+    [self setDeviceInfo]; ///Just in case can not get infomation, calling this everytime
+    [self GET:url
+   parameters:param
+     progress:^(NSProgress * _Nonnull uploadProgress) {
+     }
+      success:^(NSURLSessionDataTask *operation, id responseObject) {
+          NSLog(@"response: %@", responseObject);
+          if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+      } failure:^(NSURLSessionDataTask *operation, NSError *error) {
+          NSLog(@"error:%@", error);
+          if(completionHandler != nil) completionHandler(nil, error, operation);
+      }];
+    
+}
+
 - (void)getChannel:(NSString*)channelUid
  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation))completionHandler
 {
@@ -1162,6 +1223,30 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
         } failure:^(NSURLSessionDataTask * _Nonnull operation, NSError * _Nonnull error) {
           if(completionHandler != nil) completionHandler(nil, error, operation);
         }];
+}
+
+#pragma mark - get calendar
+-(void)getGoolgeCalandar:(NSString*)fromDate toDate:(NSString*)toDate completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler {
+    if (_appToken == nil) {
+        if(completionHandler != nil) completionHandler(nil, nil);
+        return;
+    }
+    NSString* url = @"/api/calendars/";
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    [self.requestSerializer setValue:token forHTTPHeaderField:@"Authentication"];
+    [self setDeviceInfo];
+    NSLog(@"viethd getCalandarWidget fromDate %@; toDate: %@",fromDate,toDate);
+    NSDictionary *param = @{@"from":fromDate, @"to":toDate, @"locale":@"en"};
+    [self GET:url
+   parameters:param
+     progress:^(NSProgress * _Nonnull uploadProgress) {
+     }
+      success:^(NSURLSessionDataTask * _Nonnull operation, id  _Nonnull responseObject) {
+          if(completionHandler != nil) completionHandler(responseObject, nil);
+      } failure:^(NSURLSessionDataTask * _Nonnull operation, NSError * _Nonnull error) {
+          if(completionHandler != nil) completionHandler(nil, error);
+      }];
+    
 }
 
 #pragma mark - Video Call

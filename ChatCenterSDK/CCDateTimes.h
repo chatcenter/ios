@@ -24,6 +24,13 @@
                        date:(NSDate *)date
                       times:(NSArray *)times;
 
+-(instancetype)initWithDateCalendar:(NSString *)year
+                      month:(NSString *)month
+                        day:(NSString *)day
+                  weekIndex:(NSInteger)weekIndex
+                       date:(NSDate *)date
+                      times:(NSArray *)times;
+
 - (NSComparisonResult)compare:(CCDateTimes *)otherObject;
 
 @end

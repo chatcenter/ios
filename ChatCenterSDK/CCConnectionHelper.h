@@ -9,7 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "CCHistoryViewController.h"
 #import "CCConectionHelperDelegate.h"
-//#import "NSURLSessionDataTaskManager.h"
+
+#ifdef CC_WATCH
+#import <WatchConnectivity/WatchConnectivity.h>
+#endif
 
 static const NSInteger normalAlertTag = 1;
 static const NSInteger authenticationAlertTag = 2;
@@ -30,7 +33,11 @@ typedef enum {
     DoubbleButtonAlert,
 } CCAlertType;
 
+#ifdef CC_WATCH
+@interface CCConnectionHelper : NSObject <WCSessionDelegate>
+#else
 @interface CCConnectionHelper : NSObject
+#endif
 
 @property (nonatomic, strong) UIViewController *currentView;
 @property (nonatomic, weak) id<CCConectionHelperDelegate> delegate;
@@ -74,6 +81,8 @@ typedef enum {
               limit:(int)limit
              lastId:(NSNumber *)lastId
   completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+
+- (void)loadChannels:(BOOL)showProgress orgUid: (NSString *) orgUid channelName:(NSString *) channelName limit:(int)limit  lastUpdatedAt:(NSDate *)lastUpdatedAt completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 
 -(void)loadChannels:(BOOL)showProgress
      getChennelType:(int)getChennelType
@@ -226,6 +235,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
                              funnelId:(NSString *)funnelId
                          showProgress:(BOOL)showProgress
                     completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+-(void)getGoolgeCalandar:(NSString*)fromDate toDate:(NSString*)toDate completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 #pragma mark - Video call
 -(void)getCallIdentity:(NSString *)channelId
             callerInfo:(NSDictionary *)callerInfo
@@ -249,4 +259,10 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
               user:(NSDictionary *)user
  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (BOOL)isSupportVideoChat;
+
+#ifdef CC_WATCH
+#pragma mark - Watch App
+- (void) switchChannel: (NSString *)channelId;
+- (void) switchApp: (NSString *)appToken;
+#endif
 @end

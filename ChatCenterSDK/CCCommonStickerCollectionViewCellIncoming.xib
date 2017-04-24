@@ -60,7 +60,7 @@
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="GVY-1j-0Ml" userLabel="Sticker container">
                         <rect key="frame" x="37" y="40" width="275" height="114"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="r2r-Wc-Yf0">
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="r2r-Wc-Yf0">
                                 <rect key="frame" x="0.0" y="0.0" width="30" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="38" id="Dvb-G8-QhE"/>

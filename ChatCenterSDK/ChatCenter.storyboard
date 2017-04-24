@@ -365,6 +365,7 @@
                     <extendedEdge key="edgesForExtendedLayout" bottom="YES"/>
                     <connections>
                         <outlet property="collectionView" destination="hbW-Ht-Q5J" id="t9y-cJ-fjL"/>
+                        <outlet property="constraintSegmentedViewHeight" destination="I7g-6a-pVY" id="kvk-kr-Rai"/>
                         <outlet property="segmentedControl" destination="B6t-nd-VIu" id="Ovb-Rn-hcK"/>
                     </connections>
                 </viewController>

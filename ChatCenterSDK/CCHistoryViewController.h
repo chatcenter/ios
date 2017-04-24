@@ -15,7 +15,7 @@
 #import "CCHistoryFilterViewController.h"
 #import "CCMGSwipeTableCell.h"
 
-@interface CCHistoryViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate, CCConectionHelperDelegate, CCHistoryNavigationTitleViewDelegate, CCHistoryFilterViewControllerDelegate, CCMGSwipeTableCellDelegate>
+@interface CCHistoryViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate, CCConectionHelperDelegate, CCHistoryNavigationTitleViewDelegate, CCHistoryFilterViewControllerDelegate, CCMGSwipeTableCellDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
 
 @property (nonatomic, weak) CCUISplitViewController* mySplitViewController;
 @property (nonatomic, weak) CCChatAndHistoryViewController* chatAndHistoryViewController;

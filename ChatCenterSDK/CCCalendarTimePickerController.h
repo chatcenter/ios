@@ -25,6 +25,7 @@
 @property (weak, nonatomic) id<CCCommonWidgetEditorDelegate> delegate;
 
 @property (nonatomic) NSMutableArray *selectedDateTimes;
+@property (nonatomic) NSMutableArray *calendarDateTimes;
 @property (weak, nonatomic) IBOutlet CCCalendarWeekScrollView *calendarWeekScrollView;
 @property (weak, nonatomic) IBOutlet CCCalendarTimeScrollView *calendarTimeScrollView;
 @property (weak, nonatomic) IBOutlet UILabel *CCCalendarDateLabel;

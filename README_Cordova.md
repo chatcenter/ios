@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.1
+# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.2
 
 ## Table of contents
 * [Getting Started](#GettingStarted)
@@ -393,9 +393,11 @@ resetHistory: function() {
 ## Options
 <a id="Pushnotification"></a>
 ### 1. Push notification
-**※ When using Push notification, please send the file and password on page 12 to our person in charge.**
+#### 1-1. Set p12 file in web dashboard
+Please set your p12 file from web dashboard as below("Settings">"Manage Mobile Push Endpoints").
+<p align="center"><img src="InstallationImages/pushsetting.png"></p>
 
-#### 1-1. Turning on Push notification
+#### 1-2. Turning on Push notification
 
 #### (a)Store device token to NSUserDefaults
 If you store device token to NSUserDefaults as @"deviceToken", the token is sent to ChatCenter sever when opening Chat/History view.
@@ -417,7 +419,7 @@ If you store device token to NSUserDefaults as @"deviceToken", the token is sent
 #### (b)Set device token when displaying chat view
 When calling chat view, set the device token acquired from Apple to deviceToken. Push notification is enabled at the time of registration.
 
-#### 1-2. Turning off Push notification
+#### 1-3. Turning off Push notification
 Please call the following at the timing when you want to invalidate Push notification, such as sign-out.
 ```
 - (void)signOutDeviceToken:(CDVInvokedUrlCommand *)command;
@@ -436,7 +438,7 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 </tr>
 </table>
 
-#### 1-3. Receiving Push notification
+#### 1-4. Receiving Push notification
 Please retrieve org_uid from the payload at reception and perform Display chat view.
 The following payload will be sent.
 

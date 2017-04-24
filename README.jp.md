@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDKインストールガイド Ver. 1.1.0
+# ChatCenteriO iOS SDKインストールガイド Ver. 1.1.2
 
 ## 目次
 * [Getting Started](#GettingStarted)
@@ -548,9 +548,12 @@ ChatCenter iOS SDKではチャットデータをローカルDB(Coredata)へ保�
 ## オプション
 <a id="Pushnotification"></a>
 ### 1. プッシュ通知
-**※ プッシュ通知を実施される場合は、p12ファイル及びパスワードを弊社の担当者へ送付ください。**
 
-#### 1-1. プッシュ通知のオン
+#### 1-1. p12ファイルをweb dashboard上で登録する
+以下のようにweb dashboard（設定＞プッシュ通知）上でプッシュ通知で使用するp12ファイルを登録してください。
+<p align="center"><img src="InstallationImages/pushsetting_ja.png"></p>
+
+#### 1-2. プッシュ通知のオン
 
 #### (a)チャットビューを表示時に行う
 チャットビューの呼び出しの際に、Appleより取得したデバイストークンをdeviceTokenに設定してください。登録の時点でプッシュ通知は有効になります。
@@ -627,7 +630,7 @@ ChatCenter iOS SDKではチャットデータをローカルDB(Coredata)へ保�
 </tr>
 </table>
 
-#### 1-2. プッシュ通知のオフ
+#### 1-3. プッシュ通知のオフ
 サインアウト等、プッシュ通知を無効にしたいタイミングで以下をコールしてください。
 
 ```

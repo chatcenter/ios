@@ -46,6 +46,9 @@ int const CCTopRowTableView = 0;
     UIView *newMessageView;
     NSString *currentOrgId;
     NSArray *channelRoles;
+    UISearchBar *searchBar;
+    NSString *lastSeachText;
+    UIVisualEffectView *blurEffectView;
 }
 
 @property (weak, nonatomic) IBOutlet UITextView *noCellMessage;
@@ -504,7 +507,7 @@ int const CCTopRowTableView = 0;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (_tableView.editing) return; ///During edit
-    
+
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NSDictionary *labels = [self.ChannelLabels objectAtIndex:indexPath.row];
     
@@ -555,6 +558,9 @@ int const CCTopRowTableView = 0;
         [self removeNavigationBottomBorder];
         [self.navigationController pushViewController:chatView animated:YES];
         self.isReturnFromChatView = YES;
+#ifdef CC_WATCH
+        [[CCConnectionHelper sharedClient] switchChannel:labels[@"channelId"]];
+#endif
     }
 }
 
@@ -614,6 +620,10 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 
 #pragma mark - scroll view delegates
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self.view endEditing:YES];
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     float bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height;
     if (bottomEdge >= scrollView.contentSize.height && !_isLoadingMore) {
@@ -632,7 +642,14 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
             getChannelsType = CCGetChannelsMine;
             orgUid = nil;
         }
-        [self loadChannels:getChannelsType orgUid:orgUid lastUpdatedAt:lastUpdatedAt];
+//        [self loadChannels:getChannelsType orgUid:orgUid lastUpdatedAt:lastUpdatedAt];
+        NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (inputText == nil || [inputText isEqual:[NSNull null]] || [inputText isEqualToString:@""]) {
+            [self loadChannels:getChannelsType orgUid:orgUid lastUpdatedAt:lastUpdatedAt];
+        } else {
+            NSString *channelName = self->searchBar.text;
+            [self loadChannelsByChannelName:channelName lastUpdatedAt:lastUpdatedAt];
+        }
     }else{
         // we are at the top
         NSLog(@"scrollViewDidEndDeceleratingTop");
@@ -705,6 +722,24 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     [navigationTitleView updateSearchLabel];
     
     [self navigationBarSetup];
+    if ([[CCConstants sharedInstance] isAgent]) {
+        if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES){
+            searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, self.chatAndHistoryViewController.navigationController.navigationBar.topItem.titleView.frame.size.height + 30, 320, 44)];
+        } else {
+            searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, self.navigationItem.titleView.frame.size.height + 20, self.view.frame.size.width, 44)];
+        }
+        searchBar.delegate = self;
+        [self.view addSubview:searchBar];
+        self.tableView.contentInset = UIEdgeInsetsMake(searchBar.frame.size.height, 0, 0, 0);
+        
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        blurEffectView.frame = CGRectMake(self.view.bounds.origin.x, searchBar.frame.origin.y + searchBar.frame.size.height, self.view.bounds.size.width, self.view.bounds.size.height);
+        blurEffectView.alpha = 0.9;
+        blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didTapOverlayView)];
+        [blurEffectView addGestureRecognizer:tapGes];
+    }
 }
 
 - (UIButton *)barButtonItemWithImageName:(NSString *)imageName hilightedImageName:(NSString *)hilightedImageName disableImageName:(NSString*)disableImageName target:(id)target selector:(SEL)action
@@ -724,6 +759,11 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     self.ChatChannelIds = [[NSMutableArray alloc] init];
     self.ChannelLabels = [[NSMutableArray alloc] init];
     self.ChannelTotalUnreadMessageNum = 0;
+}
+
+- (void) initInputSearchBar {
+    searchBar.text = @"";
+    [self.view endEditing:YES];
 }
 
 - (void)setNavigationBarStyles{
@@ -958,8 +998,14 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 -(void)loadLocalData:(BOOL)isOrgChange{
-    [self loadLocalChannles:isOrgChange lastUpdatedAt:nil];
     [self navigationBarSetup];
+    if ([CCConstants sharedInstance].isAgent == YES) {
+        NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (inputText.length > 0) {
+                return;
+        }
+    }
+    [self loadLocalChannles:isOrgChange lastUpdatedAt:nil];
 }
 
 - (void) reloadLocalDataWhenComeOnline {
@@ -973,6 +1019,15 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 - (void)receiveChannelJoinFromWebSocket:(NSString *)channelId newChannel:(BOOL)newChannel{
+    if ([CCConstants sharedInstance].isAgent == YES) {
+        NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (inputText.length > 0) {
+            if (![self.ChatChannelIds containsObject:channelId]) {
+                return;
+            }
+        }
+    }
+    
     if ([CCConstants sharedInstance].isAgent == YES && newChannel == YES){
         [self loadLocalData:NO];
     }
@@ -1005,6 +1060,15 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                           userAdmin:(BOOL)userAdmin
                              answer:(NSDictionary *)answer
 {
+    if ([CCConstants sharedInstance].isAgent == YES) {
+        NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (inputText.length > 0) {
+            if (![self.ChatChannelIds containsObject:channelId]) {
+                return;
+            }
+        }
+    }
+    
     BOOL shouldShowNewMessageButton = YES;
     for (UITableViewCell *cell in [self.tableView visibleCells]) {
         NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
@@ -1461,6 +1525,28 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     [self.tableView reloadData];
 }
 
+- (void) loadChannelsByChannelName:(NSString *) channelName lastUpdatedAt:(NSDate *)lastUpdatedAt  {
+    NSString *orgUid;
+    if ([CCConstants sharedInstance].isAgent == YES) {
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        if ([ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"] == nil) return;
+        orgUid = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
+    }else{
+        orgUid = nil;
+    }
+    lastSeachText = channelName;
+    BOOL showProgress = NO;
+    if (lastUpdatedAt == nil) {
+        showProgress = YES;
+    }
+    [[CCConnectionHelper sharedClient] loadChannels:YES orgUid:orgUid channelName:channelName limit:CCloadChannelFirstLimit lastUpdatedAt:lastUpdatedAt completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        [self.refreshControl endRefreshing];
+        if (result != nil) {
+            [self loadLocalChannles:NO lastUpdatedAt:lastUpdatedAt];
+        }
+    }];
+}
+
 #pragma mark - Actions
 -(void)pressSwitchApp{
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
@@ -1533,9 +1619,11 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         [self pressLogout];
     }];
     [modalLitView setDidTapSwitchAppCallback:^{
+        [self initInputSearchBar];
         [self pressSwitchApp];
     }];
     [modalLitView setDidTapSwitchOrgCallback:^{
+        [self initInputSearchBar];
         [self pressSwitchOrg];
     }];
     
@@ -1573,10 +1661,17 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)refreshOccured:(id)sender
 {
+    
     if ([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable || CCLocalDevelopmentMode) {
         [self.refreshControl beginRefreshing];
+        
         if ([CCConstants sharedInstance].isAgent== YES) {
-            [self reloadOrgsAndChannelsAndConnectWebSocket];
+            NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if (inputText.length > 0) {
+                [self loadChannelsByChannelName:inputText lastUpdatedAt:nil];
+            } else {
+                [self reloadOrgsAndChannelsAndConnectWebSocket];
+            }
         }else{
             [self reloadChannelsAndConnectWebSocket];
         }
@@ -1588,6 +1683,13 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 -(void)reloadChannelsAndConnectWebSocket{
+    if ([CCConstants sharedInstance].isAgent == YES) {
+        NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if (inputText.length > 0) {
+                return;
+        }
+    }
+    
     [[CCConnectionHelper sharedClient] loadChannelsAndConnectWebSocket:NO getChennelType:CCGetChannelsMine isOrgChange:NO org_uid:nil completionHandler:^(NSString *result,  NSError *error, NSURLSessionDataTask *operation) {
         if (result != nil) {
             [self.refreshControl endRefreshing];
@@ -1826,6 +1928,10 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     navigationBottomBorder = nil;
 }
 
+- (void)didTapOverlayView{
+    [self.view endEditing:YES];
+}
+
 #pragma mark - Keyboard Control For MenuBar
 
 -(void)keyboardWillShow:(NSNotification*)notification
@@ -1856,7 +1962,6 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     _tableView.scrollIndicatorInsets = UIEdgeInsetsMake(contentInsets.top, contentInsets.left, 0, contentInsets.right);
     
     [UIView commitAnimations];
-    
     return YES;
 }
 
@@ -1944,7 +2049,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     NSMutableAttributedString *messageAttributedString = [[NSMutableAttributedString alloc] initWithString:message attributes:messageStringAttributes];
     NSUInteger messageWidth = messageAttributedString.size.width;
     messageWidth = MIN(messageWidth, MAX_WITH_MESSAGE);
-    newMessageView = [[UIView alloc] initWithFrame: CGRectMake ( 0, 0,paddingMessageLabel + messageWidth + paddingMessageImage * 2 + imageSize, imageSize + paddingMessageImage * 2)];
+    newMessageView = [[UIView alloc] initWithFrame: CGRectMake ( 0, searchBar.frame.origin.y + searchBar.frame.size.height,paddingMessageLabel + messageWidth + paddingMessageImage * 2 + imageSize, imageSize + paddingMessageImage * 2)];
     newMessageView.backgroundColor = [UIColor colorWithRed:132.0f/255.0f
                                                      green:132.0f/255.0f
                                                       blue:132.0f/255.0f
@@ -1975,16 +2080,70 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
     [imageNewMessageView addSubview:checkmarkButton];
     [newMessageView addSubview:imageNewMessageView];
     // Add new message view to super view
-    newMessageView.center = CGPointMake(self.view.bounds.size.width / 2, 64 + newMessageView.bounds.size.height/2);
+    newMessageView.center = CGPointMake(self.view.bounds.size.width / 2, 64 + searchBar.frame.size.height + newMessageView.bounds.size.height/2);
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollToTop)];
     [newMessageView addGestureRecognizer:tapGesture];
     [self.view addSubview:newMessageView];
     [self.view bringSubviewToFront:newMessageView];
+    if ([self.view.subviews containsObject:blurEffectView]) {
+        [self.view bringSubviewToFront:blurEffectView];
+    }
 }
 
 -(void) scrollToTop {
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     [newMessageView removeFromSuperview];
+}
+
+#pragma mark - SearchBar delegate.
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar {
+    [self.view addSubview:blurEffectView];
+    [self.view bringSubviewToFront:blurEffectView];
+}
+
+- (void)searchBar:(UISearchBar *)bar textDidChange:(NSString *)searchText {
+    NSString *inputText = self->searchBar.text;
+    if (inputText.length == 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.view endEditing:YES];
+            [bar endEditing:YES];
+        });
+    }
+}
+
+- (void)searchBarTextDidEndEditing:(UISearchBar *)searchBar {
+    [blurEffectView removeFromSuperview];
+    NSString *inputText = [self->searchBar.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    
+    if (inputText == nil || [inputText isEqual:[NSNull null]] || [inputText isEqualToString:@""]) {
+        if (lastSeachText == nil || [lastSeachText isEqual:[NSNull null]] || [lastSeachText isEqualToString:@""]) {
+            return;
+        } else {
+            int getChannelsType;
+            NSString *orgUid;
+            if ([CCConstants sharedInstance].isAgent == YES) {
+                NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+                if ([ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"] == nil) return;
+                getChannelsType = CCGetChannels;
+                orgUid = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
+            }else{
+                getChannelsType = CCGetChannelsMine;
+                orgUid = nil;
+            }
+            lastSeachText = @"";
+            [self initChatData];
+            [self loadChannels:getChannelsType orgUid:orgUid lastUpdatedAt:nil];
+        }
+    } else {
+        if (![inputText isEqualToString:lastSeachText]) {
+            [self loadChannelsByChannelName:inputText lastUpdatedAt:nil];
+        }
+    }
+}
+
+- (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    [self.view endEditing:YES];
 }
 
 @end

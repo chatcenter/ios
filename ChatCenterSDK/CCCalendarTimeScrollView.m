@@ -8,6 +8,7 @@
 
 #import "CCCalendarTimeScrollView.h"
 #import "CCHourTime.h"
+#import "CCGoogleCalendarTimeSlotView.h"
 
 @interface CCCalendarTimeScrollView(){
     CGPoint slotDraggingStartPoint;
@@ -30,6 +31,7 @@ const int COLUMN_HEIGHT = 32;
 const int SCROLL_VIEW_OFFSET = 20;
 const int LEFT_OFFSET = 35;
 const int SWIPE_MOVEMENT = 60;
+const int TAG_VIEW_GOOGLE_CALENDAR = 99;
 
 #pragma mark - Initialization
 
@@ -217,7 +219,7 @@ const int SWIPE_MOVEMENT = 60;
     addedSlotViews = [NSMutableArray array];
     
     for (CCHourTime *hourTime in self.selectedHourTimes) {
-        int num = [hourTime.startHour intValue]*2 + 1;
+        int num = [hourTime.startHour intValue]*2 + 1 + [hourTime.startTime intValue]/30;
         int columnNum = ([hourTime.endHour intValue] - [hourTime.startHour intValue])*2 + ([hourTime.endTime intValue] - [hourTime.startTime intValue])/30;
         CGRect frame = CGRectMake(LEFT_OFFSET,COLUMN_HEIGHT*num-SCROLL_VIEW_OFFSET,width,COLUMN_HEIGHT*columnNum);
         CCCalendarTimeSlotView *calendarTimeSlotView = [[CCCalendarTimeSlotView alloc] initWithFrameAndLabels:frame
@@ -229,6 +231,39 @@ const int SWIPE_MOVEMENT = 60;
         [addedSlotViews addObject:calendarTimeSlotView];
     }
     [self resetProperties];
+}
+
+#pragma mark - google Calendar
+
+- (void)updateGoolgeCalendar:(NSMutableArray *)selectedHourTimes{
+    self.calendarHourTimes = selectedHourTimes;
+    
+    CGRect rect = [UIScreen mainScreen].bounds; ///calendarWeekScrollView.frame.size.width will be as same as screen width
+    int width = rect.size.width - LEFT_OFFSET;
+    
+    for (CCGoogleCalendarTimeSlotView *calendarTimeSlotView in self.subviews) {
+        if (calendarTimeSlotView.tag == TAG_VIEW_GOOGLE_CALENDAR) {
+            [calendarTimeSlotView removeFromSuperview];
+        }
+    }
+
+    for (CCHourTime *hourTime in self.calendarHourTimes) {
+        
+        int num = [hourTime.startHour intValue]*2 + 1 + [hourTime.startTime intValue]/30;
+        CGFloat columnNum = ([hourTime.endHour floatValue] - [hourTime.startHour floatValue])*2 + ([hourTime.endTime floatValue] - [hourTime.startTime floatValue])/30;
+        
+        int scaleWith = hourTime.overLappinglevel + 1;
+
+        CGRect frame = CGRectMake(self.frame.size.width - (width/ scaleWith),COLUMN_HEIGHT*num-SCROLL_VIEW_OFFSET,width / scaleWith ,COLUMN_HEIGHT*columnNum);
+        
+        CCGoogleCalendarTimeSlotView *calendarTimeSlotView = [[CCGoogleCalendarTimeSlotView alloc] initWithFrameAndLabels:frame hourTime:hourTime is24h:is24h];
+        calendarTimeSlotView.tag = TAG_VIEW_GOOGLE_CALENDAR;
+        [self addSubview:calendarTimeSlotView];
+        [self bringSubviewToFront:calendarTimeSlotView];
+    }
+    if ([selectedHourTimes count] > 0) {
+        [self displayCurrentLine];
+    }
 }
 
 #pragma mark - Drag events

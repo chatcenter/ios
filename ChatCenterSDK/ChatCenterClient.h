@@ -82,6 +82,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
  channelInformations:(NSDictionary *)channelInformations
                 note:(NSString *)note
    completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+- (void)getChannels:(NSString *) orgUid channelName:(NSString *) channelName limit:(int)limit lastUpdatedAt:(NSDate *)lastUpdatedAt completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (void)createChannel:(NSString*)orgUid
               userIds:(NSArray *)userIds
         directMessage:(BOOL)directMessage
@@ -120,6 +121,8 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
 ///App
 - (void)getApps:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (void)getAppManifest:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+// get google calendar
+-(void)getGoolgeCalandar:(NSString*)fromDate toDate:(NSString*)toDate completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler;
 
 #pragma mark - Video Call
 - (void) getCallIdentity: (NSString *) channelId

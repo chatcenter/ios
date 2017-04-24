@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDK Installation guide Ver. 1.1.0
+# ChatCenteriO iOS SDK Installation guide Ver. 1.1.2
 
 ## Table of contents
 * [Getting Started](#GettingStarted)
@@ -552,9 +552,11 @@ In ChatCenter iOS SDK, chat data is saved in the local DB (Coredata), please res
 ## Options
 <a id="Pushnotification"></a>
 ### 1. Push notification
-**※ When using Push notification, please send the file and password on page 12 to our person in charge.**
+#### 1-1. Set p12 file in web dashboard
+Please set your p12 file from web dashboard as below("Settings">"Manage Mobile Push Endpoints").
+<p align="center"><img src="InstallationImages/pushsetting.png"></p>
 
-#### 1-1. Turning on Push notification
+#### 1-2. Turning on Push notification
 
 #### (a)Set device token when displaying chat view
 When calling chat view, set the device token acquired from Apple to deviceToken. Push notification is enabled at the time of registration.
@@ -631,7 +633,7 @@ The following are the parameters. Bold is mandatory. If other parameters are not
 </tr>
 </table>
 
-#### 1-2. Turning off Push notification
+#### 1-3. Turning off Push notification
 Please call the following at the timing when you want to invalidate Push notification, such as sign-out.
 
 ```

@@ -44,7 +44,7 @@
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kJa-eg-hnZ" userLabel="Sticker container">
                         <rect key="frame" x="33" y="40" width="275" height="112"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gnP-u1-Luw">
+                            <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gnP-u1-Luw">
                                 <rect key="frame" x="0.0" y="0.0" width="30" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="38" id="MpT-Ut-a8s"/>

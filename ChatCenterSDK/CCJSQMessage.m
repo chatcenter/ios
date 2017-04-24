@@ -625,6 +625,7 @@
         return nil;
     }
 }
+
 + (NSNumber*)getNumberAtPath:(NSString*)path fromObject:(id)inObj {
     id retObj = [self getObjectAtPath:path fromObject:inObj];
     if ([retObj isKindOfClass:[NSNumber class]]) {

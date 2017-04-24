@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16D30" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="CCGoogleCalendarTimeSlotView">
+            <connections>
+                <outlet property="calendarSlotView" destination="RYa-9n-UkV" id="hJ7-YM-O1X"/>
+                <outlet property="contentView" destination="ovd-GQ-pwN" id="L1m-fZ-Axi"/>
+                <outlet property="timeLabel" destination="nBD-tq-1f2" id="9j9-Dc-FSd"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view tag="99" contentMode="scaleToFill" id="ovd-GQ-pwN" userLabel="ContentView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="26"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RYa-9n-UkV">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="26"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10:30 PM - 11:00 PM" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nBD-tq-1f2">
+                            <rect key="frame" x="5" y="5" width="115" height="10"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="10" id="OO9-dY-vgn"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" weight="light" pointSize="12"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" red="0.82745098039215681" green="0.82745098039215681" blue="0.82745098039215681" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="nBD-tq-1f2" firstAttribute="leading" secondItem="RYa-9n-UkV" secondAttribute="leading" constant="5" id="1MV-gi-qkh"/>
+                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="nBD-tq-1f2" secondAttribute="trailing" constant="5" id="AKs-ip-ymN"/>
+                        <constraint firstItem="nBD-tq-1f2" firstAttribute="top" secondItem="RYa-9n-UkV" secondAttribute="top" constant="5" id="sXv-0W-yvG"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="3"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" red="0.96078431372549022" green="0.96078431372549022" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </view>
+            </subviews>
+            <constraints>
+                <constraint firstItem="RYa-9n-UkV" firstAttribute="top" secondItem="ovd-GQ-pwN" secondAttribute="top" id="Se4-Oj-xDG"/>
+                <constraint firstItem="RYa-9n-UkV" firstAttribute="leading" secondItem="ovd-GQ-pwN" secondAttribute="leading" id="U0F-Kc-an2"/>
+                <constraint firstAttribute="bottom" secondItem="RYa-9n-UkV" secondAttribute="bottom" id="ccJ-36-fiQ"/>
+                <constraint firstAttribute="trailing" secondItem="RYa-9n-UkV" secondAttribute="trailing" id="dQp-pZ-gvp"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="474" y="328"/>
+        </view>
+    </objects>
+</document>

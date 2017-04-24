@@ -22,9 +22,11 @@
 
 @property (nonatomic, weak) id<CCCalendarTimeScrollViewDelegate>timeScrollViewDelegate;
 @property (nonatomic) NSMutableArray *selectedHourTimes;
+@property (nonatomic) NSMutableArray *calendarHourTimes;
 @property (nonatomic) NSMutableArray *hourTimes;
 
 - (void)updateSelections:(NSMutableArray *)selectedHourTimes;
+- (void)updateGoolgeCalendar:(NSMutableArray *)calendarHourTimes;
 - (void)displayCurrentLine;
 
 @end

@@ -26,6 +26,23 @@
     return self;
 }
 
+-(instancetype)initWithHourTime:(NSString *)startHour
+                      startTime:(NSString *)startTime
+                        endHour:(NSString *)endHour
+                        endTime:(NSString *)endTime
+                        summary:(NSString *)summary {
+    self = [super init];
+    if(self)
+    {
+        self.startHour = startHour;
+        self.startTime = startTime;
+        self.endHour = endHour;
+        self.endTime = endTime;
+        self.summary = summary;
+    }
+    return self;
+}
+
 #pragma mark - NSCopying
 
 - (id)copyWithZone:(NSZone *)zone {

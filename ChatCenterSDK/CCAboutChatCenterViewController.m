@@ -9,7 +9,6 @@
 #import "CCAboutChatCenterViewController.h"
 #import "ChatCenterPrivate.h"
 #import "CCWebViewController.h"
-#import "CCCopyrightViewController.h"
 #import "CCConstants.h"
 #import <SafariServices/SafariServices.h>
 
@@ -115,19 +114,13 @@
             break;
         case 4:
             title = CCLocalizedString(@"Copyright");
+            urlString = @"https://chatcenter.github.io/ios/Copyright/1.1.2/Copyright";
             break;
         default:
             break;
     }
-    if (indexPath.row != 4) {
-        if (urlString != nil) {
-            [self pushWebView:urlString title:title];
-        }
-    } else {
-        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
-        CCCopyrightViewController *viewController = [storyboard  instantiateViewControllerWithIdentifier:@"CCCopyrightViewController"];
-        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
-        [self.navigationController pushViewController:viewController animated:YES];
+    if (urlString != nil) {
+        [self pushWebView:urlString title:title];
     }
 }
 

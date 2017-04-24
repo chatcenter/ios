@@ -26,6 +26,7 @@
 @property (nullable, nonatomic, strong) NSMutableArray *appFixedPhrases;
 @property (nullable, nonatomic, strong) NSMutableArray *orgFixedPhrases;
 @property (nullable, nonatomic, strong) NSMutableArray *userFixedPhrases;
+@property (nullable, nonatomic, strong) NSMutableArray *guestFixedPhrases;
 @property (nullable, nonatomic, weak) id delegate;
 
 @end

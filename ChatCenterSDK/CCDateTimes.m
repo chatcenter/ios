@@ -60,6 +60,25 @@
     return self;
 }
 
+-(instancetype)initWithDateCalendar:(NSString *)year
+                              month:(NSString *)month
+                                day:(NSString *)day
+                          weekIndex:(NSInteger)weekIndex
+                               date:(NSDate *)date
+                              times:(NSArray *)times {
+    self = [super init];
+    if(self)
+    {
+        self.year = year;
+        self.month = month;
+        self.day = day;
+        self.weekIndex = weekIndex;
+        self.date = date;
+        self.times = times;
+    }
+    return self;
+}
+
 #pragma mark - NSCopying
 
 - (id)copyWithZone:(NSZone *)zone {

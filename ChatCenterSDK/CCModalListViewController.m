@@ -418,6 +418,9 @@ int const CCMaxLoadOrg = 10000;
     [ud synchronize];
     [[CCCoredataBase sharedClient] deleteAllOrg];
     [ChatCenter setAppToken:app[@"token"] completionHandler:^{
+#if CC_WATCH
+    [[CCConnectionHelper sharedClient] switchApp:app[@"token"]];
+#endif
         if(self.didTapSwitchAppCallback != nil) self.didTapSwitchAppCallback();
         ///close self
         [self.view setNeedsUpdateConstraints];

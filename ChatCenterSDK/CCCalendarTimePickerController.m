@@ -9,6 +9,7 @@
 #import "CCCalendarTimePickerController.h"
 #import "CCCommonStickerCollectionViewCell.h"
 #import "CCCommonWidgetPreviewViewController.h"
+#import "CCParseUtils.h"
 
 @interface CCCalendarTimePickerController (){
     CCCalendarWeekView *lastView;
@@ -23,6 +24,7 @@
     NSDate *seletedDate;
     NSDateFormatter *dateFormatter;
     BOOL isRotating;
+    NSDateFormatter *formaterFrom;
 }
 @end
 
@@ -55,6 +57,8 @@ const int VIEW_COUNT = 3;
     topBorderDate.backgroundColor = [UIColor colorWithRed:242/255.0 green:242/255.0 blue:242/255.0 alpha:1.0].CGColor;
     [self.CCCalendarDateLabel.layer addSublayer:topBorderDate];
     
+    self.calendarDateTimes = [NSMutableArray array];
+    
     [self setUpWeekView];
     [self setUpTimeView];
     
@@ -64,6 +68,10 @@ const int VIEW_COUNT = 3;
     [self updateDateLabelText]; ///Update date
     
     currentPage = 1;
+    
+    formaterFrom = [[NSDateFormatter alloc] init];
+    [formaterFrom setDateFormat:@"yyyy-MM-dd"];
+    [formaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
     
     ///Commented out because of unexpected behavior when the device(UIInterfaceOrientationMaskPortrait) rotated
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad){
@@ -119,6 +127,272 @@ const int VIEW_COUNT = 3;
     }
 }
 
+#pragma mark - Google Calendar
+- (void)getGoogleCalendar:(NSDate *)fromDate toDate:(NSDate *)toDate {
+    
+    NSString *inputFromDate =  [NSString stringWithFormat: @"%f", [fromDate timeIntervalSince1970]];
+    NSString *inputToDate =  [NSString stringWithFormat: @"%f", [toDate timeIntervalSince1970]];
+    [[CCConnectionHelper sharedClient] getGoolgeCalandar:inputFromDate toDate:inputToDate completionHandler:^(NSDictionary *result, NSError *error) {
+        CCHourTime *hourTime;
+        self.calendarDateTimes = [NSMutableArray array];
+        NSMutableArray *calendarHourTimes = [[NSMutableArray alloc] init];
+        if (result[@"calendar"] == nil || result[@"calendar"] == [NSNull null]) {
+            [self updateSelections];
+            return;
+        }
+        NSArray * calendars = result[@"calendar"];
+        NSCalendar *crtcalendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        for (NSDictionary *calendar in calendars) {
+            NSDate *startDate;
+            NSDate *endDate;
+
+            NSString *summary = [CCParseUtils stringTryGet:calendar key:@"summary"];
+            long startDateTime = [CCParseUtils longTryGet:calendar  key:@"start"];
+            long endDateTime = [CCParseUtils longTryGet:calendar  key:@"end"];
+            BOOL isAllDay = [calendar[@"isAllDay"] boolValue];
+            NSDate *startEvent = [NSDate dateWithTimeIntervalSince1970:startDateTime];
+            NSDate * endEvent = [NSDate dateWithTimeIntervalSince1970:endDateTime];
+
+            NSUInteger flags;
+#if __IPHONE_8_0
+            flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekday | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
+#else
+            flags = NSYearCalendarUnit | NSMonthCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit;
+#endif
+            NSDateComponents *fromComponents = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] components:flags fromDate:startEvent];
+            startDate = [crtcalendar dateFromComponents:fromComponents];
+            NSDateComponents *endComponents = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] components:flags fromDate:endEvent];
+            endDate = [crtcalendar dateFromComponents:endComponents];
+            
+            long dulation = (endComponents.hour - fromComponents.hour) * 60 +  (endComponents.minute - fromComponents.minute);
+            
+            if (isAllDay || dulation <= 0) {
+                NSString *strStartAllDay = [CCParseUtils stringTryGet:calendar key:@"startAllDay"];
+                NSDate *startAllDay = [formaterFrom dateFromString:strStartAllDay];
+                
+                if ([self date:fromDate isBetweenDate:startAllDay andDate:toDate]) {
+                    hourTime = [[CCHourTime alloc] initWithHourTime:@"00"
+                                                          startTime:@"00"
+                                                            endHour:@"24"
+                                                            endTime:@"00" summary:summary];
+                    [calendarHourTimes insertObject:hourTime atIndex:0];
+                }
+                
+            } else {
+                if ([self checkIsDay:startDate toDate:fromDate] && [self checkIsDay:endDate toDate:fromDate]) {
+                    hourTime = [[CCHourTime alloc] initWithHourTime:[NSMutableString stringWithFormat:@"%ld",(long)fromComponents.hour]
+                                                          startTime:[NSMutableString stringWithFormat:@"%02ld",(long)fromComponents.minute]
+                                                            endHour:[NSMutableString stringWithFormat:@"%ld",(long)endComponents.hour]
+                                                            endTime:[NSMutableString stringWithFormat:@"%02ld",(long)endComponents.minute] summary:summary];
+                    [calendarHourTimes addObject: hourTime];
+                } else if ([self checkIsDay:startDate toDate:fromDate]) {
+                    hourTime = [[CCHourTime alloc] initWithHourTime:[NSMutableString stringWithFormat:@"%ld",(long)fromComponents.hour]
+                                                          startTime:[NSMutableString stringWithFormat:@"%02ld",(long)fromComponents.minute]
+                                                            endHour:@"24"
+                                                            endTime:@"00" summary:summary];
+                    [calendarHourTimes addObject:hourTime];
+                } else if ([self checkIsDay:endDate toDate:fromDate]) {
+                    hourTime = [[CCHourTime alloc] initWithHourTime:@"00"
+                                                          startTime:@"00"
+                                                            endHour:[NSMutableString stringWithFormat:@"%ld",(long)endComponents.hour]
+                                                            endTime:[NSMutableString stringWithFormat:@"%02ld",(long)endComponents.minute] summary:summary];
+                    [calendarHourTimes addObject: hourTime];
+                } else if ([self date:fromDate isBetweenDate:startDate andDate:endDate]) {
+                    hourTime = [[CCHourTime alloc] initWithHourTime:@"00"
+                                                          startTime:@"00"
+                                                            endHour:@"24"
+                                                            endTime:@"00" summary:summary];
+                    [calendarHourTimes insertObject:hourTime atIndex:0];
+                }
+            }
+        }
+        if (calendarHourTimes.count > 0) {
+//            [self sortGoogleEvent:calendarHourTimes];
+            [self setGoogleEventLevel:calendarHourTimes];
+            
+        }
+
+        NSUInteger flags;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
+        flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekday | NSCalendarUnitDay;
+#else
+        flags = NSYearCalendarUnit | NSMonthCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit;
+#endif
+        NSDateComponents *crtComponents = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] components:flags fromDate:fromDate];
+        NSInteger crtYear = crtComponents.year;
+        NSInteger crtMonth  = crtComponents.month;
+        NSInteger crtWeekDay = crtComponents.weekday;
+        NSInteger crtDay = crtComponents.day;
+        
+        NSString *day = [NSString stringWithFormat:@"%ld", (long)crtDay];
+        NSString *month = [NSString stringWithFormat:@"%ld", (long)crtMonth];
+        NSString *year = [NSString stringWithFormat:@"%ld", (long)crtYear];
+        NSInteger weekIndex;
+        if (crtWeekDay == 1) { ///Sunday
+            weekIndex = 6;
+        }else{
+            weekIndex = crtWeekDay - 2;
+        }
+
+        CCDateTimes *newDateTime = [[CCDateTimes alloc] initWithDateCalendar:year
+                                                               month:month
+                                                                 day:day
+                                                           weekIndex:weekIndex
+                                                                date:fromDate
+                                                               times:[calendarHourTimes copy]];
+        [self.calendarDateTimes addObject:newDateTime];
+        [self updateGoolgeCalendar];
+    }];
+}
+
+- (BOOL)checkIsDay: (NSDate *)fromDate toDate:(NSDate *) toDate {
+    NSString *strFromDate = [formaterFrom stringFromDate:fromDate];
+    NSString *strToDate = [formaterFrom stringFromDate:toDate];
+    
+    if ([strFromDate isEqualToString:strToDate]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (BOOL)date:(NSDate*)date isBetweenDate:(NSDate*)beginDate andDate:(NSDate*)endDate
+{
+    if ([date compare:beginDate] == NSOrderedAscending)
+        return NO;
+    
+    if ([date compare:endDate] == NSOrderedDescending)
+        return NO;
+    
+    return YES;
+}
+
+- (void)sortGoogleEvent:(NSMutableArray *)googleCalendarHourTimes {
+    for(int i=0; i< googleCalendarHourTimes.count - 1; i++) {
+        CCHourTime *hourTime = googleCalendarHourTimes[i];
+        int startHour = [hourTime.startHour intValue];
+        int startTime = [hourTime.startTime intValue];
+        int endHour = [hourTime.endHour intValue];
+        int endTime = [hourTime.endTime intValue];
+        int dulation = (endHour -  startHour)* 60 + endTime - startTime;
+        for (int j = i + 1 ; j < googleCalendarHourTimes.count; j ++) {
+            CCHourTime * nextHourTime = googleCalendarHourTimes[j];
+            int nextStartHour = [nextHourTime.startHour intValue];
+            int nextStartTime= [nextHourTime.startTime intValue];
+            int nextEndHour = [nextHourTime.endHour intValue];
+            int nextEndTime = [nextHourTime.endTime intValue];
+            if ([nextHourTime isEqual:hourTime]) {
+                continue;
+            }
+            int nextDulation = (nextEndHour - nextStartHour) * 60 + nextEndTime - nextStartTime;
+            if ((startHour > nextEndHour) || (nextStartHour > endHour)) {
+                continue;
+            } else if (startHour <= nextStartHour) {
+                if (nextDulation >= dulation) {
+                    googleCalendarHourTimes[j] = hourTime;
+                    googleCalendarHourTimes[i] = nextHourTime;
+               }
+            } else if (nextStartHour < endHour) {
+                if (nextDulation <= dulation) {
+                    googleCalendarHourTimes[j] = hourTime;
+                    googleCalendarHourTimes[i] = nextHourTime;
+                } else {
+                    for (int j = i - 1; j >=0; j --) {
+                        CCHourTime *preHourTime = googleCalendarHourTimes[j];
+                        int preStartHour = [preHourTime.startHour intValue];
+                        int preStartTime= [preHourTime.startTime intValue];
+                        int preEndHour = [preHourTime.endHour intValue];
+                        int preEndTime = [preHourTime.endTime intValue];
+                        int preDulation = (preEndHour - preStartHour) * 60 + preEndTime - preStartTime;
+                        
+                        if (startHour <= preStartHour && preDulation >= nextDulation) {
+                            nextHourTime.overLappinglevel = preHourTime.overLappinglevel + 1;
+                            googleCalendarHourTimes[i+1] = nextHourTime;
+                            break;
+                        } else if (nextStartHour < endHour) {
+                            if (nextDulation <= dulation) {
+                                nextHourTime.overLappinglevel = hourTime.overLappinglevel + 1;
+                                googleCalendarHourTimes[i+1] = nextHourTime;
+                                break;
+                            } else if (nextDulation <= preDulation) {
+                                nextHourTime.overLappinglevel = hourTime.overLappinglevel;
+                                googleCalendarHourTimes[i] = nextHourTime;
+                                hourTime.overLappinglevel ++;
+                                googleCalendarHourTimes[i+1] = hourTime;
+                            }
+                        } else {
+                            nextHourTime.overLappinglevel = hourTime.overLappinglevel;
+                            googleCalendarHourTimes[i+1] = nextHourTime;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    [self setGoogleEventLevel:googleCalendarHourTimes];
+}
+
+- (void)setGoogleEventLevel:(NSMutableArray *)googleCalendarHourTimes {
+
+    for(int i=0; i< googleCalendarHourTimes.count - 1; i++) {
+        CCHourTime *hourTime = googleCalendarHourTimes[i];
+        int startHour = [hourTime.startHour intValue];
+        int startTime = [hourTime.startTime intValue];
+        int endHour = [hourTime.endHour intValue];
+        int endTime = [hourTime.endTime intValue];
+        int dulation = (endHour -  startHour)* 60 + endTime - startTime;
+        CCHourTime * nextHourTime = googleCalendarHourTimes[i+1];
+        int nextStartHour = [nextHourTime.startHour intValue];
+        int nextStartTime= [nextHourTime.startTime intValue];
+        int nextEndHour = [nextHourTime.endHour intValue];
+        int nextEndTime = [nextHourTime.endTime intValue];
+        int nextDulation = (nextEndHour - nextStartHour) * 60 + nextEndTime - nextStartTime;
+        if ((startHour > nextEndHour) || (nextStartHour > endHour)) {
+            for (int j = i - 1; j >=0; j --) {
+               CCHourTime *preHourTime = googleCalendarHourTimes[j];
+                int preStartHour = [preHourTime.startHour intValue];
+                int preStartTime= [preHourTime.startTime intValue];
+                int preEndHour = [preHourTime.endHour intValue];
+                int preEndTime = [preHourTime.endTime intValue];
+                int preDulation = (preEndHour - preStartHour) * 60 + preEndTime - preStartTime;
+                if (preHourTime.isAllDay || preHourTime.isStartDay) {
+                    hourTime.overLappinglevel ++;
+                    googleCalendarHourTimes[i] = hourTime;
+                    if (hourTime.isAllDay || hourTime.isStartDay) {
+                        nextHourTime.overLappinglevel = hourTime.overLappinglevel + 1;
+                        googleCalendarHourTimes[i+1] = nextHourTime;
+                        break;
+                    }
+                }
+                if (startHour <= preStartHour && preDulation >= nextDulation) {
+                    nextHourTime.overLappinglevel = preHourTime.overLappinglevel + 1;
+                    googleCalendarHourTimes[i+1] = nextHourTime;
+                    break;
+                } else if (nextStartHour < endHour) {
+                    if (nextDulation <= dulation) {
+                        nextHourTime.overLappinglevel = hourTime.overLappinglevel + 1;
+                        googleCalendarHourTimes[i+1] = nextHourTime;
+                        break;
+                    }
+                } else {
+                    nextHourTime.overLappinglevel = hourTime.overLappinglevel;
+                    googleCalendarHourTimes[i+1] = nextHourTime;
+                }
+            }
+            continue;
+        } else if (startHour <= nextStartHour && dulation >= nextDulation) {
+                nextHourTime.overLappinglevel = hourTime.overLappinglevel + 1;
+                googleCalendarHourTimes[i+1] = nextHourTime;
+        } else if (nextStartHour < endHour) {
+            if (nextDulation <= dulation) {
+                nextHourTime.overLappinglevel = hourTime.overLappinglevel + 1;
+                googleCalendarHourTimes[i+1] = nextHourTime;
+            }
+        }
+    }
+}
+
 #pragma mark - Weekly view
 
 - (void)setUpWeekView{
@@ -141,6 +415,8 @@ const int VIEW_COUNT = 3;
     frame.origin.y = 0;
     [self.calendarWeekScrollView scrollRectToVisible:frame animated:NO];
     [self.calendarWeekScrollView setDelegate:self];
+    
+    NSDate *fromDate;
     
     ///Current month
     NSDate *crtDate;
@@ -290,6 +566,19 @@ const int VIEW_COUNT = 3;
     [weekViews addObject:crntView];
     [self.calendarWeekScrollView addSubview:crntView];
     
+    int numberOfDay = [crtViewDayArray[crtWeekIndex][@"day"] intValue];
+    int numberOfMonth = [crtViewDayArray[crtWeekIndex][@"month"] intValue];
+    int numberOfYear = [crtViewDayArray[crtWeekIndex][@"year"] intValue];
+    
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = numberOfYear;
+    components.month = numberOfMonth;
+    components.day = numberOfDay;
+    components.hour = 0;
+    components.minute = 0;
+    components.second = 0;
+    fromDate = [[NSCalendar currentCalendar] dateFromComponents:components];
+    
     ///Adjusting days
     NSInteger targetNumberOfDay;
     NSInteger targetYear;
@@ -376,7 +665,7 @@ const int VIEW_COUNT = 3;
     lastView.delegate = self;
     [weekViews insertObject:lastView atIndex:0];
     [self.calendarWeekScrollView addSubview:lastView];
-    
+
     ///nextView
     NSMutableArray *nextViewDayArray = [NSMutableArray array];
     NSInteger nextViewStartDay;
@@ -447,6 +736,10 @@ const int VIEW_COUNT = 3;
                                           @"nsdate":date}];
         }
     }
+    
+    NSDate *endDate = [fromDate dateByAddingTimeInterval:+1*24*60*60];
+    [self getGoogleCalendar:fromDate toDate:endDate];
+    
     nextView = [[CCCalendarWeekView alloc] initWithFrame:CGRectMake(width*2,0,width,height)];
     [nextView setUp:[nextViewDayArray copy] dayOfWeek:-1];
     nextView.delegate = self;
@@ -488,9 +781,20 @@ const int VIEW_COUNT = 3;
     [crtWeekView updateWeekDay:crtWeekIndex]; ///Update circle
     [(CCCalendarWeekView *)weekViews[0] updateWeekDay:-1]; ///Clear circle
     [(CCCalendarWeekView *)weekViews[2] updateWeekDay:-1]; ///Clear circle
-    [self updateSelections]; ///Update selected hours
     [self updateDateLabelText]; ///Update date
+    [self updateGoolgeCalendar]; // update google calendar
     seletedDate = crtViewDayArray[crtWeekIndex][@"nsdate"];
+    
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = [crtViewDayArray[crtWeekIndex][@"year"] integerValue];
+    components.month = [crtViewDayArray[crtWeekIndex][@"month"] integerValue];
+    components.day = [crtViewDayArray[crtWeekIndex][@"day"] integerValue];
+    NSDate *date = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] dateFromComponents:components];
+    
+    NSDate *toDate = [date dateByAddingTimeInterval:+1*24*60*60];
+    
+    
+    [self getGoogleCalendar:date toDate:toDate];
 }
 
 - (void)movePageBack:(NSMutableArray *)views{
@@ -518,9 +822,18 @@ const int VIEW_COUNT = 3;
     [crtWeekView updateWeekDay:crtWeekIndex]; ///Update circle
     [(CCCalendarWeekView *)weekViews[0] updateWeekDay:-1]; ///Clear circle
     [(CCCalendarWeekView *)weekViews[2] updateWeekDay:-1]; ///Clear circle
-    [self updateSelections]; ///Update selected hours
     [self updateDateLabelText]; ///Update date
+    [self updateGoolgeCalendar]; // update google calendar
     seletedDate = crtViewDayArray[crtWeekIndex][@"nsdate"];
+    
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = [crtViewDayArray[crtWeekIndex][@"year"] integerValue];
+    components.month = [crtViewDayArray[crtWeekIndex][@"month"] integerValue];
+    components.day = [crtViewDayArray[crtWeekIndex][@"day"] integerValue];
+    NSDate *date = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] dateFromComponents:components];
+    NSDate *toDate = [date dateByAddingTimeInterval:+1*24*60*60];
+    
+    [self getGoogleCalendar:date toDate:toDate];
 }
 
 - (NSArray *)getNextViewDayArray:(NSArray *)dayArray{
@@ -744,6 +1057,15 @@ const int VIEW_COUNT = 3;
     [self updateSelections]; ///Update selected hours
     [self updateDateLabelText]; ///Update date
     seletedDate = crtViewDayArray[crtWeekIndex][@"nsdate"];
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = [crtViewDayArray[crtWeekIndex][@"year"] integerValue];
+    components.month = [crtViewDayArray[crtWeekIndex][@"month"] integerValue];
+    components.day = [crtViewDayArray[crtWeekIndex][@"day"] integerValue];
+    NSDate *date = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] dateFromComponents:components];
+    NSDate *toDate = [date dateByAddingTimeInterval:+1*24*60*60];
+    
+    [self getGoogleCalendar:date toDate:toDate];
+
 };
 
 - (void)moveBack{
@@ -759,6 +1081,15 @@ const int VIEW_COUNT = 3;
     [self updateSelections]; ///Update selected hours
     [self updateDateLabelText]; ///Update date
     seletedDate = crtViewDayArray[crtWeekIndex][@"nsdate"];
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = [crtViewDayArray[crtWeekIndex][@"year"] integerValue];
+    components.month = [crtViewDayArray[crtWeekIndex][@"month"] integerValue];
+    components.day = [crtViewDayArray[crtWeekIndex][@"day"] integerValue];
+    NSDate *date = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] dateFromComponents:components];
+    NSDate *toDate = [date dateByAddingTimeInterval:+1*24*60*60];
+    
+    [self getGoogleCalendar:date toDate:toDate];
+
 };
 
 - (void)moveWeekDay:(NSInteger)dayOfWeek{
@@ -766,9 +1097,16 @@ const int VIEW_COUNT = 3;
     [self updateSelectedDateTimes]; ///Store selected hours
     crtWeekIndex = dayOfWeek;
     [(CCCalendarWeekView *)weekViews[1] updateWeekDay:crtWeekIndex]; ///Update circle
-    [self updateSelections]; ///Update selected hours
     [self updateDateLabelText]; ///Update date
+    [self updateGoolgeCalendar]; // Update google calendar
     seletedDate = crtViewDayArray[crtWeekIndex][@"nsdate"];
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    components.year = [crtViewDayArray[crtWeekIndex][@"year"] integerValue];
+    components.month = [crtViewDayArray[crtWeekIndex][@"month"] integerValue];
+    components.day = [crtViewDayArray[crtWeekIndex][@"day"] integerValue];
+    NSDate *date = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian] dateFromComponents:components];
+    NSDate *toDate = [date dateByAddingTimeInterval:+1*24*60*60];
+    [self getGoogleCalendar:date toDate:toDate];
 };
 
 - (void)updateSelections{
@@ -783,6 +1121,21 @@ const int VIEW_COUNT = 3;
         selectedHourTimes = [[result times] mutableCopy];
     }
     [self.calendarTimeScrollView updateSelections:selectedHourTimes];
+}
+
+- (void)updateGoolgeCalendar{
+    NSDictionary *nextDay = crtViewDayArray[crtWeekIndex];
+    NSPredicate *predicate = [NSPredicate
+                              predicateWithFormat:@"year == %@ AND month == %@ AND day == %@", nextDay[@"year"], nextDay[@"month"], nextDay[@"day"]];
+    NSMutableArray *calendarHourTimes;
+    CCDateTimes *resultCalendar = [[self.calendarDateTimes filteredArrayUsingPredicate:predicate] firstObject];
+    if (resultCalendar == nil) {
+        calendarHourTimes = [NSMutableArray array];
+    }else{
+        calendarHourTimes = [[resultCalendar times] mutableCopy];
+    }
+    [self.calendarTimeScrollView updateGoolgeCalendar:calendarHourTimes];
+    [self updateSelections];
 }
 
 - (void)updateSelectedDateTimes{

@@ -33,6 +33,7 @@
 @interface CCPhraseStickerCollectionViewController ()
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraintSegmentedViewHeight;
 
 @end
 
@@ -133,6 +134,14 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     [titleView addSubview:closeButton];
     
     [self.collectionView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
+    
+    if (![[CCConstants sharedInstance] isAgent]){
+        [self.segmentedControl setHidden:YES];
+        self.constraintSegmentedViewHeight.constant = 0;
+    } else {
+        self.constraintSegmentedViewHeight.constant = 46;
+    }
+
     [self setAutomaticallyAdjustsScrollViewInsets:NO];
 }
 
@@ -161,21 +170,24 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
 {
     section = self.segmentedControl.selectedSegmentIndex;
     NSArray *phrases;
-
-    switch (section) {
-        case CC_APP_FIXED_PHRASE_INDEX: {
-            phrases = self.appFixedPhrases;
-            break;
-        }
-            
-        case CC_ORG_FIXED_PHRASE_INDEX: {
-            phrases = self.orgFixedPhrases;
-            break;
-        }
-            
-        case CC_USER_FIXED_PHRASE_INDEX: {
-            phrases = self.userFixedPhrases;
-            break;
+    if (![[CCConstants sharedInstance] isAgent]){
+        phrases = self.guestFixedPhrases;
+    } else {
+        switch (section) {
+            case CC_APP_FIXED_PHRASE_INDEX: {
+                phrases = self.appFixedPhrases;
+                break;
+            }
+                
+            case CC_ORG_FIXED_PHRASE_INDEX: {
+                phrases = self.orgFixedPhrases;
+                break;
+            }
+                
+            case CC_USER_FIXED_PHRASE_INDEX: {
+                phrases = self.userFixedPhrases;
+                break;
+            }
         }
     }
 
@@ -231,14 +243,23 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
         reusableview = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:kCCFixedPhraseSectionNoContentView forIndexPath:indexPath];
         UITextView *title = [reusableview.subviews objectAtIndex:0];
         NSString *messageStr = nil;
-        if(section == CC_APP_FIXED_PHRASE_INDEX) {
-            messageStr = CCLocalizedString(@"You have not any app's recommendation fixed phrases.");
-        } else if(section == CC_ORG_FIXED_PHRASE_INDEX) {
-            messageStr = CCLocalizedString(@"You have not any org's recommendation fixed phrases.");
-        } else if(section == CC_USER_FIXED_PHRASE_INDEX) {
-            messageStr = CCLocalizedString(@"You have not created any fixed phrases.");
+        if ([[CCConstants sharedInstance] isAgent]) {
+            
+            if(section == CC_APP_FIXED_PHRASE_INDEX) {
+                messageStr = CCLocalizedString(@"You have not any app's recommendation fixed phrases.");
+            } else if(section == CC_ORG_FIXED_PHRASE_INDEX) {
+                messageStr = CCLocalizedString(@"You have not any org's recommendation fixed phrases.");
+            } else if(section == CC_USER_FIXED_PHRASE_INDEX) {
+                messageStr = CCLocalizedString(@"You have not created any fixed phrases.");
+            } else {
+                messageStr = @"";
+            }
         } else {
-            messageStr = @"";
+            if ([self.guestFixedPhrases count] > 0) {
+                messageStr = @"";
+            } else {
+                messageStr = CCLocalizedString(@"No fixed phrases.");
+            }
         }
         title.text = messageStr;
     }
@@ -307,23 +328,26 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     
     NSInteger section = self.segmentedControl.selectedSegmentIndex;
     NSArray *phrases;
-    
-    switch (section) {
-        case CC_APP_FIXED_PHRASE_INDEX: {
-            phrases = self.appFixedPhrases;
-            break;
-        }
-            
-        case CC_ORG_FIXED_PHRASE_INDEX: {
-            phrases = self.orgFixedPhrases;
-            break;
-        }
-            
-        case CC_USER_FIXED_PHRASE_INDEX: {
-            phrases = self.userFixedPhrases;
-            break;
-        }
-    }
+     if (![[CCConstants sharedInstance] isAgent]){
+         phrases = self.guestFixedPhrases;
+     } else {
+         switch (section) {
+             case CC_APP_FIXED_PHRASE_INDEX: {
+                 phrases = self.appFixedPhrases;
+                 break;
+             }
+                 
+             case CC_ORG_FIXED_PHRASE_INDEX: {
+                 phrases = self.orgFixedPhrases;
+                 break;
+             }
+                 
+             case CC_USER_FIXED_PHRASE_INDEX: {
+                 phrases = self.userFixedPhrases;
+                 break;
+             }
+         }
+     }
 
     if (!phrases || phrases.count<1) {
         return nil;
@@ -349,6 +373,23 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     
     NSMutableArray *userMessages = [data objectForKey:@"user"];
     self.userFixedPhrases = [self createMessageObjects:userMessages];
+    
+    if (![[CCConstants sharedInstance] isAgent]){
+        self.guestFixedPhrases = [NSMutableArray array];
+        
+        for (NSDictionary * message in self.appFixedPhrases) {
+            [self.guestFixedPhrases addObject:message];
+        }
+        
+        for (NSDictionary * message in self.orgFixedPhrases) {
+            [self.guestFixedPhrases addObject:message];
+        }
+        
+        for (NSDictionary * message in self.userFixedPhrases) {
+            [self.guestFixedPhrases addObject:message];
+        }
+        
+    }
 }
 
 -(NSMutableArray *)createMessageObjects:(NSMutableArray *)messages

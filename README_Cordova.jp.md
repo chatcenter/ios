@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.1
+# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.2
 
 ## Table of contents
 * [Getting Started](#GettingStarted)
@@ -394,9 +394,12 @@ resetHistory: function() {
 ## オプション
 <a id="Pushnotification"></a>
 ### 1. プッシュ通知
-**※ プッシュ通知を実施される場合は、p12ファイル及びパスワードを弊社の担当者へ送付ください。**
 
-#### 1-1. プッシュ通知のオン
+#### 1-1. p12ファイルをweb dashboard上で登録する
+以下のようにweb dashboard（設定＞プッシュ通知）上でプッシュ通知で使用するp12ファイルを登録してください。
+<p align="center"><img src="InstallationImages/pushsetting_ja.png"></p>
+
+#### 1-2. プッシュ通知のオン
 
 #### (a)NSUserDefaultsへdevice tokenを保存する
 NSUserDefaultsへ@"deviceToken"でdevice tokenを保存すると、チャット/ヒストリービュー表示時に送信されます。
@@ -419,7 +422,7 @@ NSUserDefaultsへ@"deviceToken"でdevice tokenを保存すると、チャット/
 #### (b)チャットビューを表示時に行う
 チャットビューの呼び出しの際に、Appleより取得したデバイストークンをdeviceTokenに設定してください。登録の時点でプッシュ通知は有効になります。
 
-#### 1-2. プッシュ通知のオフ
+#### 1-3. プッシュ通知のオフ
 サインアウト等、プッシュ通知を無効にしたいタイミングで以下をコールしてください。
 ```
 - (void)signOutDeviceToken:(CDVInvokedUrlCommand *)command;
@@ -441,7 +444,7 @@ NSUserDefaultsへ@"deviceToken"でdevice tokenを保存すると、チャット/
 </tr>
 </table>
 
-#### 1-3. プッシュ通知の受信
+#### 1-4. プッシュ通知の受信
 受信時のペイロードからorg_uidを取り出し、チャットビューの呼び出しを行ってください。
 以下のようなペイロードが送信されます。
 

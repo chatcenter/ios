@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.1.1"
+#define CC_SDK_VERSION                    @"1.1.2"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_DEFAULT_VIDEO_ENABLED        1

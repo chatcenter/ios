@@ -153,6 +153,7 @@
         
         if(params.iconImage) {
             [headerImageView setImage:params.iconImage];
+            [headerImageView setHidden:NO];
             headerImageView.tintColor = [[CCConstants sharedInstance] baseColor];
             headerImageViewWidthConstraint.constant = params.iconWidth;
         } else {

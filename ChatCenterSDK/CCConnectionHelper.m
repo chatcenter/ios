@@ -26,12 +26,18 @@
 #import <GoogleMaps/GoogleMaps.h>
 #import <GooglePlaces/GooglePlaces.h>
 #endif
+#ifdef CC_WATCH
+#import <WatchConnectivity/WatchConnectivity.h>
+#endif
 
 BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing with local server
 
 @interface CCConnectionHelper (){
     UIView *toastView;
     CCAFNetworkReachabilityManager *reachability;
+#ifdef CC_WATCH
+    WCSession* watchSession;
+#endif
 }
 
 @property (nonatomic, strong) NSMutableArray *ChatChannelIds;
@@ -55,6 +61,15 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
 
 - (void)setUp
 {
+#ifdef CC_WATCH
+    // Start watch connectivity session
+    if([WCSession isSupported]) {
+        watchSession = [WCSession defaultSession];
+        watchSession.delegate = self;
+        [watchSession activateSession];
+    }
+#endif
+    
     #if CC_DEBUG
         [[CCAFNetworkActivityLogger sharedLogger] startLogging];
     #endif
@@ -299,6 +314,123 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
             if(completionHandler != nil) completionHandler(nil, error, task);
         }
     }];
+}
+
+- (void)loadChannels:(BOOL)showProgress orgUid: (NSString *) orgUid channelName:(NSString *) channelName limit:(int)limit  lastUpdatedAt:(NSDate *)lastUpdatedAt completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    if (showProgress == YES && self.currentView != nil) {
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
+    }
+    
+    [[ChatCenterClient sharedClient] getChannels:orgUid channelName:channelName limit:limit lastUpdatedAt:lastUpdatedAt completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        
+        if (result != nil) {
+            if(showProgress == YES && self.currentView != nil){
+                [CCSVProgressHUD dismiss];
+            }
+            
+            self.ChatChannelIds = [[NSMutableArray alloc] init];
+            if([[CCCoredataBase sharedClient] deleteAllChannel]){
+                NSLog(@"deleteAllChannel Success!");
+            }else{
+                NSLog(@"deleteAllChannel Error!");
+            }
+            NSMutableDictionary *unreadMessagesDic = [NSMutableDictionary dictionary];
+            for (int i = 0; i < result.count; i++) {
+                if (
+                    [result[i] valueForKey:@"uid"] != nil
+                    && ![result[i][@"uid"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"status"] != nil
+                    && ![result[i][@"status"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"org_uid"] != nil
+                    && ![result[i][@"org_uid"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"created"] != nil
+                    && ![result[i][@"created"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"last_updated_at"] != nil
+                    && ![result[i][@"last_updated_at"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"users"] != nil
+                    && ![result[i][@"users"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"org_name"] != nil
+                    && ![result[i][@"org_name"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"unread_messages"] != nil
+                    && ![result[i][@"unread_messages"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"id"] != nil
+                    && ![result[i][@"id"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"read"] != nil
+                    && ![result[i][@"read"] isEqual:[NSNull null]]
+                    && [result[i] valueForKey:@"channel_informations"] != nil /// @"channel_informations" could be Null
+                    && [result[i] valueForKey:@"icon_url"] != nil /// @"icon_url" could be Null
+                    )/// @"latest_message" could be Null
+                {
+                    NSDictionary   *assignee    = [result[i] valueForKey:@"assignee"];
+                    NSNumber *uid               = [result[i] valueForKey:@"id"];
+                    NSString *channelUid        = [result[i] valueForKey:@"uid"];
+                    NSString *status            = [result[i] valueForKey:@"status"];
+                    NSString *orgUid            = [result[i] valueForKey:@"org_uid"];
+                    NSString *stringCreatedDate = [result[i] valueForKey:@"created"];
+                    NSDate *createdDate         = [NSDate dateWithTimeIntervalSince1970:[stringCreatedDate doubleValue]];
+                    NSString *stringLastUpdatedAt = [result[i] valueForKey:@"last_updated_at"];
+                    NSDate *lastUpdatedAt         = [NSDate dateWithTimeIntervalSince1970:[stringLastUpdatedAt doubleValue]];
+                    NSArray *users              = [result[i] valueForKey:@"users"];
+                    NSString *orgName           = [result[i] valueForKey:@"org_name"];
+                    NSString *unreadMessages    = [[result[i] valueForKey:@"unread_messages"] stringValue];
+                    NSDictionary *latestMessage = [result[i] valueForKey:@"latest_message"];
+                    NSString *iconUrl           = [result[i] valueForKey:@"icon_url"];
+                    NSNumber *read              = [result[i] valueForKey:@"read"];
+                    NSDictionary *channelInformations = result[i][@"channel_informations"];
+                    NSDictionary *displayName = result[i][@"display_name"];
+                    ///name and directmessage are only used for team now
+                    NSString *name = @"";
+                    BOOL directMessage = NO;
+                    if (result[i][@"name"] != nil && ![result[i][@"name"] isEqual:[NSNull null]]) name = result[i][@"name"];
+                    if (result[i][@"direct_message"] != nil && ![result[i][@"direct_message"] isEqual:[NSNull null]]) {
+                        directMessage = [result[i][@"direct_message"] boolValue];
+                    }
+                    
+                    // Filtering.
+                    if (![CCHistoryFilterUtil isFilteringWithConnectionData:result[i]]) {
+                        if([[CCCoredataBase sharedClient] insertChannel:channelUid
+                                                              createdAt:createdDate
+                                                               updateAt:nil
+                                                                  users:users
+                                                                org_uid:orgUid
+                                                               org_name:orgName
+                                                        unread_messages:unreadMessages
+                                                         latest_message:latestMessage
+                                                                    uid:uid
+                                                                 status:status
+                                                   channel_informations:channelInformations
+                                                               icon_url:iconUrl
+                                                                   read:[read boolValue]
+                                                          lastUpdatedAt:lastUpdatedAt
+                                                                   name:name
+                                                         direct_message:directMessage
+                                                               assignee:assignee
+                                                           display_name:displayName])
+                        {
+                            NSLog(@"insertChannel Success!");
+                        }else{
+                            NSLog(@"insertChannel Error!");
+                        }
+                        [self.ChatChannelIds addObject:channelUid];
+                    }
+                    if (![unreadMessages isEqualToString:@"0"] && ![status isEqualToString:@"closed"]) {
+                        NSNumberFormatter *f = [[NSNumberFormatter alloc] init];
+                        f.numberStyle = NSNumberFormatterDecimalStyle;
+                        NSNumber *unreadMessagesNum = [f numberFromString:unreadMessages];
+                        [unreadMessagesDic setObject:unreadMessagesNum forKey:channelUid];
+                    }
+                }
+            }
+            
+            if(completionHandler != nil) completionHandler(result, nil, task);
+        } else {
+            if(showProgress == YES && self.currentView != nil){
+                [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Channels Failed")];
+            }
+            if(completionHandler != nil) completionHandler(nil, error, task);
+        }
+    }];
+    
 }
 
 -(void)loadChannel:(BOOL)showProgress
@@ -1165,7 +1297,22 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
         }
     }
     [ChatCenter setAppToken:token completionHandler:^{
-        if(completionHandler != nil) completionHandler();
+        if(completionHandler != nil) {
+#if CC_WATCH
+            if ([watchSession isReachable]) {
+                NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+                NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
+                NSDictionary *applicationContext = @{
+                                                     @"app_token": token,
+                                                     @"access_token": accessToken,
+                                                     @"current_uid": currentUid};
+                [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {
+                } errorHandler:^(NSError * _Nonnull error) {
+                }];
+            }
+#endif
+            completionHandler();
+        }
     }];
 }
 
@@ -1173,6 +1320,17 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
     NSString *token = [[CCConstants sharedInstance] getKeychainToken];
     NSString *newUrl = [url stringByAppendingString:[NSString stringWithFormat:@"?authentication=%@&app_token=%@",token,[ChatCenterClient sharedClient].appToken]];
     return newUrl;
+}
+
+-(void)getGoolgeCalandar:(NSString*)fromDate toDate:(NSString*)toDate completionHandler:(void (^)(NSDictionary *result, NSError *error))completionHandler {
+    
+    [[ChatCenterClient sharedClient] getGoolgeCalandar:fromDate toDate:toDate completionHandler:^(NSDictionary *result, NSError *error) {
+        if (result != nil) {
+            if(completionHandler != nil) completionHandler(result, nil);
+        } else {
+            if(completionHandler != nil) completionHandler(nil, error);
+        }
+    }];
 }
 
 #pragma mark - Business funnels
@@ -2353,4 +2511,95 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 - (BOOL)isSupportVideoChat{
     return [[ChatCenterClient sharedClient] isSupportVideoChat];
 }
+
+#pragma mark - WCSessionDelegate
+#ifdef CC_WATCH
+- (void)session:(WCSession *)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError *)error {
+    NSString *appToken = [ChatCenterClient sharedClient].appToken;
+    NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+    NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
+    if (appToken == nil) {
+        if (accessToken != nil && currentUid != nil) {
+            NSDictionary *applicationContext = @ {
+                @"access_token": accessToken,
+                @"current_uid": currentUid};
+            
+            [watchSession updateApplicationContext:applicationContext error:nil];
+        }
+    } else {
+        NSDictionary *applicationContext = @ {
+            @"app_token": appToken,
+            @"access_token": accessToken,
+            @"current_uid": currentUid};
+        
+        [watchSession updateApplicationContext:applicationContext error:nil];
+    }
+}
+
+- (void)session:(WCSession *)session didReceiveMessage:(NSDictionary<NSString *,id> *)message replyHandler:(void (^)(NSDictionary<NSString *,id> * _Nonnull))replyHandler {
+    NSString *appToken = message[@"app_token"];
+    if (appToken != nil) {
+        [ChatCenter setAppToken:appToken completionHandler:^{
+            [[CCConnectionHelper sharedClient] reloadOrgsAndChannelsAndConnectWebSocket];
+        }];
+    }
+}
+
+- (void)session:(WCSession *)session didReceiveApplicationContext:(NSDictionary<NSString *,id> *)applicationContext {
+    NSString *appToken = applicationContext[@"app_token"];
+    if (appToken != nil) {
+        [ChatCenter setAppToken:appToken completionHandler:^{
+            [[CCConnectionHelper sharedClient] reloadOrgsAndChannelsAndConnectWebSocket];
+        }];
+    }
+}
+
+- (void)sessionWatchStateDidChange:(WCSession *)session {
+    NSLog(@"sessionWatchStateDidChange = %@", session);
+    if ([watchSession isReachable]) {
+        NSString *appToken = [ChatCenterClient sharedClient].appToken;
+        NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+        NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
+        if (appToken != nil && accessToken != nil && currentUid != nil) {
+            NSDictionary *applicationContext = @ {
+                                                 @"app_token": appToken,
+                                                 @"access_token": accessToken,
+                                                 @"current_uid": currentUid};
+
+            [watchSession updateApplicationContext:applicationContext error:nil];
+        }
+    }
+}
+
+- (void)switchApp:(NSString *)appToken {
+    if ([watchSession isReachable]) {
+        NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+        NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
+        if (appToken != nil && accessToken != nil && currentUid != nil) {
+            NSDictionary *applicationContext = @{
+                                                 @"app_token": appToken,
+                                                 @"access_token": accessToken,
+                                                 @"current_uid": currentUid};
+            [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {
+            } errorHandler:^(NSError * _Nonnull error) {
+            }];
+        }
+    }
+}
+
+- (void)switchChannel:(NSString *)channelId {
+    if ([watchSession isReachable]) {
+        NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+        NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
+        if (accessToken != nil && currentUid != nil) {
+            NSDictionary *applicationContext = @{
+                                                 @"access_token": accessToken,
+                                                 @"current_uid": currentUid};
+            [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {
+            } errorHandler:^(NSError * _Nonnull error) {
+            }];
+        }
+    }
+}
+#endif
 @end

@@ -181,6 +181,8 @@ typedef void (^JSQAnimationCompletionBlock)(BOOL finished);
             }
         }
         self.keyboardView = keyboardViewProxy;
+    } else {
+        self.keyboardView = keyboardViewProxy;
     }
 
     [self jsq_setKeyboardViewHidden:NO];
