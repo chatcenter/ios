@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDK Installation guide Ver. 1.1.2
+# ChatCenteriO iOS SDK Installation guide Ver. 1.1.3
 
 ## Table of contents
 * [Getting Started](#GettingStarted)
