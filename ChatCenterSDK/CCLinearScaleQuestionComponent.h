@@ -10,5 +10,6 @@
 
 
 @interface CCLinearScaleQuestionComponent : CCQuestionComponent <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *constraintLabelWidth;
 
 @end

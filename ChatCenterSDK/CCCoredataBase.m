@@ -320,7 +320,7 @@
     [fetchRequest setSortDescriptors:[NSArray arrayWithObject:sort]];
     NSPredicate *pred;
     if (lastId == nil) {
-        pred = [NSPredicate predicateWithFormat:@"(channel_uid = %@) && (status != %d)", channelUid, CC_MESSAGE_STATUS_DELIVERING];
+        pred = [NSPredicate predicateWithFormat:@"(channel_uid = %@)", channelUid];
     }else{
         pred = [NSPredicate predicateWithFormat:@"(channel_uid = %@) AND (id < %@) AND (status != %d)", channelUid, lastId, CC_MESSAGE_STATUS_DELIVERING];
     }

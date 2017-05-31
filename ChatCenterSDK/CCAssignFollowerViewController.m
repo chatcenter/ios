@@ -105,7 +105,7 @@
 
 #pragma mark - Load agents
 - (void)loadAgentWithOrgID:(NSString *)orgUid{
-    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     NSLog(@"Load agent with orgid");
     NSArray *agentArray = [[CCCoredataBase sharedClient] selectOrgWithUid:orgUid];
     if (agentArray != nil && agentArray.count > 0) {
@@ -184,7 +184,7 @@
 
 #pragma mark - Do assign
 -(void) pressSave {
-    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Saving...") maskType:SVProgressHUDMaskTypeBlack];
+    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Saving...")];
     
     for (int i = 0; i < followingAgents.count; i++) {
         BOOL remove = YES;

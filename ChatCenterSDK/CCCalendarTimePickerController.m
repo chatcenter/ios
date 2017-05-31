@@ -428,12 +428,7 @@ const int VIEW_COUNT = 3;
     }
     NSUInteger flags;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
-    float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (osVersion >= 8.0f)  {
-        flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekday | NSCalendarUnitDay;
-    } else {
-        flags = NSYearCalendarUnit | NSMonthCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit;
-    }
+    flags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitWeekday | NSCalendarUnitDay;
 #else
     flags = NSYearCalendarUnit | NSMonthCalendarUnit | NSWeekdayCalendarUnit | NSDayCalendarUnit;
 #endif
@@ -1246,9 +1241,9 @@ const int VIEW_COUNT = 3;
         CCDateTimes *datetimes = selectedDateTimes[i];
         if (datetimes.times.count == 0) continue;
         
-        NSDateFormatter *formaterFrom = [[NSDateFormatter alloc] init];
-        [formaterFrom setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_from")];
-        [formaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
+        NSDateFormatter *stickerFormaterFrom = [[NSDateFormatter alloc] init];
+        [stickerFormaterFrom setDateFormat:CCLocalizedString(@"calendar_sticker_time_format_from")];
+        [stickerFormaterFrom setTimeZone:[NSTimeZone defaultTimeZone]];
         
         NSDateFormatter *formaterWithDate = [[NSDateFormatter alloc] init];
         [formaterWithDate setDateFormat:CCLocalizedString(@"calendar_sticker_time_format")];
@@ -1275,7 +1270,7 @@ const int VIEW_COUNT = 3;
                 to = [formaterWithDate stringFromDate:endDate];
             } else {
                 to = [formaterTo stringFromDate:endDate];
-                from = [formaterFrom stringFromDate:startDate];
+                from = [stickerFormaterFrom stringFromDate:startDate];
             }
             NSString *label = [NSString stringWithFormat:CCLocalizedString(@"From %@ to %@ %@"), from, to, [[NSTimeZone defaultTimeZone] abbreviation]];
             
@@ -1291,7 +1286,8 @@ const int VIEW_COUNT = 3;
     NSDictionary *content = @{@"uid":uid,
                               @"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
                               @"sticker-action":@{@"action-type":@"select",
-                                                  @"action-data":actionsDatas}
+                                                  @"action-data":actionsDatas},
+                              @"sticker-type": @"schedule"
                               };
     
     // create message:sticker from data

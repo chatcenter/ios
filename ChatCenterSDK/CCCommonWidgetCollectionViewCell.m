@@ -1,19 +1,16 @@
 //
-//  CCCommonStickerCollectionViewCell.m
+//  CCCommonStickWidgetCollectionViewCell.m
 //  ChatCenterDemo
 //
-//  Created by AppSocially Inc. on 2/25/16.
-//  Copyright © 2016 AppSocially Inc. All rights reserved.
+//  Created by GiapNH on 4/26/17.
+//  Copyright © 2017 AppSocially Inc. All rights reserved.
 //
 
-
+#import "CCCommonWidgetCollectionViewCell.h"
 #import <CoreText/CoreText.h>
-
-#import "CCCommonStickerCollectionViewCell.h"
 #import "CCJSQMessagesTimestampFormatter.h"
 #import "CCHightlightButton.h"
 #import "CCConstants.h"
-#import "CCCommonStickerCollectionViewCell.h"
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 #import "CCLocationStickerViewController.h"
@@ -27,13 +24,8 @@
 #import "UIImage+CCSDKImage.h"
 #import "CCLiveLocationTask.h"
 
-// Text area size calculation by NSAttributedString always underestimates the width
-// and the text will be chopped at the drawing step.
-// So we subtract this correction value when estimating
-#define TEXTAREA_WIDTH_CALC_ERROR_CORRECTION 15
 
-
-@interface CCMessageHeaderParameters : NSObject {
+@interface CCMessageHeaderWidgetParameters : NSObject {
 }
 @property (nonatomic) CGFloat iconWidth;
 @property (nonatomic, strong) UIImage *iconImage;
@@ -41,12 +33,11 @@
 @property (nonatomic) CGSize textAreaSize;
 @end
 
-@implementation CCMessageHeaderParameters
+@implementation CCMessageHeaderWidgetParameters
 @end
 
 
-
-@implementation CCCommonStickerCollectionViewCell
+@implementation CCCommonWidgetCollectionViewCell
 {
     
     CCStickerCollectionViewCellOptions options;
@@ -65,7 +56,7 @@
     
     options = inOptions;
     self.avatarImage.image = avatar.avatarImage;
-
+    
     if (([CCConstants sharedInstance].isAgent && (options & CCStickerCollectionViewCellOptionShowAsAgent))
         || (![CCConstants sharedInstance].isAgent && !(options & CCStickerCollectionViewCellOptionShowAsAgent))) {
         options |= CCStickerCollectionViewCellOptionShowAsMyself;
@@ -99,13 +90,13 @@
         }
     }
     
-
+    
     // Keep message object
     _msg = msg;
     
     // Bubble width
     stickerContainerWidth.constant = CC_STICKER_BUBBLE_WIDTH;
-
+    
     //------------------------------
     //
     // Part A: Date
@@ -118,7 +109,7 @@
         self.cellTopLabelHeight.constant = 0;
     }
     
-
+    
     
     index = indexPath.row;
     NSLog(@"index = %ld", (long)index);
@@ -130,12 +121,7 @@
     
     if (options & CCStickerCollectionViewCellOptionShowName) {
         self.stickerTopLabelHeight.constant = 20;
-        if (([CCConstants sharedInstance].isAgent && (options & CCStickerCollectionViewCellOptionShowAsAgent))
-            || (![CCConstants sharedInstance].isAgent && !(options & CCStickerCollectionViewCellOptionShowAsAgent))) {
-            self.stickerTopLabel.text = [NSString stringWithFormat:@"%@  %@", [[CCJSQMessagesTimestampFormatter sharedFormatter] timeForDate:msg.date], msg.senderDisplayName];
-        } else {
-            self.stickerTopLabel.text = [NSString stringWithFormat:@"%@  %@", msg.senderDisplayName, [[CCJSQMessagesTimestampFormatter sharedFormatter] timeForDate:msg.date]];
-        }
+        self.stickerTopLabel.text = [NSString stringWithFormat:@"%@  %@", [[CCJSQMessagesTimestampFormatter sharedFormatter] timestampForDate:msg.date], msg.senderDisplayName];
     }else{
         self.stickerTopLabelHeight.constant = 0;
     }
@@ -149,7 +135,7 @@
     
     // Suggestion and image shouldn't have a message field
     if (message != nil && ![msg.type isEqualToString:CC_RESPONSETYPESUGGESTION] && ![msg.type isEqualToString:CC_STICKERTYPEIMAGE]) {
-        CCMessageHeaderParameters *params = [[self class] getMessageHeaderParameterForMessage:msg];
+        CCMessageHeaderWidgetParameters *params = [[self class] getMessageHeaderWidgetParameterForMessage:msg];
         
         if(params.iconImage) {
             [headerImageView setImage:params.iconImage];
@@ -178,7 +164,7 @@
         self.discriptionViewHeight.constant = params.textAreaSize.height + 5; // 5 for bottom margin
         
         //
-        // Setting color 
+        // Setting color
         //
         if( options & CCStickerCollectionViewCellOptionShowAsWidget ) {
             // If it's a widget use baseColor no matter if it's outgoing or incoming
@@ -298,7 +284,7 @@
             
             ///display status
             [self setMessageStatusLabel:msg delegate:delegate];
-
+            
             return YES; // End setup
         } else {
             stickerObjectContainerHeight.constant = 0;
@@ -355,7 +341,7 @@
     // Part F: Status
     //
     [self setMessageStatusLabel:msg delegate:delegate];
-
+    
     //------------------------------
     //
     // Part J: Live Label
@@ -377,12 +363,10 @@
                 self.headerLiveWidgetLabel.hidden = YES;
             }
             for(int i = 0; i < users.count; i++) {
-                NSDictionary *user = users[i];
                 UIImageView *imageView = [[UIImageView alloc] init];
                 imageView.backgroundColor = [UIColor whiteColor];
                 imageView.frame = CGRectMake((avatarWidth + padding) * i, 0, avatarWidth, avatarHeight);
                 imageView.contentMode = UIViewContentModeScaleAspectFill;
-                [self setupAvatar:user imageView:imageView];
                 imageView.layer.cornerRadius = avatarWidth / 2;
                 imageView.clipsToBounds = YES;
                 [self.liveUsersContainer addSubview:imageView];
@@ -397,7 +381,7 @@
         self.headerLiveWidgetLabel.hidden = YES;
         self.liveUsersContainer.hidden = YES;
     }
-
+    
     return YES;
 }
 
@@ -415,49 +399,6 @@
     action = [[self class] convertStickerActionToMoonStyleIfNeeded:action];
     
     //
-    // Unwrap the action response
-    //
-    
-    //
-    // "action-response-data" can come in two types of structure
-    //
-    ////// *** Single Type ***
-    ////// Has an OBJECT under "action"
-    //
-    // (
-    //    {
-    //       "action" =  {
-    //                      "label" = label
-    //                      "value" = {
-    //                                     //Any specific key-values
-    //                                 }
-    //                   }
-    //
-    //     }
-    // )
-    //
-    ////// *** Multiple Type ***
-    ////// Has an ARRAY under "action"
-    //
-    // (
-    //    {
-    //       "action" =  (
-    //                      {
-    //                        "label" = label
-    //                        "value" = {
-    //                                     //Any specific key-values
-    //                                   }
-    //                      },
-    //                      {
-    //                        "label" = label
-    //                        "value" = {
-    //                                     //Any specific key-values
-    //                                   }
-    //                      },
-    //                      ...
-    //                   )
-    //     }
-    // )
     NSArray <NSDictionary*> *stickerActionsResponses;
     
     if (stickerActionsResponses_wrapped) {
@@ -531,22 +472,6 @@
     }
 }
 
--(void)setupAvatar:(NSDictionary *)user imageView:(UIImageView *)imageView{
-    NSString *userUid = user[@"id"];
-    NSLog(@"Load avatar of user %@", userUid);
-    NSString *firstCharacter = [user[@"display_name"] substringToIndex:1];
-    UIImage *textImage = [[ChatCenter sharedInstance] createAvatarImage:firstCharacter width:32.0 height:32.0 color:[[ChatCenter sharedInstance] getRandomColor:user[@"id"]] fontSize:24 textOffset:1.5];
-    if (textImage != nil) {
-        imageView.image = textImage;
-    }
-    
-    if (user[@"icon_url"] != nil && !([user[@"icon_url"] isEqual:[NSNull null]])) {
-        if([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable) {
-            [imageView sd_setImageWithURL:[NSURL URLWithString:user[@"icon_url"]]];
-        }
-    }
-}
-
 //
 // Convert sticker data if needed
 //
@@ -562,14 +487,14 @@
         
         return newAction;
     }
-
+    
     return stickerAction; // No conversion
 }
 
 
-+ (CCMessageHeaderParameters*)getMessageHeaderParameterForMessage:(CCJSQMessage*)msg {
++ (CCMessageHeaderWidgetParameters*)getMessageHeaderWidgetParameterForMessage:(CCJSQMessage*)msg {
     
-    CCMessageHeaderParameters *params = [[CCMessageHeaderParameters alloc] init];
+    CCMessageHeaderWidgetParameters *params = [[CCMessageHeaderWidgetParameters alloc] init];
     
     UIImage *img = nil;
     //
@@ -579,7 +504,7 @@
     if (stickerActions != nil && stickerActions.count > 0) {
         img = [UIImage SDKImageNamed:@"questionBubbleIcon"];
     }
-
+    
     //
     // Map Widget
     //
@@ -602,7 +527,7 @@
     }
     
     NSAttributedString *message = [self createMessageString:msg];
-
+    
     if (img) {
         params.iconImage = [img imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];  // Set icon with tint color
         params.iconWidth = 45;
@@ -613,7 +538,7 @@
         CGSize calculatedSize = [self calculateTextAreaSizeForAttributedString:message textWidth:textAreaWidth];
         params.textAreaSize = calculatedSize;
     } else {
-    
+        
         params.iconImage = nil;
         params.iconWidth = 0;
         
@@ -628,23 +553,6 @@
 }
 
 + (CGSize)calculateTextAreaSizeForAttributedString:(NSAttributedString*)message textWidth:(CGFloat)textWidth {
-    
-/* NG: CTFrameSetter underestimates the hight (at least with this parameter settings)
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)message);
-    CGSize targetSize = CGSizeMake(textWidth - TEXTAREA_WIDTH_CALC_ERROR_CORRECTION , CGFLOAT_MAX);
-    CGSize fitSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, [message length]), NULL, targetSize, NULL);
-    CFRelease(framesetter);
-    return fitSize;
-*/
-    
-/*  NG: NSAttributedText#boundingRectWithSize also underestimates the height
-    CGRect rect = [message boundingRectWithSize:CGSizeMake(textWidth  - TEXTAREA_WIDTH_CALC_ERROR_CORRECTION, 1800)
-                                        options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading
-                                        context:nil];
-    return rect.size;
-     
-*/
-    
     //
     // This works!
     //
@@ -668,7 +576,7 @@
     if (!text) {
         text = [msg getStringAtPath:@"text"];
     }
-
+    
     NSString *stickerType = [msg.content objectForKey:CC_STICKER_TYPE];
     if ([stickerType isEqualToString:CC_STICKERTYPECOLOCATION]) {
         text = CCLocalizedString(@"Live Location");
@@ -679,11 +587,11 @@
     if (!text) {
         return nil;
     }
-
+    
     NSDictionary *messageStringAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:15.0f]};
     
     NSMutableAttributedString *message = [[NSMutableAttributedString alloc] initWithString:text attributes:messageStringAttributes];
-
+    
     return message;
 }
 
@@ -716,58 +624,11 @@
 }
 
 - (void) onActionClicked:(UIButton*)sender {
-    if(_msg == nil || _msg.status == CC_MESSAGE_STATUS_DELIVERING || _msg.status == CC_MESSAGE_STATUS_SEND_FAILED) {
-        return;
-    }
-    NSLog(@"onActionClicked");
-    NSInteger indexAction = [sender tag];
-    NSArray *stickerActions = _msg.content[@"sticker-action"][@"action-data"];
-    if (stickerActions != nil && indexAction < stickerActions.count) {
-        
-        //
-        // The action just have chosen by the user
-        //
-        NSDictionary *stickerAction = [stickerActions objectAtIndex:indexAction];
-        
-        //
-        // The reaction which already stored
-        //
-        NSArray *stickerActionsResponses = _msg.content[@"sticker-action"][@"action-response-data"];
-        NSString *isReacted = @"false";
-        
-        for(int j=0; j<stickerActionsResponses.count; j++) {
-            NSDictionary *responseAction = [stickerActionsResponses objectAtIndex:j];
-            if(responseAction != nil && ![responseAction isEqual:[NSNull null]]) {
-                if(([responseAction objectForKey:@"value"] != nil && [stickerAction objectForKey:@"value"] != nil &&
-                    [[responseAction objectForKey:@"value"] isKindOfClass:[NSDictionary class]] &&
-                    [[responseAction objectForKey:@"value"] isEqualToDictionary:[stickerAction objectForKey:@"value"]]) ||
-                   ([responseAction objectForKey:@"action"] != nil && [stickerAction objectForKey:@"action"] != nil &&
-                    [[responseAction objectForKey:@"action"] isKindOfClass:[NSArray class]] &&
-                    [[responseAction objectForKey:@"action"] isEqualToArray:[stickerAction objectForKey:@"action"]])) {
-                       isReacted = @"true"; // This action was already taken
-                       break;
-                   }
-            }
-        }
-        // do action here!!!
-        NSDictionary *data = @{         @"msgId" : _msg.uid,
-                                  @"action-type" : _msg.content[@"sticker-action"][@"action-type"],
-                                @"stickerAction" : stickerAction,
-                                  @"sticker_type": _msg.type ,
-                                      @"reacted" : isReacted};
-        [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:nil userInfo:data];
-    }
+    
 }
 
 - (void)onStickerContentTap:(UIGestureRecognizer*)gestureRecognizer {
-    NSLog(@"Message content = %@", _msg.content);
-    if (_msg.content[CC_STICKERCONTENT][CC_STICKERCONTENT_ACTION] != nil) {
-        NSMutableDictionary *data = [@{ @"msgId":_msg.uid, CC_STICKERCONTENT_ACTION:_msg.content[CC_STICKERCONTENT][CC_STICKERCONTENT_ACTION]} mutableCopy];
-        if(_msg.content[CC_STICKER_TYPE] != nil) {
-            [data setValue:_msg.content[CC_STICKER_TYPE] forKey:CC_STICKER_TYPE];
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToStickerContent object:nil userInfo:data];
-    }
+   
 }
 
 + (CGSize) estimateSizeForMessage:(CCJSQMessage *)msg
@@ -785,7 +646,7 @@
     if (options & CCStickerCollectionViewCellOptionShowDate) {
         height += CC_STICKER_DATE_HEIGHT;
     }
-
+    
     //------------------------------
     //
     // Part B: Sender Name
@@ -809,7 +670,7 @@
     
     if (text != nil && ![msg.type isEqualToString:CC_RESPONSETYPESUGGESTION] && ![msg.type isEqualToString:CC_STICKERTYPEIMAGE]) {
         
-        CCMessageHeaderParameters *params = [self getMessageHeaderParameterForMessage:msg];
+        CCMessageHeaderWidgetParameters *params = [self getMessageHeaderWidgetParameterForMessage:msg];
         
         height += params.textAreaSize.height + 5; // 5 for bottom margin
     }
@@ -843,21 +704,19 @@
     //
     NSArray *stickerActions = msg.content[@"sticker-action"][@"action-data"];
     
-
-    
     if (stickerActions != nil ) {
-//    if (stickerActions != nil && [stickerActionType isEqualToString:@"confirm"]) {
+        //    if (stickerActions != nil && [stickerActionType isEqualToString:@"confirm"]) {
         
         NSDictionary *action =  msg.content[@"sticker-action"];
         // If the stickerActionType is "confirm" convert it to YesNo Question Widget
         action = [self convertStickerActionToMoonStyleIfNeeded:action];
-
-
+        
+        
         CGFloat actionHeight = [CCQuestionComponent calculateHeightForStickerAction:action];
         
         height += actionHeight;
     }
-
+    
     NSLog(@"WWW Height= %d", height);
     //------------------------------
     //
@@ -865,7 +724,7 @@
     //
     
     // (Status is shown to the side of the cell, so doesn't affect to the height)
-
+    
     
     // calculate cell width
     CGRect screenRect = [UIScreen mainScreen].applicationFrame;
@@ -895,5 +754,6 @@
     
     [self setupQuestionComponentWithMessage:_msg];
 }
+
 
 @end

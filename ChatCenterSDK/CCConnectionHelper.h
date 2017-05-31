@@ -82,6 +82,12 @@ typedef enum {
              lastId:(NSNumber *)lastId
   completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 
+- (void)loadSticker:(BOOL)showProgress channelId:(NSString *) channelId
+        stickerType:(NSString *) stickerType
+              limit:(int)limit
+             lastId:(NSNumber *)lastId
+  completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+
 - (void)loadChannels:(BOOL)showProgress orgUid: (NSString *) orgUid channelName:(NSString *) channelName limit:(int)limit  lastUpdatedAt:(NSDate *)lastUpdatedAt completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 
 -(void)loadChannels:(BOOL)showProgress
@@ -150,6 +156,7 @@ completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTa
   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 
 - (void)sendFile:(NSString *)channelId
+             uid:(NSString *)uid
            files:(NSArray *)files
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 

@@ -1,5 +1,5 @@
 /* 
-  ChatCenterSDK.strings Version 1.1.1
+  ChatCenterSDK.strings Version 1.1.3
 
   Created by AppSocially Inc.on 2015/03/21.
   Copyright (c) 2015年 AppSocially Inc. All rights reserved.
@@ -264,6 +264,7 @@
 "Linear Scale" = "Linear Scale";
 "Add more options" = "Add more options";
 "Suggestion" = "Suggestion";
+"Please fill in items." = "Please fill in items.";
 
 // Left Panel Menu
 "Switch" = "Switch";
@@ -300,3 +301,7 @@
 "チャットをクローズしますか？" = "Do you want to close this chat?";
 "New chat" = "New chat";
 "New suggestion" = "New suggestion";
+"No fixed phrases." = "No fixed phrases.";
+"File" = "File";
+"Fixed Phrase" = "Fixed Phrase";
+"Checking Account..." = "Checking Account...";

@@ -72,6 +72,12 @@
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDestructive handler:nil];
     [actionSheet addAction:cancelAction];
     
+    
+    actionSheet.modalPresentationStyle = UIModalPresentationPopover;
+    UIPopoverPresentationController *pop = actionSheet.popoverPresentationController;
+    pop.sourceView = self.fromButton;
+    pop.sourceRect = self.fromButton.bounds;
+    
     [self presentViewController:actionSheet animated:YES completion:nil];
 }
 
@@ -89,6 +95,11 @@
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDestructive handler:nil];
     [actionSheet addAction:cancelAction];
+    
+    actionSheet.modalPresentationStyle = UIModalPresentationPopover;
+    UIPopoverPresentationController *pop = actionSheet.popoverPresentationController;
+    pop.sourceView = self.toButton;
+    pop.sourceRect = self.toButton.bounds;
     
     [self presentViewController:actionSheet animated:YES completion:nil];
 }

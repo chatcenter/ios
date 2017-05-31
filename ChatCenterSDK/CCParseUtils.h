@@ -12,6 +12,5 @@
 
 + (long) longTryGet:(NSDictionary *)dictionary key:(NSString *) key;
 + (NSString *) stringTryGet:(NSDictionary *)dictionary key:(NSString *) key;
-+ (BOOL) boolTryGet:(NSDictionary *)dictionary key:(NSString *) key;
 
 @end

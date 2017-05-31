@@ -75,7 +75,7 @@ static const int buttonTagBase = 100;
 }
 
 - (IBAction)buttonPressed:(UIButton *)sender {
-    int index = sender.tag - buttonTagBase;
+    NSInteger index = sender.tag - buttonTagBase;
     
     [self showSelection:index];
     

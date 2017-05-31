@@ -143,8 +143,21 @@ int const CCTopRowTableView = 0;
     NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
     currentOrgId = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
     NSDictionary *privelege = [ud dictionaryForKey:kCCUserDefaults_privilege];
-    if(privelege[@"channel"] != nil) {
-        channelRoles = privelege[@"channel"];
+    // Retry privelege information if need
+    if (privelege == nil) {
+        // update user info
+        [[ChatCenter sharedInstance] isTokenVailid:^(BOOL result) {
+            NSDictionary *privelege = [ud dictionaryForKey:kCCUserDefaults_privilege];
+            if(privelege[@"channel"] != nil) {
+                channelRoles = privelege[@"channel"];
+            }
+            [self.tableView reloadData];
+        }];
+
+    } else {
+        if(privelege[@"channel"] != nil) {
+            channelRoles = privelege[@"channel"];
+        }
     }
     [self viewSetUp];
 }
@@ -164,7 +177,7 @@ int const CCTopRowTableView = 0;
     if (self.isReturnFromRightMenuView) {
         self.isReturnFromRightMenuView = NO;
     } else if ([CCConnectionHelper sharedClient].isLoadingUserToken == YES) {
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     }else{
         [self initializingData];
         self.isReturnFromChatView = NO;
@@ -264,11 +277,11 @@ int const CCTopRowTableView = 0;
     UILabel *status         = (UILabel*)[cell viewWithTag:9];
     NSDictionary *labels    = [self.ChannelLabels objectAtIndex:indexPath.row];
     title.text              = labels[@"title"];
+    BOOL admin              = ([labels objectForKey:@"admin"] != nil) ? [[labels objectForKey:@"admin"] boolValue] : NO;
     // process lastMessage
     NSNumber *senderIdOfLastMessage = labels[@"senderId"];
     NSString *originalMessage = labels[@"message"];
     NSString *senderName = labels[@"senderName"];
-    NSString *messageType = labels[@"messageType"];
     if(senderIdOfLastMessage == (NSNumber *)[NSNull null]) { // Not message yet
         lastMessage.text = originalMessage;
     } else {
@@ -314,6 +327,19 @@ int const CCTopRowTableView = 0;
         cell.backgroundColor = [[CCConstants sharedInstance] historySelectedCellBackgroundColor];
     }else{
         cell.backgroundColor = [CCConstants defaultHistoryCellBackgroundColor];
+    }
+    
+    UIImage *image = [[UIImage imageNamed:@"CCreply-icon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [cell.imageReply setImage:image];
+    cell.imageReply.tintColor = [UIColor lightGrayColor];
+    if ([[CCConstants sharedInstance] isAgent] && admin) {
+        [cell.imageReply setHidden:NO];
+        cell.imageReplyLeftMargin.constant = 5.0f;
+        cell.imageReplyWidth.constant = 20.0f;
+    } else {
+        [cell.imageReply setHidden:YES];
+        cell.imageReplyWidth.constant = 0;
+        cell.imageReplyLeftMargin.constant = 0;
     }
     
     ///Display status(Only for agent)
@@ -526,6 +552,8 @@ int const CCTopRowTableView = 0;
         title.font          = [UIFont systemFontOfSize:17.0];
         lastUpdateDate.font = [UIFont systemFontOfSize:14.0];
         lastMessage.font    = [UIFont systemFontOfSize:14.0];
+        NSDictionary * channel = [self.ChannelLabels objectAtIndex:indexPath.row];
+        NSNumber *admin = channel[@"admin"];
         [self.ChannelLabels removeObjectAtIndex:indexPath.row];
         NSDictionary *channelLabel = @{@"uid":labels[@"uid"],
                                        @"channelId":labels[@"channelId"],
@@ -535,7 +563,8 @@ int const CCTopRowTableView = 0;
                                        @"status":labels[@"status"],
                                        @"iconImage":labels[@"iconImage"],
                                        @"senderName":labels[@"senderName"],
-                                       @"unreadMessageNum":@"0"};
+                                       @"unreadMessageNum":@"0",
+                                       @"admin":admin};
         [self.ChannelLabels insertObject:channelLabel atIndex:indexPath.row];
         // Show right side menu button
         if ([self isVideocallEnabled:labels[@"canUseVideoChat"]]){
@@ -945,14 +974,14 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         ///edit button
         if (self.channelType == CCUnarchivedChannel) {
             self.rightBarButton = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Edit")
-                                                                   style:UIBarButtonItemStyleBordered
+                                                                   style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(didTapEditButton)];
             self.navigationItem.rightBarButtonItem = self.rightBarButton;
         }
         ///delete button
         self.deleteButton = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Delete")
-                                                             style:UIBarButtonItemStyleBordered
+                                                             style:UIBarButtonItemStylePlain
                                                             target:self
                                                             action:@selector(didTapDeleteButton)];
     }
@@ -1385,6 +1414,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                                               fontSize:CCRandomCircleAvatarFontSize
                                                             textOffset:CCRandomCircleAvatarTextOffset];
         }
+        NSNumber *admin = [[NSNumber alloc] initWithInt:0];
         NSString *messageType = @"";
         if ([object valueForKey:@"latest_message"] != nil && [object valueForKey:@"latest_message"] != [NSNull null]) {
             NSData *latestMessageData   = [object valueForKey:@"latest_message"];
@@ -1405,6 +1435,9 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
             }
             if([sender valueForKey:@"display_name"] != nil && [sender valueForKey:@"display_name"] != [NSNull null]) {
                 senderName = [sender valueForKey:@"display_name"];
+            }
+            if([sender valueForKey:@"admin"] != nil && [sender valueForKey:@"admin"] != [NSNull null]) {
+                admin = ([sender valueForKey:@"admin"] != nil) ? [sender valueForKey:@"admin"] : 0 ;
             }
             NSDictionary *caller;
             if([content valueForKey:@"caller"] != nil && [content valueForKey:@"caller"] != [NSNull null]) {
@@ -1469,7 +1502,8 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
                                        @"senderId":senderId,
                                        @"senderName":senderName,
                                        @"messageType":messageType,
-                                       @"canUseVideoChat":usersVideoChat};
+                                       @"canUseVideoChat":usersVideoChat,
+                                       @"admin":admin};
         [self.ChannelLabels addObject:channelLabel];
     }
 
@@ -1989,7 +2023,7 @@ titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
         }
     }
     
-    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+    [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) {
         [_chatAndHistoryViewController displayVoidViewController];

@@ -70,8 +70,38 @@ static const CGFloat cellHeight = 125;
 }
 
 + (CGFloat)calculateHeightForStickerAction:(NSDictionary *)stickerAction {
-    return cellHeight;
     
+    NSDictionary *actionData = [stickerAction objectForKey:@"action-data"];
+    if (actionData.count == 0) {
+        return cellHeight;
+    }
+    CGFloat labelHeightDefault = 21;
+    NSDictionary *vi = (NSDictionary*)[stickerAction objectForKey:@"view-info"];
+    NSString *lbl1 = [vi objectForKey:@"min-label"];
+    NSString *lbl2 = [vi objectForKey:@"max-label"];
+    
+    NSDictionary *labelStringAttributes = @{NSFontAttributeName : [UIFont boldSystemFontOfSize:14]};
+    NSMutableAttributedString *minLabel = [[NSMutableAttributedString alloc] initWithString:lbl1 attributes:labelStringAttributes];
+    CGRect discriptionMinLabelFrame = [minLabel boundingRectWithSize:CGSizeMake(CC_STICKER_BUBBLE_WIDTH / actionData.count , 1800)
+                                                        options:NSStringDrawingUsesLineFragmentOrigin
+                                                        context:nil];
+    NSMutableAttributedString *maxLabel = [[NSMutableAttributedString alloc] initWithString:lbl2 attributes:labelStringAttributes];
+    CGRect discriptionMaxLabelFrame = [maxLabel boundingRectWithSize:CGSizeMake(CC_STICKER_BUBBLE_WIDTH / actionData.count , 1800)
+                                                             options:NSStringDrawingUsesLineFragmentOrigin
+                                                             context:nil];
+    
+    CGFloat height = 0;
+    if (discriptionMaxLabelFrame.size.height > discriptionMinLabelFrame.size.height) {
+        height = discriptionMaxLabelFrame.size.height;
+    } else {
+        height = discriptionMinLabelFrame.size.height;
+    }
+    
+    if (height > labelHeightDefault) {
+        return cellHeight + height - labelHeightDefault;
+    }
+    
+    return cellHeight;
 }
 
 #pragma mark UICollectionView delegate/datasource
@@ -95,6 +125,10 @@ static const CGFloat cellHeight = 125;
     CCLinearScaleQuestionComponentCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
     
     [self setDefaultStyleToLabel:cell.label];
+    
+    if (row == 0) {
+      self.constraintLabelWidth.constant = cell.frame.size.width;
+    }
     
     if(row<actionData.count) {
         id textObj = [[actionData objectAtIndex:row] objectForKey:@"label"];

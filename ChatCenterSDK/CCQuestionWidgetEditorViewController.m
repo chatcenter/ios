@@ -193,6 +193,7 @@ static const float TOP_VIEW_HEIGHT = 255;
     msg.content = @{
                     @"message": @{@"text":questionContent.text},
                     @"sticker-action": [self getStickerAction],
+                    @"sticker-type":@"select",
                     @"uid": [delegate generateMessageUniqueId]
                     };
     

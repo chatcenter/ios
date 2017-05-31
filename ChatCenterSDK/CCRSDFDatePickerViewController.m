@@ -35,7 +35,7 @@
     
     UIBarButtonItem *button = [[UIBarButtonItem alloc]
                                initWithTitle:@"Done"
-                               style:UIBarButtonItemStyleBordered
+                               style:UIBarButtonItemStylePlain
                                target:self
                                action:@selector(pressDone:)];
     self.navigationItem.leftBarButtonItem = button;

@@ -430,7 +430,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
         }];
 }
 
-- (void)sendFile:(NSString *)channelId
+- (void)sendFile:(NSString *)channelId uid:(NSString *)uid
            files:(NSArray *)files
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *operation))completionHandler
 {
@@ -439,21 +439,26 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
     NSString *authentication = [NSString stringWithFormat:@"%@", token];
     [self.requestSerializer setValue:authentication forHTTPHeaderField:@"Authentication"];
     [self setDeviceInfo]; ///Just in case can not get infomation, calling this evertime
-    [self POST:url
-        parameters:nil constructingBodyWithBlock:^(id<CCAFMultipartFormData> formData){
-            for(NSDictionary *file in files){
-                [formData appendPartWithFileData:file[@"data"]
-                                            name:@"files[]"
-                                        fileName:file[@"name"]
-                                        mimeType:file[@"mimeType"]];
-            }
-        }success:^(NSURLSessionDataTask *operation, id responseObject){
-            NSLog(@"response: %@", responseObject);
-            if(completionHandler != nil) completionHandler(responseObject, nil, operation);
-        }failure:^(NSURLSessionDataTask *operation, NSError *error){
-            NSLog(@"error:%@", error);
-            if(completionHandler != nil) completionHandler(nil, error, operation);
-        }];
+    NSDictionary *param = nil;
+    if (uid != nil) {
+        param = @{@"uid":uid};
+    }
+    [self POST:url parameters:param constructingBodyWithBlock:^(id<CCAFMultipartFormData> formData) {
+        for(NSDictionary *file in files){
+            [formData appendPartWithFileData:file[@"data"]
+                                        name:@"files[]"
+                                    fileName:file[@"name"]
+                                    mimeType:file[@"mimeType"]];
+        }
+    } progress:^(NSProgress * _Nonnull uploadProgress) {
+        
+    } success:^(NSURLSessionDataTask *operation, id responseObject) {
+        NSLog(@"response: %@", responseObject);
+        if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+    } failure:^(NSURLSessionDataTask *operation, NSError *error) {
+        NSLog(@"error:%@", error);
+        if(completionHandler != nil) completionHandler(nil, error, operation);
+    }];
 }
 
 - (void)sendMessage:(NSDictionary *)content
@@ -654,6 +659,32 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
 {
     NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
     [self getMessage:channelId token:token limit:limit lastId:lastId completionHandler:completionHandler];
+}
+
+-(void)getMessage:(NSString *)channelId stickerType: (NSString *) stickerType limit:(int)limit lastId:(NSNumber *)lastId completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    
+    NSString *url = [NSString stringWithFormat:@"/api/channels/%@/messages",channelId];
+    NSDictionary *param;
+    if (lastId == nil){
+        param = @{@"sticker_type": stickerType, @"limit":[NSNumber numberWithInteger: limit]};
+    }else{
+        param = @{@"sticker_type": stickerType, @"limit":[NSNumber numberWithInteger: limit],@"last_id":lastId};
+    }
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    NSString *authentication = [NSString stringWithFormat:@"%@", token];
+    [self.requestSerializer setValue:authentication forHTTPHeaderField:@"Authentication"];
+    [self setDeviceInfo]; ///Just in case can not get infomation, calling this evertime
+    [self GET:url
+   parameters:param
+     progress:^(NSProgress * _Nonnull uploadProgress) {
+     }
+      success:^(NSURLSessionDataTask *operation, id responseObject) {
+          NSLog(@"get message response: %@", responseObject);
+          if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+      } failure:^(NSURLSessionDataTask *operation, NSError *error) {
+          if(completionHandler != nil) completionHandler(nil, error, operation);
+          NSLog(@"error:%@", error);
+      }];
 }
 
 #pragma mark - Channel

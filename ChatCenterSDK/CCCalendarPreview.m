@@ -122,7 +122,8 @@ const int CHOICE_MARGIN = 10;
     
     NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
                               @"sticker-action":@{@"action-type":@"select",
-                                                  @"action-data":actionsDatas}
+                                                  @"action-data":actionsDatas},
+                              @"sticker-type": @"schedule"
                               };
     
     // create message:sticker from data

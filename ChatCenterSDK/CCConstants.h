@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.1.2"
+#define CC_SDK_VERSION                    @"1.1.3"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_DEFAULT_VIDEO_ENABLED        1
@@ -71,6 +71,8 @@
 #define CC_STICKERTYPEIMAGE                @"sticker_image"
 #define CC_STICKERTYPECAMERA               @"camera_upload"
 
+#define CC_WIDGETTYPECALENDER               @"calendar"
+
 #define CC_LATITUDE                     @"lat"
 #define CC_LONGITUDE                    @"lng"
 
@@ -89,6 +91,12 @@
 #define CC_MESSAGE_STATUS_SEND_FAILED   1
 #define CC_MESSAGE_STATUS_DELIVERING    2
 #define CC_MESSAGE_STATUS_DRAFT         3
+
+#define TEXTAREA_WIDTH_CALC_ERROR_CORRECTION 15
+#define CC_STICKER_DATE_HEIGHT              20
+#define CC_STICKER_SENDER_NAME_HEIGHT       20
+#define CC_STICKER_ACTION_BUTTON_MIN_HEIGHT 30
+#define CC_STICKER_BUBBLE_WIDTH             240
 
 // key for notification center
 FOUNDATION_EXPORT NSString * const kCCNoti_UserReactionToSticker;

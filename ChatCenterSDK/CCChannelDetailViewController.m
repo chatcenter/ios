@@ -17,6 +17,7 @@
 #import "CCCoredataBase.h"
 #import <SafariServices/SafariServices.h>
 #import "CCNoteEditorViewController.h"
+#import "CCStickerWidgetViewController.h"
 #import "UIView+CCToast.h"
 #import "UIImageView+CCWebCache.h"
 #import "UIImage+CCSDKImage.h"
@@ -73,7 +74,10 @@
     self.titleMenuAbout.text = CCLocalizedString(@"About ChatCenter.iO");
     self.titleMenuClose.text = CCLocalizedString(@"Close Conversation");
     self.titleMenuDelete.text = CCLocalizedString(@"Delete Conversation");
-
+    self.titleMenuSchedule.text = CCLocalizedString(@"Schedule");
+    self.titleMenuQuestion.text = CCLocalizedString(@"Question");
+    self.titleMenuFileWidget.text = CCLocalizedString(@"File");
+    
     self.assigneeNotFound.text = CCLocalizedString(@"No assignee");
     self.followerNotFound.text = CCLocalizedString(@"No followers");
     self.assigneeNotFound.hidden = true;
@@ -82,17 +86,14 @@
     randomCircleAvatarFontSize = circleAvatarSize*0.75;
     randomCircleAvatarTextOffset = 1.0f + (circleAvatarSize-24.0f)*0.0625;
     self.avatars = [[NSDictionary alloc] init];
-    if ([CCConstants sharedInstance].isAgent == NO) {
-        self.emailHeightConstraint.constant = 0.0f;
-        self.socalIconHeightConstraint.constant = 0.0f;
-        self.socialIconTapAreaHeightConstraint.constant = 0.0f;
-    }
+    
     self.emailProfileInfo.textContainerInset = UIEdgeInsetsZero;
     self.emailProfileInfo.textContainer.lineFragmentPadding = 0;
-    UITapGestureRecognizer *tapEmailGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showGuestInfor:)];
+    UITapGestureRecognizer *tapEmailGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(openMail:)];
     [self.emailProfileInfo addGestureRecognizer:tapEmailGesture];
     UITapGestureRecognizer *tapIconGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showGuestInfor:)];
     [self.imageProfileTapAreaView addGestureRecognizer:tapIconGesture];
+    
     
     //--------------------------------------------------------------------
     // Display custom back button
@@ -134,7 +135,7 @@
 
 -(void) updateView {
     [self.tableView reloadData];
-    if ([CCConstants sharedInstance].isAgent== YES) {
+    if ([CCConstants sharedInstance].isAgent) {
         [self setupChannelProfileView: YES];
         
         // Agent
@@ -178,35 +179,58 @@
     //
     if (!isAgent) {
         if (self.assigneeInfo != nil) {
+            BOOL shoudDisplaySocialIcon = NO;
             [self setupAvatar:self.assigneeInfo imageView:self.channelAvatar];
             self.channelName.text = self.profileUser[@"display_name"];
+            self.emailHeightConstraint.constant = 19.0f;
+            self.socalIconHeightConstraint.constant = 19.0f;
+            self.socialIconTapAreaHeightConstraint.constant = 40.0f;
+
+            ///
+            /// Email
+            ///
+            if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]] && ![self.profileUser[@"email"] isEqualToString:@""]) {
+                self.emailProfileInfo.text = [self.profileUser[@"email"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                [self.imageProfileInfor setUserInteractionEnabled:NO];
+                [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
+                self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-mail"];
+                shoudDisplaySocialIcon = YES;
+            }
+            
+            if (!shoudDisplaySocialIcon) {
+                self.socalIconHeightConstraint.constant = 0;
+                self.socialIconTapAreaHeightConstraint.constant = 0;
+                self.emailHeightConstraint.constant = 0;
+            }
+
             [self setupOnlineStatus:self.profileUser];
         } else {
             [self setOrgProfile:self.orgUid];
         }
-        self.emailHeightConstraint.constant = 0;
-        self.socalIconHeightConstraint.constant = 0;
         return;
     }
     //
     // Agent
     //
-    if (self.guestUid != nil) {
+    if (self.guestUid != nil && isAgent) {
         [self setupAvatar:self.profileUser];
         if (self.profileUser[@"display_name"] != nil && ![self.profileUser[@"display_name"] isEqual:[NSNull null]]) {
             self.channelName.text = self.profileUser[@"display_name"];
         }
+        BOOL shoudDisplaySocialIcon = NO;
+        
         self.emailHeightConstraint.constant = 19.0f;
         self.socalIconHeightConstraint.constant = 19.0f;
         self.socialIconTapAreaHeightConstraint.constant = 40.0f;
         ///
         /// Email
         ///
-        if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]]) {
+        if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]] && ![self.profileUser[@"email"] isEqualToString:@""]) {
             self.emailProfileInfo.text = [self.profileUser[@"email"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             [self.imageProfileInfor setUserInteractionEnabled:NO];
             [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
             self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-mail"];
+            shoudDisplaySocialIcon = YES;
         }
         ///
         /// Facebook
@@ -215,6 +239,8 @@
             self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-facebook"];
             [self.imageProfileInfor setUserInteractionEnabled:YES];
             [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
+            self.emailHeightConstraint.constant = 0;
+            shoudDisplaySocialIcon = YES;
         }
         ///
         /// Twitter
@@ -223,6 +249,14 @@
             self.imageProfileInfor.image = [UIImage SDKImageNamed:@"CCicon-twitter"];
             [self.imageProfileInfor setUserInteractionEnabled:YES];
             [self.imageProfileTapAreaView setUserInteractionEnabled:YES];
+            self.emailHeightConstraint.constant = 0;
+            shoudDisplaySocialIcon = YES;
+        }
+        
+        if (!shoudDisplaySocialIcon) {
+            self.socalIconHeightConstraint.constant = 0;
+            self.socialIconTapAreaHeightConstraint.constant = 0;
+            self.emailHeightConstraint.constant = 0;
         }
         
         [self setupOnlineStatus:self.profileUser];
@@ -441,6 +475,15 @@
         [self pressCloseChannel];
     } else if (section == CC_MENU_DELETE_SECTION) {
         [self pressDeleteChannel];
+    }else if (section == CC_MENU_FILE_WIDGET_SECTION) {
+        NSString *title = CCLocalizedString(@"File");
+        [self pressesWidgetSticker:CC_MENU_STICKER_TYPE_FILE_WIDGET title:title];
+    } else if (section == CC_MENU_SCHEDULE_SECTION) {
+        NSString *title = CCLocalizedString(@"Schedule");
+        [self pressesWidgetSticker:CC_MENU_STICKER_TYPE_SCHEDULE title:title];
+    } else if (section == CC_MENU_QUESTION_SECTION) {
+        NSString *title = CCLocalizedString(@"Question");
+        [self pressesWidgetSticker:CC_MENU_STICKER_TYPE_QUESTION title:title];
     } else if (section == CC_MENU_INFORMATION_SECTION && row == CC_MENU_ABOUTAPP_CELL) {
         // About chat center
         [self pressAbout];
@@ -510,6 +553,18 @@
     [self.navigationController pushViewController:noteVC animated:YES];
 }
 
+-(void) pressesWidgetSticker: (NSString *) stickerType title: (NSString *) title {
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
+    CCStickerWidgetViewController *stickerWidgetView = [storyboard  instantiateViewControllerWithIdentifier:@"stickerWidgetViewController"];
+    stickerWidgetView.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    stickerWidgetView.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    stickerWidgetView.channelId = self.channelId;
+    stickerWidgetView.stickerType = stickerType;
+    stickerWidgetView.titleNavigation = title;
+    stickerWidgetView.uid = self.uid;
+    [self.navigationController pushViewController:stickerWidgetView animated:YES];
+}
+
 -(void) pressCloseChannel {
     NSString *channelStatus = self.channelInfo[@"status"];
     if (channelStatus != nil && [channelStatus isEqualToString:@"closed"]) {
@@ -570,18 +625,26 @@
 
 - (void)showGuestInfor:(UIGestureRecognizer*)gestureRecognizer {
     NSURL *url = nil;
+    if (self.profileUser[@"facebook_url"] != nil && ![self.profileUser[@"facebook_url"] isEqual:[NSNull null]]) {
+        url = [NSURL URLWithString:self.profileUser[@"facebook_url"]];
+        [self openURL:url];
+    } else if (self.profileUser[@"twitter_url"] != nil && ![self.profileUser[@"twitter_url"] isEqual:[NSNull null]]) {
+        url = [NSURL URLWithString:self.profileUser[@"twitter_url"]];
+        [self openURL:url];
+    } else {
+        if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]]) {
+            NSString *email = [self.profileUser[@"email"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *url = [@"mailto:" stringByAppendingString:email];
+            [[UIApplication sharedApplication]  openURL: [NSURL URLWithString: url]];
+        }
+    }
+}
+
+- (void)openMail:(UIGestureRecognizer*)gestureRecognizer {
     if (self.profileUser[@"email"] != nil && ![self.profileUser[@"email"] isEqual:[NSNull null]]) {
         NSString *email = [self.profileUser[@"email"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         NSString *url = [@"mailto:" stringByAppendingString:email];
         [[UIApplication sharedApplication]  openURL: [NSURL URLWithString: url]];
-    }
-    if (self.profileUser[@"facebook_url"] != nil && ![self.profileUser[@"facebook_url"] isEqual:[NSNull null]]) {
-        url = [NSURL URLWithString:self.profileUser[@"facebook_url"]];
-        [self openURL:url];
-    }
-    if (self.profileUser[@"twitter_url"] != nil && ![self.profileUser[@"twitter_url"] isEqual:[NSNull null]]) {
-        url = [NSURL URLWithString:self.profileUser[@"twitter_url"]];
-        [self openURL:url];
     }
 }
 
@@ -680,6 +743,9 @@
             
             // Assignee
             self.assigneeInfo = assignee;
+            ///
+            /// For Guest
+            ///
             if (assignee != nil) {
                 if ([CCConstants sharedInstance].isAgent== NO) {
                     for (int i = 0; i < optimizedUsers.count; i++) {
@@ -723,8 +789,14 @@
                     }
                 }
             }
+            
+            ///
+            /// For Agent
+            ///
+            if ([CCConstants sharedInstance].isAgent) {
+                [self updateView];
+            }
         }
-        [self updateView];
     }];
 }
 

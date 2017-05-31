@@ -196,7 +196,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
 { //get channels from server, store channels to local
     __block NSDate *blockLastUpdatedAt = lastUpdatedAt;
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...")];
     }
     [[ChatCenterClient sharedClient] getChannel:getChennelType
                                         org_uid:org_uid
@@ -438,7 +438,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channel from server and store it into coredata
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...")];
     }
     [[ChatCenterClient sharedClient] getChannel:channelUid
                               completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
@@ -550,7 +550,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
    completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get channel from server and store it into coredata
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...")];
     }
     [[ChatCenterClient sharedClient] getChannel:channelUid
                               completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
@@ -663,7 +663,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
   completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 { //get messages from server, store messages to local
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Messages...")];
     }
     __block NSNumber *blockLastId = lastId;
     [[ChatCenterClient sharedClient] getMessage:channelUid limit:limit lastId:lastId completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
@@ -768,7 +768,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     }
     ///get channels from server, store channels to local, connect channels, get messages from server, store messages to local
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     }
     [self loadChannels:NO
         getChennelType:getChennelType
@@ -827,7 +827,7 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
     completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     self.isLoadingUserToken = YES;
     if (showProgress == YES && self.currentView != nil) {
-        [CCSVProgressHUD showWithStatus:@"Checking Account..." maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Checking Account...")];
     }
     [[ChatCenterClient sharedClient] getUserToken:email
                                          password:password
@@ -901,7 +901,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
     self.isLoadingUserToken = YES;
     
     if (showProgress == YES && self.currentView != nil) {
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...")];
     }
     [[ChatCenterClient sharedClient] getUserToken:email
                                          password:password
@@ -968,7 +968,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
 
 - (void)loadOrg:(BOOL)showProgress completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler{ //get channels from server, store channels to local, connect channels,get messages from server, store messages to local
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Organizations...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Organizations...")];
     }
     [[ChatCenterClient sharedClient] getOrg:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil && result.count > 0){
@@ -1071,7 +1071,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
          userUid:(NSString*)userUid
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...")];
     }
     [[ChatCenterClient sharedClient] getUser:userUid completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
@@ -1093,7 +1093,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 - (void)loadUsers:(BOOL)showProgress
 completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Users...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Users...")];
     }
     [[ChatCenterClient sharedClient] getUsers:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
@@ -1115,7 +1115,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
 - (void)loadUserMe:(BOOL)showProgress
  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading Profile...")];
     }
     [[ChatCenterClient sharedClient] getUserMe:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
@@ -1164,7 +1164,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
 
 - (void)loadFixedPhrase: (NSString *)orgUid showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler{
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     }
     [[ChatCenterClient sharedClient] getFixedPhrases:orgUid withHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
@@ -1302,13 +1302,17 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
             if ([watchSession isReachable]) {
                 NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
                 NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
-                NSDictionary *applicationContext = @{
+                NSString *appName = [CCConstants sharedInstance].appName;
+                if (accessToken != nil && currentUid != nil && appName != nil) {
+                    NSDictionary *applicationContext = @{
                                                      @"app_token": token,
+                                                     @"app_name": appName,
                                                      @"access_token": accessToken,
                                                      @"current_uid": currentUid};
-                [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {
-                } errorHandler:^(NSError * _Nonnull error) {
-                }];
+                    [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {
+                    } errorHandler:^(NSError * _Nonnull error) {
+                    }];
+                }
             }
 #endif
             completionHandler();
@@ -1333,12 +1337,40 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
     }];
 }
 
+- (void)loadSticker:(BOOL)showProgress channelId:(NSString *) channelId
+        stickerType:(NSString *) stickerType
+              limit:(int)limit
+             lastId:(NSNumber *)lastId
+  completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    if (showProgress == YES && self.currentView != nil) {
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
+    }
+
+    [[ChatCenterClient sharedClient] getMessage:channelId stickerType:stickerType limit:limit lastId:lastId completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        
+        if(showProgress == YES && self.currentView != nil){
+            [CCSVProgressHUD dismiss];
+        }
+        
+        if (result != nil) {
+            if(completionHandler != nil) completionHandler(result, nil, task);
+        } else {
+            if(showProgress == YES && self.currentView != nil){
+                [CCSVProgressHUD showErrorWithStatus:CCLocalizedString(@"Load Message Failed")];
+            }
+            [self checkNetworkStatus];
+            if(completionHandler != nil) completionHandler(nil, error, task);
+        }
+    }];
+}
+
+
 #pragma mark - Business funnels
 -(void)loadBusinessFunnels:(BOOL)showProgress
          completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     if(showProgress == YES && self.currentView != nil){
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...")];
     }
     [[ChatCenterClient sharedClient] getBusinessFunnels:^(NSArray *result, NSError *error, NSURLSessionDataTask *task){
         if(result != nil){
@@ -1712,7 +1744,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
             return;
         }
         if (showProgress == YES && self.currentView != nil) {
-            [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+            [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
         }
         [self createUserAndConnectWebSocket:orgUid
                                   firstName:firstName
@@ -1744,7 +1776,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
         ///User already exists or no need authentication or no need registering device token
         if ([self getNetworkStatus] != CCNotReachable || CCLocalDevelopmentMode) {
             if (showProgress == YES && self.currentView != nil) {
-                [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+                [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
             }
             [self createChannelAndConnectWebSocket:orgUid channelInformations:channelInformations completionHandler:^(NSString *channelId, NSError *error, NSURLSessionDataTask *task) {
                 if (channelId != nil) {
@@ -1825,10 +1857,12 @@ providerRefreshToken:(NSString *)providerRefreshToken
 }
 
 - (void)sendFile:(NSString *)channelId
+             uid:(NSString *)uid
            files:(NSArray *)files
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     [[ChatCenterClient sharedClient] sendFile:channelId
+                                          uid:(NSString *)uid
                                         files:files
                             completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
     {
@@ -2057,7 +2091,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 
 - (void)coredataMigration:(void (^)(void))completionHandler{
     if ([[CCCoredataBase sharedClient] isRequiredMigration] == YES) {
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Data Loading...")];
         dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_async(queue, ^{[[CCCoredataBase sharedClient] doMigration];
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2392,7 +2426,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
      completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler
 {
     if (showProgress == YES && self.currentView != nil) {
-        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...") maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:CCLocalizedString(@"Loading...")];
     }
     [[ChatCenterClient sharedClient]getAppManifest:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if(showProgress == YES && self.currentView != nil){
@@ -2516,19 +2550,23 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 #ifdef CC_WATCH
 - (void)session:(WCSession *)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError *)error {
     NSString *appToken = [ChatCenterClient sharedClient].appToken;
+    NSString *appName = [CCConstants sharedInstance].appName;
     NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
     NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
     if (appToken == nil) {
-        if (accessToken != nil && currentUid != nil) {
+        if (accessToken != nil && currentUid != nil && appName != nil) {
             NSDictionary *applicationContext = @ {
                 @"access_token": accessToken,
-                @"current_uid": currentUid};
+                @"current_uid": currentUid,
+                @"app_name": appName
+            };
             
             [watchSession updateApplicationContext:applicationContext error:nil];
         }
     } else {
         NSDictionary *applicationContext = @ {
             @"app_token": appToken,
+            @"app_name": appName,
             @"access_token": accessToken,
             @"current_uid": currentUid};
         
@@ -2558,11 +2596,13 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
     NSLog(@"sessionWatchStateDidChange = %@", session);
     if ([watchSession isReachable]) {
         NSString *appToken = [ChatCenterClient sharedClient].appToken;
+        NSString *appName = [CCConstants sharedInstance].appName;
         NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
         NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
-        if (appToken != nil && accessToken != nil && currentUid != nil) {
+        if (appToken != nil && accessToken != nil && currentUid != nil && appName != nil) {
             NSDictionary *applicationContext = @ {
                                                  @"app_token": appToken,
+                                                 @"app_name": appName,
                                                  @"access_token": accessToken,
                                                  @"current_uid": currentUid};
 
@@ -2574,10 +2614,12 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 - (void)switchApp:(NSString *)appToken {
     if ([watchSession isReachable]) {
         NSString *accessToken = [[CCConstants sharedInstance] getKeychainToken];
+        NSString *appName = [CCConstants sharedInstance].appName;
         NSString *currentUid = [[CCConstants sharedInstance] getKeychainUid];
-        if (appToken != nil && accessToken != nil && currentUid != nil) {
+        if (appToken != nil && accessToken != nil && currentUid != nil && appName != nil) {
             NSDictionary *applicationContext = @{
                                                  @"app_token": appToken,
+                                                 @"app_name": appName,
                                                  @"access_token": accessToken,
                                                  @"current_uid": currentUid};
             [watchSession sendMessage:applicationContext replyHandler:^(NSDictionary<NSString *,id> * _Nonnull replyMessage) {

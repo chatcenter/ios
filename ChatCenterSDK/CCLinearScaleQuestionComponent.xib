@@ -11,23 +11,23 @@
             <rect key="frame" x="0.0" y="0.0" width="200" height="125"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Fh-Rr-IZZ">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Fh-Rr-IZZ">
+                    <rect key="frame" x="0.0" y="79" width="88" height="21"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="21" id="Cv2-e2-8QX"/>
+                        <constraint firstAttribute="width" constant="88" id="0tA-89-cAe"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tu4-3X-Dvo">
-                    <constraints>
-                        <constraint firstAttribute="height" constant="21" id="G7T-hw-cnR"/>
-                    </constraints>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tu4-3X-Dvo">
+                    <rect key="frame" x="112" y="79" width="88" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" scrollEnabled="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="ncH-jT-GXm">
+                    <rect key="frame" x="0.0" y="23" width="200" height="48"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="48" id="SWD-0B-8Lw"/>
@@ -46,20 +46,23 @@
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
-                <constraint firstAttribute="trailing" secondItem="tu4-3X-Dvo" secondAttribute="trailing" constant="12" id="5i5-N1-OCl"/>
+                <constraint firstAttribute="trailing" secondItem="tu4-3X-Dvo" secondAttribute="trailing" id="5i5-N1-OCl"/>
                 <constraint firstItem="ncH-jT-GXm" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="23" id="BWf-xU-vHE"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="5Fh-Rr-IZZ" secondAttribute="bottom" constant="20" id="Dwa-qo-ve8"/>
                 <constraint firstItem="5Fh-Rr-IZZ" firstAttribute="top" secondItem="ncH-jT-GXm" secondAttribute="bottom" constant="8" id="G71-7p-WXP"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="tu4-3X-Dvo" secondAttribute="bottom" constant="20" id="L2y-HT-3KP"/>
                 <constraint firstItem="tu4-3X-Dvo" firstAttribute="top" secondItem="ncH-jT-GXm" secondAttribute="bottom" constant="8" id="STR-yg-AK2"/>
-                <constraint firstItem="5Fh-Rr-IZZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="12" id="g6d-qT-b3q"/>
+                <constraint firstItem="5Fh-Rr-IZZ" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="g6d-qT-b3q"/>
                 <constraint firstAttribute="trailing" secondItem="ncH-jT-GXm" secondAttribute="trailing" id="irJ-8F-HQa"/>
                 <constraint firstItem="ncH-jT-GXm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="owe-cd-3FY"/>
-                <constraint firstItem="tu4-3X-Dvo" firstAttribute="leading" secondItem="5Fh-Rr-IZZ" secondAttribute="trailing" id="sti-kn-Nnr"/>
+                <constraint firstItem="tu4-3X-Dvo" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="5Fh-Rr-IZZ" secondAttribute="trailing" id="sti-kn-Nnr"/>
                 <constraint firstItem="tu4-3X-Dvo" firstAttribute="width" secondItem="5Fh-Rr-IZZ" secondAttribute="width" id="ut9-2q-BGI"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="collectionView" destination="ncH-jT-GXm" id="Xu1-Pd-OiR"/>
+                <outlet property="constraintLabelWidth" destination="0tA-89-cAe" id="v4N-4u-TvG"/>
                 <outlet property="maxLabel" destination="tu4-3X-Dvo" id="wE9-V3-TPz"/>
                 <outlet property="minLabel" destination="5Fh-Rr-IZZ" id="nbo-td-7hw"/>
             </connections>

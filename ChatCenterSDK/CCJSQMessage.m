@@ -580,7 +580,11 @@
             return nil;
         } else {
             NSInteger num = [[components[0] substringFromIndex:1] integerValue];
-            retObj = [(NSArray*)obj objectAtIndex:num];
+            if ([(NSArray *)obj count] > num ) {
+                retObj = [(NSArray*)obj objectAtIndex:num];
+            } else {
+                return nil;
+            }
         }
     } else {
         if (![obj isKindOfClass:[NSDictionary class]]) {

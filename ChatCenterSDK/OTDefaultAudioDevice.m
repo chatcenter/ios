@@ -412,7 +412,7 @@ static NSString* FormatError(OSStatus error)
     else
     {
         // no, format it as an integer
-        return [NSString stringWithFormat:@"%d", error];
+        return [NSString stringWithFormat:@"%d", (int) error];
     }
 }
 

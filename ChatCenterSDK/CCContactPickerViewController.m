@@ -81,11 +81,11 @@ NSString *THContactPickerContactCellReuseID = @"THContactPickerContactCell";
     [self.view insertSubview:self.tableView belowSubview:self.contactPickerView];
     
     UIBarButtonItem *cancelBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Cancel")
-                                                                        style:UIBarButtonItemStyleBordered
+                                                                        style:UIBarButtonItemStylePlain
                                                                        target:self
                                                                        action:@selector(didTapCancelBtn)];
     self.createBtn = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Create")
-                                                                  style:UIBarButtonItemStyleBordered
+                                                                  style:UIBarButtonItemStylePlain
                                                                  target:self
                                                                  action:@selector(didTapCreateBtn)];
     self.navigationItem.leftBarButtonItem = cancelBtn;

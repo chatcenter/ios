@@ -125,12 +125,15 @@
     NSLog(@"delegate = %@", delegate);
     if (delegate != nil) {
         NSLog(@"send message");
-        [delegate sendWidgetWithType:message.type andContent:message.content];
         if ([message.type isEqualToString:CC_STICKERTYPEIMAGE]) {
-            [self.navigationController popViewControllerAnimated:YES];
-            return;
+            if (self.navigationController != nil) {
+                [delegate sendWidgetWithType:message.type andContent:message.content];
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+        } else {
+            [delegate sendWidgetWithType:message.type andContent:message.content];
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         }
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     }
 }
 

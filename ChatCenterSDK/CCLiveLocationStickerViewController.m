@@ -183,6 +183,7 @@ float MAP_ZOOM_BUILDINGS = 20;
                                                       @{@"lat":[NSString stringWithFormat:@"%f", self.mapView.myLocation.coordinate.latitude],
                                                         @"lng":[NSString stringWithFormat:@"%f", self.mapView.myLocation.coordinate.longitude]}
                                                   },
+                                            @"sticker-type": @"location",
                                             @"thumbnail-url" : mapThumbURLStr
                                             }
                                       };
@@ -203,7 +204,7 @@ float MAP_ZOOM_BUILDINGS = 20;
 
 - (void)doneLiveLocationSticker:(id)sender {
     if (!tappedDoneButton) {
-        [CCSVProgressHUD showWithStatus:nil maskType:SVProgressHUDMaskTypeBlack];
+        [CCSVProgressHUD showWithStatus:nil];
         tappedDoneButton = YES;
         NSUserDefaults *userDefault = [NSUserDefaults standardUserDefaults];
         [userDefault setInteger:durationList[durationIndex] forKey:kCCUserDefaults_liveLocationDuration];

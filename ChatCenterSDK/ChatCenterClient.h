@@ -55,7 +55,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
           channelId:(NSString *)channelId
                type:(NSString *)type
   completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
-- (void)sendFile:(NSString *)channelId
+- (void)sendFile:(NSString *)channelId uid:(NSString *)uid
            files:(NSArray *)files
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (void)sendMessageStatus:(NSString *)channelId messageIds:(NSArray *)messageIds completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
@@ -74,6 +74,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
              question_id:(NSString *)question_id
        completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 -(void)sendSuggestionMessage:(NSString *)channelId answer:(NSObject *)answer text:(NSString *)text replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+-(void)getMessage:(NSString *)channelId stickerType: (NSString *) stickerType limit:(int)limit lastId:(NSNumber *)lastId completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 ///Channel
 -(void)createChannel:(NSString *)orgUid
  channelInformations:(NSDictionary *)channelInformations

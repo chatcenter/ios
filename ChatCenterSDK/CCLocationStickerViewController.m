@@ -125,7 +125,8 @@ int mapTapCount = 0; // Count times tap on the MapView
                                                         @"lng":[NSString stringWithFormat:@"%f", selectedPlace.coordinate.longitude]}
                                                   },
                                             @"thumbnail-url" : mapThumbURLStr
-                                            }
+                                            },
+                                      @"sticker-type": @"location"
                                       };
     CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
     msg.type = CC_RESPONSETYPESTICKER;

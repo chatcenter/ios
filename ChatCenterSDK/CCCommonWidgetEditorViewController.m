@@ -53,6 +53,17 @@
     if ([self validInput]) {
         [self showPreviewView];
     }
+    else {
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"Please fill in items.") preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction
+                                   actionWithTitle:CCLocalizedString(@"OK")
+                                   style:UIAlertActionStyleDefault
+                                   handler:^(UIAlertAction *action) {
+                                   }];
+        [alertController addAction:okAction];
+        [self presentViewController:alertController animated:YES completion:nil];
+    }
+
 }
 
 - (void) showPreviewView {

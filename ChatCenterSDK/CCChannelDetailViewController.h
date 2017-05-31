@@ -12,11 +12,19 @@
 #define CC_MENU_VIEWERS_SECTION             2
 #define CC_MENU_FUNNEL_SECTION              3
 #define CC_MENU_NOTE_SECTION                4
-#define CC_MENU_INFORMATION_SECTION         5
-#define CC_MENU_CLOSE_SECTION               6
-#define CC_MENU_DELETE_SECTION              7
-#define CC_MENU_DIRECTORIES_SECTION         8
+#define CC_MENU_FILE_WIDGET_SECTION         5
+#define CC_MENU_SCHEDULE_SECTION            6
+#define CC_MENU_QUESTION_SECTION            7
+#define CC_MENU_INFORMATION_SECTION         8
+#define CC_MENU_CLOSE_SECTION               9
+#define CC_MENU_DELETE_SECTION              10
+#define CC_MENU_DIRECTORIES_SECTION         11
 #define CC_MENU_ABOUTAPP_CELL               0
+
+#define CC_MENU_STICKER_TYPE_FILE_WIDGET    @"file"
+#define CC_MENU_STICKER_TYPE_SCHEDULE       @"schedule"
+#define CC_MENU_STICKER_TYPE_QUESTION  @"select"
+#define CC_MENU_STICKER_TYPE_LOCATION   @"location"
 
 @interface CCChannelDetailViewController : UITableViewController<UICollectionViewDataSource, UICollectionViewDelegate>
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
@@ -28,6 +36,9 @@
 @property (strong, nonatomic) IBOutlet UILabel *titleMenuAbout;
 @property (strong, nonatomic) IBOutlet UILabel *titleMenuClose;
 @property (strong, nonatomic) IBOutlet UILabel *titleMenuDelete;
+@property (weak, nonatomic) IBOutlet UILabel *titleMenuFileWidget;
+@property (weak, nonatomic) IBOutlet UILabel *titleMenuSchedule;
+@property (weak, nonatomic) IBOutlet UILabel *titleMenuQuestion;
 
 
 // Channel information (can be Guest, Assignee

@@ -9,6 +9,7 @@
 #import "CCConstants.h"
 #import "ChatCenterPrivate.h"
 #import "CCSSKeychain.h"
+#import "CCSVProgressHUD.h"
 
 @implementation CCConstants
 
@@ -59,7 +60,7 @@ const int CCUploadFileSizeLimit = 20 * 1024 * 1024; // 20MB
         instance.isAgent = NO;
         instance.isModal = NO;
         instance.enableVideoCall = CC_DEFAULT_VIDEO_ENABLED;
-        
+        [CCSVProgressHUD setDefaultMaskType:SVProgressHUDMaskTypeClear];
     });
     return instance;
 }

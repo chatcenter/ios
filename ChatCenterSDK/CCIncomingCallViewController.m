@@ -222,7 +222,7 @@
                 break;
             }
         }
-        NSString *callerId = [[caller objectForKey:@"user_id"] stringValue];
+        NSString *callerId = [[caller objectForKey:@"user_id"] respondsToSelector:@selector(stringValue)] ? [[caller objectForKey:@"user_id"] stringValue]: [caller objectForKey:@"user_id"];
         if ((!rejectedUserInReceivers && [callerId isEqualToString:rejectedUserId])|| (rejectedUserInReceivers && [rejectedUserId isEqualToString:uid])) {
             needCloseView = YES;
             break;

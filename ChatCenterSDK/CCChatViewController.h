@@ -54,6 +54,8 @@
 @property BOOL onResendingFailedMessages;
 @property BOOL isReturnFromRightMenuView;
 @property BOOL isReturnFromVideoCallView;
+@property BOOL isReturnFromStickerView;
+@property BOOL shouldDisplayFixedPhraseMenu;
 @property (nonatomic, strong) NSArray *twilioInviteList;
 
 @property (nonatomic, strong) NSString *pendingFixedPhrase;
@@ -100,7 +102,6 @@
 - (void) pressPhrase;
 - (void) pressVideoCall;
 - (void) pressVoiceCall;
-- (BOOL)processUserMeVideoChatInfo;
 - (BOOL)processChannelUserVideoChatInfo;
 
 //// Called locally and from CCSuggestionInputView

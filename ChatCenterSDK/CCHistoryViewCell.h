@@ -18,4 +18,7 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *UnassignedWidth;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *UnassignedRightMargin;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *LastMessageRightMargin;
+@property (strong, nonatomic) IBOutlet UIImageView *imageReply;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *imageReplyWidth;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *imageReplyLeftMargin;
 @end

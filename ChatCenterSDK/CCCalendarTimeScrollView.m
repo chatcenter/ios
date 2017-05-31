@@ -167,12 +167,7 @@ const int TAG_VIEW_GOOGLE_CALENDAR = 99;
     NSDate *crtDate = [NSDate date];
     NSUInteger flags;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_8_0
-    float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if (osVersion >= 8.0f)  {
-        flags = NSCalendarUnitHour | NSCalendarUnitMinute;
-    } else {
-        flags = NSHourCalendarUnit | NSMinuteCalendarUnit;
-    }
+    flags = NSCalendarUnitHour | NSCalendarUnitMinute;
 #else
     flags = NSHourCalendarUnit | NSMinuteCalendarUnit;
 #endif

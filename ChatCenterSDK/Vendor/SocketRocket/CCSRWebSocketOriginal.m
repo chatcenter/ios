@@ -652,6 +652,8 @@ static __strong NSData *CRLFCRLF;
         case NSURLNetworkServiceTypeVoice:
             networkServiceType = NSStreamNetworkServiceTypeVoice;
             break;
+        default:
+            break;
     }
     
     if (networkServiceType != nil) {

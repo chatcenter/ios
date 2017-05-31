@@ -73,6 +73,18 @@
             }
         }
         
+        ///
+        /// Remove fixed phrase if user is Guest and at least one fixed phrase message is available
+        ///
+        if (owner.shouldDisplayFixedPhraseMenu) {
+            for (int i = 0; i < stickers.count; i++) {
+                if ([stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]) {
+                    [stickers removeObject:stickers[i]];
+                    break;
+                }
+            }
+        }
+        
         float stickerButtonWidth = screen.bounds.size.width / 3;
         float stickerButtonHeight = 80.0;
         float labelX = 0;

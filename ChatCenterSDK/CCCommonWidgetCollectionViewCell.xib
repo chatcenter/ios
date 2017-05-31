@@ -1,24 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="wd7-5l-VOn" userLabel="Common Sticker Preview Collection View Cell" customClass="CCCommonStickerPreviewCollectionViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="114"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="" id="wd7-5l-VOn" userLabel="Common Widget Collection View Cell" customClass="CCCommonWidgetCollectionViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="134"/>
             <autoresizingMask key="autoresizingMask"/>
             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="114"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="134"/>
                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T5J-rg-BMw">
+                        <rect key="frame" x="40" y="0.0" width="240" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="55W-xt-Pb4"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" weight="medium" pointSize="12"/>
+                        <color key="textColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                     <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Czv-rc-PGu" userLabel="Sticker container">
-                        <rect key="frame" x="40" y="0.0" width="240" height="114"/>
+                        <rect key="frame" x="40" y="20" width="240" height="114"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="7Eo-Ty-6NC">
                                 <rect key="frame" x="0.0" y="0.0" width="30" height="38"/>
@@ -27,7 +36,7 @@
                                     <constraint firstAttribute="height" constant="38" id="gox-AI-o6z"/>
                                 </constraints>
                             </imageView>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Live" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L7M-DF-Z8N">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Live" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L7M-DF-Z8N">
                                 <rect key="frame" x="205" y="10" width="30" height="15"/>
                                 <color key="backgroundColor" red="0.98039215690000003" green="0.35686274509999999" blue="0.32156862749999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -89,21 +98,26 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="Czv-rc-PGu" secondAttribute="bottom" id="8NS-BN-iKm"/>
+                <constraint firstItem="Czv-rc-PGu" firstAttribute="top" secondItem="T5J-rg-BMw" secondAttribute="bottom" id="NE0-FV-ItA"/>
+                <constraint firstItem="T5J-rg-BMw" firstAttribute="top" secondItem="wd7-5l-VOn" secondAttribute="top" id="Rvn-0g-Xnf"/>
+                <constraint firstItem="T5J-rg-BMw" firstAttribute="leading" secondItem="Czv-rc-PGu" secondAttribute="leading" id="T9A-5S-j7j"/>
                 <constraint firstItem="Czv-rc-PGu" firstAttribute="centerX" secondItem="wd7-5l-VOn" secondAttribute="centerX" id="Tgj-DS-98p"/>
-                <constraint firstItem="Czv-rc-PGu" firstAttribute="top" secondItem="wd7-5l-VOn" secondAttribute="top" id="Y47-bQ-9iv"/>
+                <constraint firstItem="Czv-rc-PGu" firstAttribute="trailing" secondItem="T5J-rg-BMw" secondAttribute="trailing" id="Yhp-ol-LTE"/>
             </constraints>
             <size key="customSize" width="143" height="89"/>
             <connections>
-                <outlet property="discriptionView" destination="gVf-yo-XVA" id="5HY-ZU-ro2"/>
-                <outlet property="discriptionViewHeight" destination="tgh-Re-ey4" id="Iet-Rt-A6S"/>
-                <outlet property="headerImageView" destination="7Eo-Ty-6NC" id="HYI-kp-AmH"/>
-                <outlet property="headerImageViewWidthConstraint" destination="V3j-td-w71" id="deb-Hz-fOg"/>
-                <outlet property="headerLiveWidgetLabel" destination="L7M-DF-Z8N" id="kN1-w9-Hpk"/>
-                <outlet property="stickerActionsContainer" destination="49L-W3-fJg" id="CZ3-0b-59s"/>
-                <outlet property="stickerActionsContainerHeight" destination="vd9-Gb-Gi2" id="Nke-1T-3uh"/>
-                <outlet property="stickerContainer" destination="Czv-rc-PGu" id="fRd-MZ-eMg"/>
-                <outlet property="stickerObjectContainer" destination="oPi-CS-z63" id="nXC-dd-Gkp"/>
-                <outlet property="stickerObjectContainerHeight" destination="kXz-Z5-xyh" id="Foc-w7-HoJ"/>
+                <outlet property="discriptionView" destination="gVf-yo-XVA" id="khh-oG-K5K"/>
+                <outlet property="discriptionViewHeight" destination="tgh-Re-ey4" id="7x0-hJ-1mH"/>
+                <outlet property="headerImageView" destination="7Eo-Ty-6NC" id="9JE-QX-7mK"/>
+                <outlet property="headerImageViewWidthConstraint" destination="V3j-td-w71" id="qFL-an-Aru"/>
+                <outlet property="headerLiveWidgetLabel" destination="L7M-DF-Z8N" id="zFj-dM-OQR"/>
+                <outlet property="stickerActionsContainer" destination="49L-W3-fJg" id="QII-wZ-MAP"/>
+                <outlet property="stickerActionsContainerHeight" destination="vd9-Gb-Gi2" id="0Hm-FX-1VP"/>
+                <outlet property="stickerContainer" destination="Czv-rc-PGu" id="8hC-kN-YjN"/>
+                <outlet property="stickerContainerWidth" destination="Ap0-fy-vbd" id="KNe-7R-Ub1"/>
+                <outlet property="stickerObjectContainer" destination="oPi-CS-z63" id="lDP-ly-2zp"/>
+                <outlet property="stickerObjectContainerHeight" destination="kXz-Z5-xyh" id="4q1-33-h3H"/>
+                <outlet property="stickerTopLabel" destination="T5J-rg-BMw" id="XvJ-Xw-JrJ"/>
             </connections>
             <point key="canvasLocation" x="289" y="321"/>
         </collectionViewCell>

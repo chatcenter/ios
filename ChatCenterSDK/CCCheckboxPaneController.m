@@ -69,7 +69,7 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
     cell.textView.leftViewMode = UITextFieldViewModeAlways;
     cell.textView.text = label;
     cell.textView.delegate = self;
-    cell.textView.placeholder = [NSString stringWithFormat:@"%@ %ld", CCLocalizedString(@"Option"), indexPath.row + 1];
+    cell.textView.placeholder = [NSString stringWithFormat:@"%@ %ld", CCLocalizedString(@"Option"), (long)(indexPath.row + 1)];
     cell.index = indexPath.row;
     cell.delegate = self;
     if(optionLabels.count == 1 && indexPath.row == 0) {
