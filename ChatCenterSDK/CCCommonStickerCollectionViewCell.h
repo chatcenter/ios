@@ -34,5 +34,5 @@
 - (NSAttributedString*)createMessageString:(CCJSQMessage*)msg;
 
 - (void)resetSelection;
-
+- (void)setupQuestionComponentWithMessage:(CCJSQMessage*)msg needRecreateSubviews:(BOOL)needRecreateSubviews;
 @end

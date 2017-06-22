@@ -11,6 +11,7 @@
 #import "CCSingleSelectionPaneController.h"
 #import "CCCheckboxPaneController.h"
 #import "CCLinearScalePaneController.h"
+#import "CCPulldownSelectionPaneController.h"
 #import "ChatCenterPrivate.h"
 #import "CCConstants.h"
 #import "UIImage+CCSDKImage.h"
@@ -19,7 +20,8 @@ typedef enum{
     YesNo,
     MultipleChoise,
     Checkbox,
-    LinearScale
+    LinearScale,
+    Pulldown
 }AnswerType;
 
 
@@ -49,6 +51,7 @@ static const float TOP_VIEW_HEIGHT = 255;
 
 - (void) viewSetup {
     self.navigationController.navigationBar.barTintColor = [UIColor whiteColor];
+    [typeAnswerIcon setTintColor:[UIColor blackColor]];
 
     UITapGestureRecognizer *selectTypeAnswerTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapTypeAnswerSelector:)];
     [typeAnswerSelectorView addGestureRecognizer:selectTypeAnswerTapGesture];
@@ -125,6 +128,16 @@ static const float TOP_VIEW_HEIGHT = 255;
                                                   handler:^(UIAlertAction *action){
                                                       [self linearScaleAnswer];
                                                   }]];
+    
+    //
+    // Pulldown Selection
+    //
+    [actionSheet addAction:[UIAlertAction actionWithTitle:CCLocalizedString(@"Pulldown")
+                                                    style:UIAlertActionStyleDefault
+                                                  handler:^(UIAlertAction * _Nonnull action) {
+                                                      [self pulldownAnswer];
+                                                  }]];
+    
     [actionSheet addAction:[UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel")
                                                     style:UIAlertActionStyleDestructive
                                                   handler:nil]];
@@ -146,6 +159,9 @@ static const float TOP_VIEW_HEIGHT = 255;
     long textLenght = inputText.length;
     if (textLenght > CCWidgetInputTitleLimit) {
         textView.text = [inputText substringToIndex:CCWidgetInputTitleLimit];
+        CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:nil message:[NSString stringWithFormat:CCLocalizedString(@"Please input %d characters or less."), CCWidgetInputTitleLimit]];
+        [alert addActionWithTitle:CCLocalizedString(@"OK") handler:nil];
+        [alert show];
     }
 }
 
@@ -168,6 +184,10 @@ static const float TOP_VIEW_HEIGHT = 255;
         } else if (_answerType == LinearScale) {
             UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
             CCLinearScalePaneController *paneController = (CCLinearScalePaneController *) [[navigationController viewControllers] lastObject];
+            return [paneController validInput];
+        } else if (_answerType == Pulldown) {
+            UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
+            CCPulldownSelectionPaneController *paneController = (CCPulldownSelectionPaneController *) [[navigationController viewControllers] lastObject];
             return [paneController validInput];
         }
         return YES;
@@ -234,6 +254,14 @@ static const float TOP_VIEW_HEIGHT = 255;
     [self setScrollViewDelegate];
 }
 
+- (void) pulldownAnswer {
+    _answerType = Pulldown;
+    typeAnswerIcon.image = [UIImage SDKImageNamed:@"selectbox"];
+    typeAnswerLabel.text = CCLocalizedString(@"Pulldown");
+    [[self.childViewControllers lastObject] performSegueWithIdentifier:@"pulldown" sender:self];
+    [self setScrollViewDelegate];
+}
+
 - (void) setScrollViewDelegate {
     UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
     if (_answerType == YesNo) {
@@ -248,6 +276,9 @@ static const float TOP_VIEW_HEIGHT = 255;
     } else if (_answerType == LinearScale) {
         CCLinearScalePaneController *paneController = (CCLinearScalePaneController *) [[navigationController viewControllers] lastObject];
         paneController.scrollViewDelegate = self;
+    } else if (_answerType == Pulldown) {
+        CCPulldownSelectionPaneController *paneController = (CCPulldownSelectionPaneController *) [[navigationController viewControllers] lastObject];
+        paneController.scrollViewDelegate = self; 
     }
 }
 
@@ -294,6 +325,10 @@ static const float TOP_VIEW_HEIGHT = 255;
     } else if (_answerType == LinearScale) {
         UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
         CCLinearScalePaneController *paneController = (CCLinearScalePaneController *) [[navigationController viewControllers] lastObject];
+        return [paneController getStickerAction];
+    } else if (_answerType == Pulldown) {
+        UINavigationController *navigationController = (UINavigationController *)[self.childViewControllers lastObject];
+        CCPulldownSelectionPaneController *paneController = (CCPulldownSelectionPaneController *) [[navigationController viewControllers] lastObject];
         return [paneController getStickerAction];
     }
     return nil;

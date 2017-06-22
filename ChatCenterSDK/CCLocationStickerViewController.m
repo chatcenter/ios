@@ -136,6 +136,7 @@ int mapTapCount = 0; // Count times tap on the MapView
     CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
     [vc setDelegate:self.delegate];
     [vc setMessage:msg];
+    vc.closeWidgetPreviewCallback = self.closeLocationStickerCallback;
     returnFromPreview = YES;
     [self.navigationController pushViewController:vc animated:YES];
 }

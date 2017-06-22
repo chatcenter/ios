@@ -14,11 +14,11 @@
 
 @implementation CCWidgetMenuView
 
-- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner {
+- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner shouldShowSuggestion:(BOOL)shouldShowSuggestion {
     if(self =[super initWithFrame:frame]) {
-        UIScreen *screen = [UIScreen mainScreen];
-        
-        self.backgroundColor = [UIColor colorWithRed:242.0/256 green:242.0/256 blue:242.0/256 alpha:1];
+        self.shouldShowSuggestion = shouldShowSuggestion;
+        self.buttons = [[NSMutableArray alloc] init];
+        self.backgroundColor = [UIColor whiteColor];
         
         NSMutableArray *stickers = [[CCConstants sharedInstance].stickers mutableCopy];
         for (int i = 0;i < stickers.count; i++) {
@@ -73,122 +73,90 @@
             }
         }
         
-        ///
-        /// Remove fixed phrase if user is Guest and at least one fixed phrase message is available
-        ///
-        if (owner.shouldDisplayFixedPhraseMenu) {
-            for (int i = 0; i < stickers.count; i++) {
-                if ([stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]) {
-                    [stickers removeObject:stickers[i]];
-                    break;
-                }
-            }
-        }
-        
-        float stickerButtonWidth = screen.bounds.size.width / 3;
-        float stickerButtonHeight = 80.0;
-        float labelX = 0;
-        float labelY = 50.0;
-        float labelWidth = stickerButtonWidth;
-        float labelHeight = 25.0;
-        
+        float stickerButtonWidth = 50.0;
+        float stickerButtonHeight = 44.0;
+
         //
         // Add scroll view
         //
         UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:frame];
-        scrollView.contentSize = CGSizeMake(screen.bounds.size.width, stickerButtonHeight * ceil((float)stickers.count / 3));
-        scrollView.showsHorizontalScrollIndicator = YES;
+        if (shouldShowSuggestion) {
+            scrollView.contentSize = CGSizeMake((stickers.count + 2) * stickerButtonWidth, stickerButtonHeight);
+        } else {
+            scrollView.contentSize = CGSizeMake((stickers.count + 1) * stickerButtonWidth, stickerButtonHeight);
+        }
+        scrollView.showsHorizontalScrollIndicator = NO;
+        scrollView.showsVerticalScrollIndicator = NO;
         [self addSubview:scrollView];
         
-        //Add top padding
-        UIView *topPaddingView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screen.bounds.size.width, 1)];
-        topPaddingView.backgroundColor = [UIColor colorWithRed:227.0/256 green:227.0/256 blue:227.0/256 alpha:1];
-        [scrollView addSubview:topPaddingView];
-        
+        ///
+        /// Add text mode button
+        ///
+        UIButton *textModeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        CGRect textModeButtonFrame = CGRectMake(0, 0, stickerButtonWidth, stickerButtonHeight);
+        textModeButton.frame = textModeButtonFrame;
+        textModeButton.opaque = YES;
+        textModeButton.layer.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.0].CGColor;
+        UIImage *iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_text"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        [textModeButton addTarget:_owner action:@selector(switchToInputTextMode) forControlEvents:UIControlEventTouchUpInside];
+        [textModeButton setImage:iconImage forState:UIControlStateNormal];
+        [textModeButton setTintColor:[UIColor lightGrayColor]];
+        [scrollView addSubview:textModeButton];
+        [self.buttons addObject:textModeButton];
+        ///
+        /// Add suggestion mode button
+        ///
+        if (shouldShowSuggestion) {
+            UIButton *suggestionModeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+            CGRect suggestionModeButtonFrame = CGRectMake(1 * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
+            suggestionModeButton.frame = suggestionModeButtonFrame;
+            suggestionModeButton.opaque = YES;
+            suggestionModeButton.layer.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.0].CGColor;
+            UIImage *suggestionIconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_suggestion"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            [suggestionModeButton addTarget:_owner action:@selector(switchToSuggestionMode) forControlEvents:UIControlEventTouchUpInside];
+            [suggestionModeButton setImage:suggestionIconImage forState:UIControlStateNormal];
+            [suggestionModeButton setTintColor:[CCConstants sharedInstance].baseColor];
+            [scrollView addSubview:suggestionModeButton];
+            [self.buttons addObject:suggestionModeButton];
+        }
         
         for (int i = 0;i < stickers.count; i++) {
             UIButton *stickerButton = [UIButton buttonWithType:UIButtonTypeCustom];
-            CGRect stickerButtonFrame = CGRectMake((i % 3) * stickerButtonWidth, ((int)floorf(i / 3)) * stickerButtonHeight, stickerButtonWidth, stickerButtonHeight);
+            CGRect stickerButtonFrame;
+            if (shouldShowSuggestion) {
+                stickerButtonFrame = CGRectMake((i + 2) * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
+            } else {
+                stickerButtonFrame = CGRectMake((i + 1) * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
+            }
             stickerButton.frame = stickerButtonFrame;
             stickerButton.opaque = YES;
             stickerButton.layer.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.0].CGColor;
-            
-            UIView *rectangle = [[UIView alloc] initWithFrame:CGRectMake(0, 0, stickerButtonWidth, stickerButtonHeight)];
-            rectangle.userInteractionEnabled = NO;
-            // Add padding
-            UIView *paddingView = [[UIView alloc] initWithFrame:CGRectMake(stickerButtonWidth - 1, 0, 1, stickerButtonHeight)];
-            paddingView.backgroundColor = [UIColor colorWithRed:227.0/256 green:227.0/256 blue:227.0/256 alpha:1];
-            [rectangle addSubview:paddingView];
-            UIView *paddingView2 = [[UIView alloc] initWithFrame:CGRectMake(0, stickerButtonHeight - 1, stickerButtonWidth, 1)];
-            paddingView2.backgroundColor = [UIColor colorWithRed:227.0/256 green:227.0/256 blue:227.0/256 alpha:1];
-            [rectangle addSubview:paddingView2];
-            
-            UIImageView *icon = [[UIImageView alloc] init];
-            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(labelX, labelY, labelWidth, labelHeight)];
-            label.userInteractionEnabled = NO;
-            label.textColor = [CCConstants sharedInstance].baseColor;
-            label.font = [UIFont systemFontOfSize:14.0];
-            label.textAlignment = NSTextAlignmentCenter;
+
             UIImage *iconImage;
             if ([stickers[i] isEqualToString:CC_STICKERTYPEDATETIMEAVAILABILITY]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_calendar"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Schedule");
                 [stickerButton addTarget:_owner action:@selector(pressCalendar) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPELOCATION]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_location"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Location");
                 [stickerButton addTarget:_owner action:@selector(pressLocationWidget) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPETHUMB]) {
                 iconImage = [[UIImage SDKImageNamed:@"questionBubbleIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Question");
                 [stickerButton addTarget:_owner action:@selector(pressThumb) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPEFILE]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_image"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Image");
                 [stickerButton addTarget:_owner action:@selector(pressImage) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPECAMERA]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_camera"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Camera");
                 [stickerButton addTarget:_owner action:@selector(takePhoto) forControlEvents:UIControlEventTouchUpInside];
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_fixed_phrase"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Saved");
                 [stickerButton addTarget:_owner action:@selector(pressPhrase) forControlEvents:UIControlEventTouchUpInside];
-            } else if ([stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]) {
-                iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_videocall"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Videochat");
-                CGRect oldFrame = label.frame;
-                oldFrame.size.width = oldFrame.size.width + 40;
-                oldFrame.origin.x = oldFrame.origin.x - 20;
-                [label setFrame:oldFrame];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-                [stickerButton addTarget:_owner action:@selector(pressVideoCall) forControlEvents:UIControlEventTouchUpInside];
-#pragma clang diagnostic pop
-            } else if ([stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]) {
-                iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_phone"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                label.text = CCLocalizedString(@"Voicechat");
-                CGRect oldFrame = label.frame;
-                oldFrame.size.width = oldFrame.size.width + 40;
-                oldFrame.origin.x = oldFrame.origin.x - 20;
-                [label setFrame:oldFrame];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wundeclared-selector"
-                [stickerButton addTarget:_owner action:@selector(pressVoiceCall) forControlEvents:UIControlEventTouchUpInside];
-#pragma clang diagnostic pop
             }
-            float iconX = stickerButtonWidth/2 - iconImage.size.width/2;
-            float iconY = stickerButtonHeight/2 - iconImage.size.height/2 - 10;
-            icon.frame = CGRectMake(iconX, iconY, iconImage.size.width, iconImage.size.height);
-            icon.image = iconImage;
-            icon.tintColor = [CCConstants sharedInstance].baseColor;
-            [rectangle addSubview:icon];
-            [stickerButton addSubview:label];
-            [stickerButton addSubview:rectangle];
+            [stickerButton setTintColor:[UIColor lightGrayColor]];
+            [stickerButton setImage:iconImage forState:UIControlStateNormal];
             [scrollView addSubview:stickerButton];
+            [self.buttons addObject:stickerButton];
         }
-        
-
     }
     return self;
     

@@ -654,16 +654,13 @@ int const CCMaxLoadOrg = 10000;
         [self presentViewController:alertController animated:YES completion:nil];
         return;
     }
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
-    float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if(osVersion >= 9.0) {
-        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL];
-        webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
-        [self presentViewController:webViewController animated:YES completion:nil];
-        return;
-    }
-#endif
-    [[UIApplication sharedApplication] openURL:URL];
+    
+    NSString *title = CCLocalizedString(@"ChatCenter iO for iOS");
+    CCWebViewController *webViewController = [[CCWebViewController alloc] initWithURL:URL.absoluteString title:title isOpenDashboard: YES];
+    webViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+    webViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
+    UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:webViewController];
+    [self presentViewController:rootNC animated:YES completion:nil];
 }
 
 @end

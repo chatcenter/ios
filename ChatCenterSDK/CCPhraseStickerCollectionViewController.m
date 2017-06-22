@@ -452,7 +452,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
 }
 
 - (NSString *)generateMessageUniqueId {
-    NSString *generatedUniqueId = [NSString stringWithFormat:@"%@-%@-%ld", _channelId, _userId, (long)([[NSDate date] timeIntervalSince1970] * 1000)];
+    NSString *generatedUniqueId = [NSString stringWithFormat:@"%@-%@-%f", _channelId, _userId, (double)([[NSDate date] timeIntervalSince1970] * 1000)];
     return generatedUniqueId;
 }
 

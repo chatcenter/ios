@@ -21,6 +21,7 @@
 #import "CCSSKeychain.h"
 #import "CCAFNetworkActivityLogger.h"
 #import "CCHistoryFilterUtil.h"
+#import "CCParseUtils.h"
 
 #ifndef EXIST_GOOGLEMAPS_API_KEY
 #import <GoogleMaps/GoogleMaps.h>
@@ -328,11 +329,13 @@ BOOL const offlineDevelopmentMode = NO;  ///Insert "YES" only when developing wi
                 [CCSVProgressHUD dismiss];
             }
             
-            self.ChatChannelIds = [[NSMutableArray alloc] init];
-            if([[CCCoredataBase sharedClient] deleteAllChannel]){
-                NSLog(@"deleteAllChannel Success!");
-            }else{
-                NSLog(@"deleteAllChannel Error!");
+            if (lastUpdatedAt == nil) {
+                self.ChatChannelIds = [[NSMutableArray alloc] init];
+                if([[CCCoredataBase sharedClient] deleteAllChannel]){
+                    NSLog(@"deleteAllChannel Success!");
+                }else{
+                    NSLog(@"deleteAllChannel Error!");
+                }
             }
             NSMutableDictionary *unreadMessagesDic = [NSMutableDictionary dictionary];
             for (int i = 0; i < result.count; i++) {
@@ -2580,6 +2583,18 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
         [ChatCenter setAppToken:appToken completionHandler:^{
             [[CCConnectionHelper sharedClient] reloadOrgsAndChannelsAndConnectWebSocket];
         }];
+        return;
+    }
+    
+    NSString *action = message[@"action"];
+    if ([action isEqualToString:@"loadUnreadChannels"]) {
+        [self loadFixedPhraseAndUnreadChannels:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+            NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+            if (result != nil) {
+                NSDictionary *normalized = [CCParseUtils removeUnsupportedTypesFrom:result];
+                replyHandler(normalized);
+            }
+        }];
     }
 }
 
@@ -2642,6 +2657,25 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
             }];
         }
     }
+}
+
+- (void) sessionDidBecomeInactive:(nonnull WCSession *)session {
+    NSLog(@"sessionDidBecomeInactive");
+}
+
+
+- (void) sessionDidDeactivate:(nonnull WCSession *)session {
+    NSLog(@"sessionDidDeactivate");
+}
+
+- (void)loadFixedPhraseAndUnreadChannels:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    [[ChatCenterClient sharedClient] loadFixedPhraseAndUnreadChannels:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        if (result != nil) {
+            if(completionHandler != nil) completionHandler(result, nil, task);
+        }else{
+            if(completionHandler != nil) completionHandler(nil, error, task);
+        }
+    }];
 }
 #endif
 @end

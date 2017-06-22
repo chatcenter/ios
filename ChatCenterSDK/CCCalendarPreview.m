@@ -120,7 +120,7 @@ const int CHOICE_MARGIN = 10;
     }
     [actionsDatas addObject:@{@"label":CCLocalizedString(@"Propose other slots"), @"action":@[@"open:sticker/calender"]}];
     
-    NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
+    NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select date and time.")},
                               @"sticker-action":@{@"action-type":@"select",
                                                   @"action-data":actionsDatas},
                               @"sticker-type": @"schedule"

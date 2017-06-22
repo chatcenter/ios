@@ -18,5 +18,6 @@
 @interface CCLocationStickerViewController : UIViewController <CLLocationManagerDelegate>
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, weak) id<CCCommonWidgetEditorDelegate> delegate;
+@property (nullable, nonatomic, copy) void (^closeLocationStickerCallback)(void);
 @property BOOL isLocalLocationActive;
 @end

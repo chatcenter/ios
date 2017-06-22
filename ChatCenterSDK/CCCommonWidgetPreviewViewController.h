@@ -18,6 +18,7 @@
     id delegate;
 }
 @property (strong, nonatomic) IBOutlet UIButton *sendButton;
+@property (nullable, nonatomic, copy) void (^closeWidgetPreviewCallback)(void);
 - (void) setDelegate: (id<CCCommonWidgetEditorDelegate>)newDelegate;
 - (void) setMessage: (CCJSQMessage *) msg;
 - (void) cancelButtonPressed:(id)sender;

@@ -16,6 +16,7 @@
 @property (strong, nonatomic) IBOutlet GMSMapView *mapView;
 @property (strong, nonatomic) IBOutlet UILabel *changeTimeTitle;
 @property (strong, nonatomic) IBOutlet UILabel *durationTitle;
+@property (nonatomic, copy) void (^closeCoLocationStickerCallback)(void);
 ///
 /// To check if other user share live location on existing widget
 ///

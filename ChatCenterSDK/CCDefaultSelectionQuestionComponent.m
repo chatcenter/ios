@@ -19,6 +19,7 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
 @interface CCDefaultSelectionQuestionComponent () {
     NSArray<NSDictionary*> *actionData;
     id<CCQuestionComponentDelegate> delegate;
+    NSInteger selectedIndex;
 }
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
@@ -33,6 +34,7 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
     delegate = inDelegate;
     
     self.tableView.separatorColor = [[CCConstants sharedInstance] baseColor];
+    selectedIndex = -1;
     
     [self.tableView reloadData];
 }
@@ -47,7 +49,8 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
         NSIndexPath *path = [NSIndexPath indexPathForRow:i inSection:0];
         UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:path];
         [cell setSelected:YES];
-        [self setSelectedColorForCell:cell];
+        selectedIndex = [n integerValue];
+        [self setSelectedColorForCell:cell isSelected:YES];
     }
 }
 
@@ -128,7 +131,11 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
     cell.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
     cell.textLabel.textAlignment = NSTextAlignmentCenter;
     //...
-    
+    if (row == selectedIndex) {
+        [self setSelectedColorForCell:cell isSelected:YES];
+    } else {
+        [self setSelectedColorForCell:cell isSelected:NO];
+    }
     if(row<actionData.count) {
         NSString *text = [[actionData objectAtIndex:row] objectForKey:@"label"];
         cell.textLabel.text = text;
@@ -148,7 +155,15 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
         return;
     }
     
+    for(UITableViewCell* cell in [self.tableView visibleCells]) {
+        [cell setSelected:NO];
+        [self setSelectedColorForCell:cell isSelected:NO];
+    }
+    
     NSDictionary *selectedAction = [actionData objectAtIndex:[indexPath row]];
+    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    [cell setSelected:YES];
+    [self setSelectedColorForCell:cell isSelected:YES];
     [delegate userDidSelectActionItems:@[selectedAction]];
 }
 
@@ -166,14 +181,19 @@ static const CGFloat bottomMargin = 0; //set this value when if you set a gap be
 }
 
 
-- (void)setSelectedColorForCell:(UITableViewCell *)cell {
+- (void)setSelectedColorForCell:(UITableViewCell *)cell isSelected:(BOOL)isSelected {
     UIColor *col = [[CCConstants sharedInstance] baseColor];
     CGFloat r, g, b, a;
     [col getRed:&r green:&g blue:&b alpha:&a];
     UIColor *newCol = [UIColor colorWithRed:r green:g blue:b alpha:0.25];
-    
-    cell.contentView.backgroundColor = newCol;
-    cell.backgroundColor = newCol;
+    if (isSelected) {
+        cell.contentView.backgroundColor = newCol;
+        cell.backgroundColor = newCol;
+    } else {
+        UIColor *oldCol = [UIColor whiteColor];
+        cell.contentView.backgroundColor = oldCol;
+        cell.backgroundColor = oldCol;
+    }
 }
 
 

@@ -157,6 +157,11 @@ static const float ADD_MORE_VIEW_HEIGHT   = 72;
     }
     
     NSUInteger newLength = [textField.text length] + [string length] - range.length;
+    if (newLength >= CCWidgetInputChoiceTextLimit) {
+        CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:nil message:[NSString stringWithFormat:CCLocalizedString(@"Please input %d characters or less."), CCWidgetInputChoiceTextLimit]];
+        [alert addActionWithTitle:CCLocalizedString(@"OK") handler:nil];
+        [alert show];
+    }
     return newLength <= CCWidgetInputChoiceTextLimit;
 }
 @end

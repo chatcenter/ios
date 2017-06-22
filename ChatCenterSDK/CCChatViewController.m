@@ -48,6 +48,7 @@
 #import "CCFixedPhraseInputView.h"
 #import "CCCommonWidgetPreviewViewController.h"
 #import "CCLiveLocationWebviewController.h"
+#import "CCPickerViewController.h"
 #import "UIImage+CCSDKImage.h"
 #import "CCLiveLocationTask.h"
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -68,6 +69,7 @@ int kInputStickerMenuMode = 1;
 int kInputFixedPhraseMenuMode = 2;
 
 #define CC_COLOCATION_PREFERRED_INTERVAL    30.0
+#define CC_INPUT_TOOLBAR_HEIGHT 44.0
 
 @interface CCChatViewController ()<UIAlertViewDelegate>{
     UIView *inputMenuBar;
@@ -102,7 +104,6 @@ int kInputFixedPhraseMenuMode = 2;
     NSArray *filteredChannelUsers;
     NSString *inviteCallerName;
     NSString *inviteCallerAvatarURL;
-    BOOL isDisplayingStickerMenu;
     int currentInputMode;
     UIView *newMessageView;
     BOOL isKeyboardShowing;
@@ -116,6 +117,8 @@ int kInputFixedPhraseMenuMode = 2;
     BOOL isDisplayingSuggestionView;
     BOOL isAlreadyDisplaySuggestionView;
     BOOL isDisplayingAlert;
+    BOOL isEditingFreewordTextView;
+    BOOL isDisplayFixedPhrase;
 }
 
 @property (nonatomic, strong) NSMutableArray *timestamps;
@@ -228,12 +231,13 @@ int kInputFixedPhraseMenuMode = 2;
     self.sendingMessages = [NSMutableArray array];
     self.senderId = @"";
     self.senderDisplayName = @"";
-    self.automaticallyScrollsToMostRecentMessage = NO;
     self.showLoadEarlierMessagesHeader = NO;
     self.showTypingIndicator = YES;
     isTyping = NO;
     self.isAbleToPressCall = YES;
     [super viewDidLoad];
+    // This setting have to call after super.viewDidLoad is called.
+    self.automaticallyScrollsToMostRecentMessage = NO;
     [self viewSetUp];
     [self customNibsSetUp];
     [[CCConnectionHelper sharedClient] isSupportVideoChat];
@@ -244,14 +248,6 @@ int kInputFixedPhraseMenuMode = 2;
     [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidBecomeActiveNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
         [self reloadCollectionViewData];
     }];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardDidShowNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
-                                                 name:UIKeyboardDidHideNotification
-                                               object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(reinstateBackgroundTask)
                                                  name:UIApplicationDidBecomeActiveNotification object:nil];
@@ -263,9 +259,26 @@ int kInputFixedPhraseMenuMode = 2;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardDidHideNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == NO) {
         [[CCConnectionHelper sharedClient] setCurrentView:self]; ////To display online/offline alert
         [[CCConnectionHelper sharedClient] setDelegate:self]; ///Retry reload is included
+    }
+    if (isKeyboardShowing || self.inputToolbar.contentView.textView.inputView != nil) {
+        self.marginBottomCollectionView.constant = 60;
+        [self.view setNeedsLayout];
+    } else {
+        self.marginBottomCollectionView.constant = 44;
+        [self.view setNeedsLayout];
     }
     ///Initialize (Create user or Create channel or Load channel)
     if (self.isReturnFromStickerView) {
@@ -281,6 +294,7 @@ int kInputFixedPhraseMenuMode = 2;
         [self loadLocalMessages:self.channelId];
     } else if (self.isReturnFromInteractingWithURL) {
         self.isReturnFromInteractingWithURL = NO;
+        [self shouldDisplayFixedPhraseIfNeed];
     } else {
         [self setNavigationBarStyles];
         if ([CCConnectionHelper sharedClient].isLoadingUserToken == YES || [CCConnectionHelper sharedClient].isRefreshingData == YES) {
@@ -295,10 +309,6 @@ int kInputFixedPhraseMenuMode = 2;
         [super viewWillAppear:animated];
     }
     
-    if (![[CCConstants sharedInstance] isAgent] && !isDisplayingAlert && self.fixedPhrases != nil && self.fixedPhrases.count > 0) {
-        [self displayFixedPhrase:self.fixedPhrases];
-    }
-    
     if ([CCConnectionHelper sharedClient].datepicker.count > 0) {
         [self sendCalendar:[CCConnectionHelper sharedClient].datepicker];
     }
@@ -308,6 +318,12 @@ int kInputFixedPhraseMenuMode = 2;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserReactToStickerContent:) name:kCCNoti_UserReactionToStickerContent object:nil];
   
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onFreeWordTextviewDidBeginEditing:) name:kCCNoti_TextViewDidBeginEditing object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserDidReactPulldownWidget:) name:kCCNoti_UserReactionToPulldownWidget object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onUserSelectionToPulldownWidget:) name:kCCNoti_UserSelectionToPulldownWidget object:nil];
+
     //FIXME: callAgain: existed before??
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(callAgain:) name:kCCNoti_UserReactionToCallAgain object:nil];
 
@@ -315,6 +331,7 @@ int kInputFixedPhraseMenuMode = 2;
     [[CCConnectionHelper sharedClient] getAppManifest:NO completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         // update left of input toolbar
         [self updateLeftOfInputToolbar];
+        [self displayWidgetMenu];
     }];
     
     CCLiveLocationTask *task = [[CCConnectionHelper sharedClient].shareLocationTasks objectForKey:self.channelId];
@@ -326,7 +343,6 @@ int kInputFixedPhraseMenuMode = 2;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
     /**
      *  Enable/disable springy bubbles, default is NO.
      *  You must set this from `viewDidAppear:`
@@ -358,7 +374,7 @@ int kInputFixedPhraseMenuMode = 2;
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidShowNotification object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardDidHideNotification object:nil];
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == NO && !self.isReturnFromVideoCallView) {
         [[CCConnectionHelper sharedClient] setDelegate:nil];
@@ -368,7 +384,16 @@ int kInputFixedPhraseMenuMode = 2;
     // remove 'onUserReactionToSticker' from notification center
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCCNoti_UserReactionToSticker object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:kCCNoti_UserReactionToStickerContent object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kCCNoti_TextViewDidBeginEditing object:nil];
     [super viewWillDisappear:animated];
+    isDisplayingSuggestionView = NO;
+    if (self.inputToolbarMenuView.shouldShowSuggestion) {
+        UIButton *button = self.inputToolbarMenuView.buttons[1];
+        [button setTintColor:[UIColor lightGrayColor]];
+    }
+    self.inputToolbar.contentView.textView.text = @"";
+    [self.inputToolbar.contentView.textView resignFirstResponder];
+    [self.inputToolbar.contentView.textView setHidden:YES];
 }
 
 - (void)updateViewOrientation {
@@ -383,9 +408,6 @@ int kInputFixedPhraseMenuMode = 2;
         [self.navigationController.view setNeedsDisplay];
         [self.navigationController.view updateConstraintsIfNeeded];
         NSLog(@"after:stickerMenuView.width: %2f - stickerMenuView.heght: %2f", stickerMenuView.bounds.size.width, stickerMenuView.bounds.size.height);
-        if(isDisplayingStickerMenu) {
-            [self displayStickerMenu];
-        }
     }
 }
 
@@ -422,6 +444,7 @@ int kInputFixedPhraseMenuMode = 2;
     [self hideNaviShadowWithView:self.navigationController.navigationBar];
     self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
     self.inputToolbar.maximumHeight = 80;
+    self.inputToolbar.maximumNumberOfLine = 4;
     [self.inputToolbar.contentView.leftBarButtonItem setHidden:YES];
     keyboardHeight = 216;
     self.inputTextView.delegate = self;
@@ -430,6 +453,7 @@ int kInputFixedPhraseMenuMode = 2;
     loadPreviousMessage = NO;
     fullScreen = NO;
     self.collectionView.backgroundColor = [UIColor whiteColor];
+    [self findConstraints];
     ///Date
     UIColor *color = [UIColor lightGrayColor];
     NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
@@ -490,11 +514,6 @@ int kInputFixedPhraseMenuMode = 2;
     self.incomingBubbleImageData = [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor colorWithRed:245/255.0 green:245/255.0 blue:245/255.0 alpha:1.0]];
     
     [self navigationBarSetup];
-    UIView *forTapTextView = [[UIView alloc] initWithFrame:self.inputToolbar.contentView.textView.frame];
-    [forTapTextView setBackgroundColor:[UIColor clearColor]];
-    [self.inputToolbar.contentView addSubview:forTapTextView];
-    UITapGestureRecognizer *gestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnTextView)];
-    [forTapTextView addGestureRecognizer:gestureRecognizer];
 }
 
 - (void)navigationBarSetup{
@@ -748,10 +767,10 @@ int kInputFixedPhraseMenuMode = 2;
             self.inputToolbar.contentView.leftBarButtonItem = nil;
         } else if (!isDisplayingSuggestionView){
             [self.inputToolbar.contentView.leftBarButtonItem setHidden:NO];
-            UIButton *addButton = [UIButton buttonWithType:UIButtonTypeSystem];
-            [addButton setImage:[UIImage SDKImageNamed:@"CCadd_widget_btn"] forState:UIControlStateNormal];
-            addButton.tintColor = [[CCConstants sharedInstance] baseColor];
-            self.inputToolbar.contentView.leftBarButtonItem = addButton;  ///triger for sticker menu
+            UIButton *switchToToolbarMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
+            [switchToToolbarMenuButton setImage:[UIImage SDKImageNamed:@"CCcancel_btn"] forState:UIControlStateNormal];
+            switchToToolbarMenuButton.tintColor = [[CCConstants sharedInstance] baseColor];
+            self.inputToolbar.contentView.leftBarButtonItem = switchToToolbarMenuButton;
         }
     }
 }
@@ -1195,7 +1214,6 @@ int kInputFixedPhraseMenuMode = 2;
         }
     } completion:^(BOOL finished) {
         [stickerMenuView removeFromSuperview];
-        isDisplayingStickerMenu = NO;
     }];
 }
 
@@ -1206,6 +1224,29 @@ int kInputFixedPhraseMenuMode = 2;
 
 -(void)pressFullScreen:(id)sender {
 ///TODO :fix chat bubble width and escape iOS7
+}
+
+- (void)switchToInputTextMode {
+    isDisplayFixedPhrase = YES;
+    isKeyboardShowing = YES;
+    self.marginBottomCollectionView.constant = 60;
+    [self.view setNeedsLayout];
+    [self.inputToolbar.contentView.textView setHidden:NO];
+    [self.inputToolbar.contentView.textView becomeFirstResponder];
+    self.inputToolbar.contentView.textView.inputView = nil;
+    [self.inputToolbar.contentView.textView reloadInputViews];
+    [self loadDraftMessage];
+    [self.inputToolbarMenuView setHidden:YES];
+}
+
+- (void)switchToSuggestionMode {
+    [self displaySuggestionWithActionData:self.suggestionActionData];
+}
+
+- (void)switchToSaveWidget {
+    if (self.fixedPhrases != nil){
+        [self displayFixedPhrase:self.fixedPhrases];
+    }
 }
 
 -(void)pressLocationWidget {
@@ -1227,36 +1268,76 @@ int kInputFixedPhraseMenuMode = 2;
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
         isDisplayingAlert = NO;
+        if (!isDisplayingSuggestionView) {
+            [self shouldDisplayFixedPhraseIfNeed];
+        } else {
+            [self displaySuggestionCallBack];
+        }
     }];
     
     [alertVC addAction:venueLocationAction];
     [alertVC addAction:liveLocationAction];
     [alertVC addAction:cancelAction];
     isDisplayingAlert = YES;
+    [self.inputToolbar.contentView.textView resignFirstResponder];
     [self presentViewController:alertVC animated:YES completion:nil];
 }
 
+///
+/// Location widget editor
+///
 -(void)pressLocation{
+    [self openLocationPicker:nil msgId:nil callbackHandler:nil];
+}
+
+- (void) openLocationPicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
+    [self openLocationPicker:stickerAction msgId:msgId callbackHandler:^{
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        }];
+    }];
+}
+
+- (void)openLocationPicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId callbackHandler: (void (^)(void)) callbackHandler {
     if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
         [self pressCloseStickerMenu];
         CCLocationStickerViewController *locationStickerViewController = [[CCLocationStickerViewController alloc] initWithNibName:@"CCLocationStickerViewController" bundle:SDK_BUNDLE];
         [locationStickerViewController setDelegate:self];
+        if (callbackHandler != nil) {
+            [locationStickerViewController setCloseLocationStickerCallback:callbackHandler];
+        }
         UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:locationStickerViewController];
         [self presentViewController:rootNC animated:YES completion:^{
             self.isReturnFromStickerView = YES;
         }];
         
     }else{
-       [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
+        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
     }
 }
 
+///
+/// Live location widget
+///
 -(void)pressLivelocation{
+    [self openLiveLocationWidgetEditor:nil msgId:nil callbackHandler:nil];
+}
+
+- (void)openCoLocationPicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
+    [self openLiveLocationWidgetEditor:stickerAction msgId:msgId callbackHandler:^{
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        }];
+    }];
+}
+
+- (void) openLiveLocationWidgetEditor:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId callbackHandler:(void (^)(void)) callbackHandler{
     [self locationSetup];
     if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened) || CCLocalDevelopmentMode) {
         CCLiveLocationStickerViewController *locationStickerViewController = [[CCLiveLocationStickerViewController alloc] initWithNibName:@"CCLiveLocationStickerViewController" bundle:SDK_BUNDLE];
         [locationStickerViewController setDelegate:self];
         locationStickerViewController.isOpenedFromWidgetMessage = NO;
+        if (callbackHandler != nil) {
+            [locationStickerViewController setCloseCoLocationStickerCallback:callbackHandler];
+        }
         UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:locationStickerViewController];
         [self presentViewController:rootNC animated:YES completion:^{
             self.isReturnFromStickerView = YES;
@@ -1285,13 +1366,9 @@ int kInputFixedPhraseMenuMode = 2;
 - (void)proposeOtherSlots:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
     [self pressCloseStickerMenu];
     CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithDelegate:self];
-    [calendarView setCloseCalendarTimePickerCallback:^(NSArray *dateTimes) {
-        if (dateTimes != nil) {
-            // send response action Propose another
-            [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                [self sendDateTime:dateTimes];
-            }];
-        }
+    [calendarView setCloseWidgetCalendarCallback:^{
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        }];
     }];
     UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
     [self presentViewController:rootNC animated:YES completion:^{
@@ -1331,15 +1408,32 @@ int kInputFixedPhraseMenuMode = 2;
     }
 }
 
--(void)pressThumb{
+///
+/// Question widget editor
+///
+- (void)openQuestionWidgetEditor:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
+    [self openQuestionWidgetEditor:stickerAction msgId:msgId callbackHandler:^{
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        }];
+    }];
+}
+
+-(void)openQuestionWidgetEditor:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId callbackHandler:(void (^)(void))callbackHandler {
     UIStoryboard *sb = [UIStoryboard storyboardWithName:@"CCQuestionWidgetEditor" bundle:SDK_BUNDLE];
     CCQuestionWidgetEditorViewController *questionWidgetEditorViewController = [sb instantiateViewControllerWithIdentifier:@"CCQuestionWidgetEditorViewController"];
     [questionWidgetEditorViewController setDelegate: self];
+    if (callbackHandler != nil) {
+        [questionWidgetEditorViewController setCloseQuestionCallback:callbackHandler];
+    }
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:questionWidgetEditorViewController];
     [self presentViewController:navController animated:YES completion:^{
         self.isReturnFromStickerView = YES;
     }];
-    
+
+}
+
+-(void)pressThumb{
+    [self openQuestionWidgetEditor:nil msgId:nil callbackHandler:nil];
     return;
 }
 
@@ -1350,6 +1444,9 @@ int kInputFixedPhraseMenuMode = 2;
     
 }
 
+///
+/// Image picker
+///
 -(void)pressImage{
     if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
         [self pressCloseStickerMenu];
@@ -1369,8 +1466,32 @@ int kInputFixedPhraseMenuMode = 2;
                 self.isReturnFromStickerView = YES;
             }];
         }
-        NSLog(@"pressssss");
-        
+    }else{
+        [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
+    }
+}
+
+- (void)openImagePicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
+    if (([[CCConnectionHelper sharedClient] getNetworkStatus] != CCNotReachable && [CCConnectionHelper sharedClient].webSocketStatus == CCCWebSocketOpened)|| CCLocalDevelopmentMode) {
+        [self pressCloseStickerMenu];
+        UIImagePickerControllerSourceType sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        if ([UIImagePickerController isSourceTypeAvailable:sourceType]) {
+            UIImagePickerController *picker;
+            if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+                picker = [[CCImagePickerViewController alloc] init];
+            } else {
+                picker = [[UIImagePickerController alloc] init];
+            }
+            picker.navigationBar.tintColor = [[CCConstants sharedInstance] baseColor];
+            picker.modalPresentationStyle = UIModalPresentationCurrentContext;
+            picker.sourceType = sourceType;
+            picker.delegate = self;
+            [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+            }];
+            [self presentViewController:picker animated:YES completion:^{
+                self.isReturnFromStickerView = YES;
+            }];
+        }
     }else{
         [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
     }
@@ -1538,7 +1659,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     [actionsDatas addObject:@{@"label":CCLocalizedString(@"Propose other slots"), @"action":@[@"open:sticker/calender"]}];
 
-    NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
+    NSDictionary *content = @{@"message":@{@"text":CCLocalizedString(@"Please select date and time.")},
                               @"sticker-action":@{@"action-type":@"select",
                                                   @"action-data":actionsDatas},
                               @"sticker_type": @"schedule",
@@ -1984,7 +2105,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             //
             NSString *uniqueId = (message.content != nil) ? [message.content objectForKey:@"uid"] : @"unique-id";
             NSString *newUniqueId = (content != nil) ? [content objectForKey:@"uid"] : @"new-unique-id";
-            if (uniqueId != nil && [uniqueId isEqualToString:newUniqueId]) {
+            if (uniqueId != nil && ![uniqueId isEqual:[NSNull null]] && [uniqueId isEqualToString:newUniqueId]) {
                 [self.messages removeObject:message];
                 [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
                 foundDuplicate = YES;
@@ -2015,23 +2136,38 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     
     CCJSQMessage *newMsg;
+    BOOL shouldHideSuggestion = NO;
     if (newMessages.count > 0) {
         newMsg = [newMessages lastObject];
     }
     CGSize previewCellSize = [CCCommonStickerCollectionViewCell estimateSizeForMessage:newMsg atIndexPath:nil hasPreviousMessage:nil options:0 withListUser:nil];
     NSString *buttonTitle;
+    
+    [self shouldDisplayFixedPhraseIfNeed];
+    
     if([messageType isEqualToString:CC_RESPONSETYPEMESSAGE]){
         buttonTitle = newMsg.text;
+        shouldHideSuggestion = YES;
     }
     else if ([messageType isEqualToString:CC_RESPONSETYPESTICKER]){
         buttonTitle = [NSString stringWithFormat:@"%@:%@", newMsg.senderDisplayName, CCLocalizedString(@"Sent a sticker")];
+        shouldHideSuggestion = YES;
     }
     else if([messageType isEqualToString:CC_RESPONSETYPECALL]){
         buttonTitle = [NSString stringWithFormat:@"%@:%@", newMsg.senderDisplayName, CCLocalizedString(@"Missed call")];
+        shouldHideSuggestion = YES;
     }
     else if ([messageType isEqualToString:CC_RESPONSETYPESUGGESTION]) {
         buttonTitle = [NSString stringWithFormat:@"%@", CCLocalizedString(@"New suggestion")];
         isAlreadyDisplaySuggestionView = NO;
+        shouldHideSuggestion = NO;
+    }
+    
+    if (shouldHideSuggestion && self.inputToolbarMenuView.shouldShowSuggestion && !isKeyboardShowing) {
+        if (self.inputToolbarMenuView.shouldShowSuggestion) {
+            UIButton *button = self.inputToolbarMenuView.buttons[1];
+            [button setTintColor:[UIColor lightGrayColor]];
+        }
     }
     
     if(self.collectionView.contentOffset.y >= (self.collectionView.contentSize.height - self.collectionView.frame.size.height - previewCellSize.height)) {
@@ -2196,6 +2332,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSDictionary *content        = [NSKeyedUnarchiver unarchiveObjectWithData:contentData];
         if (content !=nil && content[@"text"] != nil ) {
             self.inputToolbar.contentView.textView.text     = content[@"text"];
+            if (content[@"text"] != nil && ![content[@"text"] isEqualToString:@""]) {
+                [self.inputToolbar toggleSendButtonEnabled];
+            }
             NSString *inputText = self.inputToolbar.contentView.textView.text;
             lastTextLenght = inputText.length;
         }
@@ -2460,10 +2599,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         if(success) {
             if ([msg.type isEqualToString: CC_RESPONSETYPESUGGESTION]) {
                 NSInteger lastIndex = self.messages.count - 1;
-                if ( lastIndex == indexPath.item && !isDisplayingStickerMenu && !isDisplayingSuggestionView && !isAlreadyDisplaySuggestionView) {
+                if ( lastIndex == indexPath.item) {
                     NSString *inputText = [self.inputToolbar.contentView.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                     NSArray<NSDictionary*> *actionData = [[[msg content] objectForKey:@"sticker-action"] objectForKey:@"action-data"];
-                    if (inputText.length == 0 && actionData != nil && actionData.count > 0 && self.inputToolbar.contentView.textView != nil) {
+                    if (inputText.length == 0 && actionData != nil && actionData.count > 0 && self.inputToolbar.contentView.textView != nil && !isKeyboardShowing && !isDisplayingSuggestionView) {
                         [self displaySuggestionWithActionData:actionData];
                     }
                 }
@@ -2599,27 +2738,19 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 #pragma mark - CCConectionHelper delegate
 - (void)openURL:(NSURL *) URL{
-    // Invalid URL
-    if(!([URL.absoluteString hasPrefix:@"http://"] || [URL.absoluteString hasPrefix:@"https://"])) {
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:CCLocalizedString(@"Invalid URL") preferredStyle:UIAlertControllerStyleAlert];
-        UIAlertAction *okAction = [UIAlertAction
-                                   actionWithTitle:CCLocalizedString(@"OK")
-                                   style:UIAlertActionStyleDefault
-                                   handler:^(UIAlertAction *action) {
-                                   }];
-        [alertController addAction:okAction];
-        [self presentViewController:alertController animated:YES completion:nil];
-        return;
-    }
 
     self.isReturnFromWebBrowser = YES;
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
-    float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
-    if(osVersion >= 9.0) {
-        SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL];
-        webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
-        [self presentViewController:webViewController animated:YES completion:nil];
-        return;
+    if([URL.absoluteString hasPrefix:@"http://"] || [URL.absoluteString hasPrefix:@"https://"]) {
+        float osVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+        if(osVersion >= 9.0) {
+            SFSafariViewController *webViewController = [[SFSafariViewController alloc] initWithURL:URL];
+            webViewController.view.tintColor = [[CCConstants sharedInstance] headerItemColor];
+            [self presentViewController:webViewController animated:YES completion:nil];
+            return;
+        }
+    } else {
+        [[UIApplication sharedApplication] openURL:URL];
     }
 #endif
     [[UIApplication sharedApplication] openURL:URL];
@@ -2797,10 +2928,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
              }
              
              self.fixedPhrases = fixedPhrases;
-             if (!isDisplayingAlert && self.fixedPhrases != nil && [self.fixedPhrases count] > 0) {
+             if (!isDisplayingAlert && self.fixedPhrases != nil && [self.fixedPhrases count] > 0 && !isDisplayingSuggestionView) {
                  _shouldDisplayFixedPhraseMenu = YES;
                  [self updateLeftOfInputToolbar];
-                 [self displayFixedPhrase:self.fixedPhrases];
+                 [self shouldDisplayFixedPhraseIfNeed];
              }
          }else{
              NSLog(@"Can not Get Fixed Phrases");
@@ -2872,13 +3003,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 - (void) onClickNewMessageButton:(UITapGestureRecognizer *) recognizer {
     [self scrollToBottomAnimated:YES];
+    [self shouldDisplayFixedPhraseIfNeed];
     if (![[CCConstants sharedInstance] isAgent] && self.messages.count > 0) {
         NSInteger lastIndex = self.messages.count - 1;
         CCJSQMessage *msg = [self.messages objectAtIndex:lastIndex];
-        if (!isDisplayingStickerMenu && !isDisplayingSuggestionView) {
+        if (!isDisplayingSuggestionView) {
             NSString *inputText = [self.inputToolbar.contentView.textView.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             NSArray<NSDictionary*> *actionData = [[[msg content] objectForKey:@"sticker-action"] objectForKey:@"action-data"];
-            if (inputText.length == 0 && actionData != nil && actionData.count > 0 && self.inputToolbar.contentView.textView != nil) {
+            if (inputText.length == 0 && actionData != nil && actionData.count > 0 && self.inputToolbar.contentView.textView != nil && !isKeyboardShowing) {
                 [self displaySuggestionWithActionData:actionData];
             }
         }
@@ -3038,10 +3170,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     if (![self.uid isEqualToString:userId]) {
         typingLabel = [[UILabel alloc] init];
-        typingLabel.frame = CGRectMake(10, - 20, self.view.frame.size.width, 20);
+        typingLabel.frame = CGRectMake(0, - 22, self.view.frame.size.width, 20);
         typingLabel.font = [UIFont systemFontOfSize:12];
         typingLabel.textColor = [UIColor lightGrayColor];
-        typingLabel.text = [NSString stringWithFormat:@"%@ %@", displayName, CCLocalizedString(@"is typing")];
+        typingLabel.backgroundColor = [UIColor whiteColor];
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.headIndent = 10;
+        paragraphStyle.firstLineHeadIndent = 10;
+        NSDictionary *attrsDictionary = @{NSParagraphStyleAttributeName: paragraphStyle};
+        typingLabel.attributedText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", displayName, CCLocalizedString(@"is typing")] attributes:attrsDictionary];
         [self.inputToolbar addSubview:typingLabel];
         [self.inputToolbar bringSubviewToFront:typingLabel];
         [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeTypingLabel) userInfo:nil repeats:NO];
@@ -3050,6 +3187,22 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 - (void) removeTypingLabel {
     [typingLabel removeFromSuperview];
+}
+
+- (void) findConstraints {
+    for (NSLayoutConstraint *constraint in self.collectionView.superview.constraints) {
+        if ((constraint.firstItem == self.collectionView && constraint.firstAttribute == NSLayoutAttributeBottom) || (constraint.secondItem == self.collectionView && constraint.secondAttribute == NSLayoutAttributeBottom)) {
+            self.marginBottomCollectionView = constraint;
+            break;
+        }
+    }
+    
+    for (NSLayoutConstraint *constraint in self.inputToolbar.superview.constraints) {
+        if ((constraint.firstItem == self.inputToolbar && constraint.firstAttribute == NSLayoutAttributeBottom) || (constraint.secondItem == self.inputToolbar && constraint.secondAttribute == NSLayoutAttributeBottom)) {
+            self.marginBottomInputToolbar = constraint;
+            break;
+        }
+    }
 }
 
 - (void)receiveCloseChannelFromWebSocket:(NSString *)channelUid {
@@ -3107,11 +3260,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 self.userVideoChat = [result valueForKey:@"users"];
                 [self updateLeftOfInputToolbar];
             }
-            [self loadDraftMessage];
             [self loadLocalDisplayname:channelId];
-            if (![CCConstants sharedInstance].isAgent) {
-                [self loadAllFixedPhrases:self.orgUid];
-            }
+            [self loadAllFixedPhrases:self.orgUid];
         }
     }];
 }
@@ -3473,6 +3623,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSManagedObject *object      = [messageArray objectAtIndex:i];
         NSArray *messages = [self createMessageObjectsFromNSMagedObject:object reloadImage:YES];
         for (CCJSQMessage *message in messages) {
+            if ([message.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+                NSArray<NSDictionary*> *actionData = [[[message content] objectForKey:@"sticker-action"] objectForKey:@"action-data"];
+                self.suggestionActionData = [actionData mutableCopy];
+            }
+            
             [self.messages addObject:message];
         }
     }
@@ -3489,6 +3644,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
      */
     [self.collectionView reloadData];
     [self scrollToBottomAnimated:YES];
+    [self shouldDisplayFixedPhraseIfNeed];
     newMessageView.hidden = YES;
     // try to resend failed message
     [self resendFailedMessage:self.channelId resendDelivering:NO];
@@ -3824,29 +3980,42 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 -(void)keyboardWillShow:(NSNotification*)notification
 {
     keyboardHeight = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue].size.height;
-    [self scrollToBottomAnimated:YES];
+//    if (!isEditingFreewordTextView) {
+//        [self scrollToBottomAnimated:YES];
+//    }
+    isEditingFreewordTextView = NO;
+    
     if (newMessageView != nil) {
         newMessageView.hidden = YES;
     }
-    isKeyboardShowing = YES;
 }
 
 - (BOOL)keyboardWillHide:(NSNotification*)notification
 {
+    isKeyboardShowing = NO;
+    if (isEditingFreewordTextView) {
+        isEditingFreewordTextView = NO;
+    }
+
+    self.marginBottomCollectionView.constant = 44;
+    [self.view setNeedsLayout];
     [self.view endEditing:YES];
     self.inputToolbar.contentView.textView.inputView = nil;
-    isKeyboardShowing = NO;
-    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [addButton setImage:[UIImage SDKImageNamed:@"CCadd_widget_btn"] forState:UIControlStateNormal];
-    addButton.tintColor = [[CCConstants sharedInstance] baseColor];
-    self.inputToolbar.contentView.leftBarButtonItem = addButton;  ///triger for sticker menu
+    [self.inputToolbar.contentView.textView reloadInputViews];
+    [self showInputToolbarMenu];
+    if (self.inputToolbarMenuView.shouldShowSuggestion) {
+        UIButton *button = self.inputToolbarMenuView.buttons[1];
+        [button setTintColor:[UIColor lightGrayColor]];
+    }
     currentInputMode = kInputKeyboardMode;
-    if (![[CCConstants sharedInstance] isAgent] && !isDisplayingAlert && self.fixedPhrases != nil && self.fixedPhrases.count > 0) {
-        [self displayFixedPhrase:self.fixedPhrases];
+    if (isKeyboardShowing) {
+        [self.inputToolbar.contentView.textView resignFirstResponder];
     }
     isKeyboardShowing = NO;
-    isDisplayingSuggestionView = NO;
-    isDisplayingStickerMenu = NO;
+    // Hide suggestion if latest message is not suggestion
+    if (!isDisplayingAlert) {
+        isDisplayingSuggestionView = NO;
+    }
     return YES;
 }
 
@@ -3927,44 +4096,51 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         [self initView];
         return;
     }
-    
-    if (isDisplayingStickerMenu) {
-        [self displayKeyboard];
-    } else {
-        [self displayStickerMenu];
-        isDisplayingStickerMenu = YES;
-    }
+    isDisplayFixedPhrase = YES;
+    isDisplayingSuggestionView = NO;
+    [self showInputToolbarMenu];
 }
 
-- (UIView *)createStickersMenuView {
+- (void) showInputToolbarMenu {
+    self.inputToolbar.contentView.textView.text = @"";
+    [self.inputToolbar.contentView.textView endEditing:YES];
+    [self.inputToolbar.contentView.textView setHidden:YES];
+    [self.inputToolbarMenuView setHidden:NO];
+    CGRect oldFrame = self.inputToolbar.frame;
+    CGRect newFrame = oldFrame;
+    newFrame.size.height = CC_INPUT_TOOLBAR_HEIGHT;
+    [self.inputToolbar setFrame:newFrame];
+    [self.inputToolbar setNeedsUpdateConstraints];
+    [self.inputToolbar updateConstraints];
+}
+
+- (CCWidgetMenuView *)createInputToolbarMenuView:(BOOL)shouldShowSuggestion {
     UIScreen *screen = [UIScreen mainScreen];
  
-    CGRect stickersMenuFrame = CGRectMake(0.0, 0.0, screen.bounds.size.width, keyboardHeight);
+    CGRect stickersMenuFrame = CGRectMake(0.0, 0.0, screen.bounds.size.width, CC_INPUT_TOOLBAR_HEIGHT);
     
-    CCWidgetMenuView *inputAccessoryView = [[CCWidgetMenuView alloc] initWithFrame:stickersMenuFrame owner:self];
+    CCWidgetMenuView *inputAccessoryView = [[CCWidgetMenuView alloc] initWithFrame:stickersMenuFrame owner:self shouldShowSuggestion:shouldShowSuggestion];
     
     return inputAccessoryView;
 
 }
 
-- (void)displayStickerMenu {
-    isDisplayingSuggestionView = NO;
-    self.inputToolbar.contentView.textView.inputView = [self createStickersMenuView];
-    UIButton *keyboardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [keyboardButton setImage:[UIImage SDKImageNamed:@"CCkeyboard"] forState:UIControlStateNormal];
-    self.inputToolbar.contentView.leftBarButtonItem = keyboardButton;  ///triger for sticker menu
-    [self.inputToolbar.contentView.textView becomeFirstResponder];
-    [self.inputToolbar.contentView.textView reloadInputViews];
-    return;
-}
-
 - (void)displaySuggestionWithActionData:(NSArray<NSDictionary*> *)actionData {
-    
+    if (self.isPulldownSelectBoxDisplayed || ![self isTopMostViewController]) {
+        return;
+    }
+    self.marginBottomCollectionView.constant = 60;
+    [self.view setNeedsLayout];
+    [self.inputToolbarMenuView removeFromSuperview];
+    self.inputToolbarMenuView = [self createInputToolbarMenuView:YES];
+    [self.inputToolbar.contentView addSubview:self.inputToolbarMenuView];
+    //    [self.inputToolbar.contentView setNeedsLayout];
+    //    [self.inputToolbar.contentView layoutSubviews];
+
+    self.suggestionActionData = actionData;
     isDisplayingSuggestionView = YES;
-    isDisplayingStickerMenu = YES;
     isAlreadyDisplaySuggestionView = YES;
-    UIScreen *screen = [UIScreen mainScreen];
-    CGRect frame = CGRectMake(0.0, 0.0, screen.bounds.size.width, keyboardHeight);
+    CGRect frame = CGRectMake(10.0, 0.0, 520, keyboardHeight);
     
     NSArray *nibs = [SDK_BUNDLE loadNibNamed:@"CCSuggestionInputView" owner:nil options:0];
     CCSuggestionInputView *inputAccessoryView = [nibs lastObject];
@@ -3974,37 +4150,43 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     [inputAccessoryView setupWithData:actionData owner:self];
     
     self.inputToolbar.contentView.textView.inputView = inputAccessoryView;
-    UIButton *keyboardButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [keyboardButton setImage:[UIImage SDKImageNamed:@"CCkeyboard"] forState:UIControlStateNormal];
-    self.inputToolbar.contentView.leftBarButtonItem = keyboardButton;  ///triger for sticker menu
+    UIButton *switchToToolbarMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [switchToToolbarMenuButton setImage:[UIImage SDKImageNamed:@"CCcancel_btn"] forState:UIControlStateNormal];
+    switchToToolbarMenuButton.tintColor = [[CCConstants sharedInstance] baseColor];
+    self.inputToolbar.contentView.leftBarButtonItem = switchToToolbarMenuButton;
     [self.inputToolbar.contentView.textView becomeFirstResponder];
     [self.inputToolbar.contentView.textView reloadInputViews];
+    
     return;
 }
 
-- (void)tappedOnTextView {
-    if (self.inputToolbar.contentView.textView.inputView != nil) {
-        [self displayKeyboard];
-    } else {
-        [self.inputToolbar.contentView.textView becomeFirstResponder];
+- (void)displayWidgetMenu {
+    if (self.inputToolbarMenuView != nil) {
+        [self.inputToolbarMenuView removeFromSuperview];
     }
-}
 
-- (void)displayKeyboard {
-    isDisplayingStickerMenu = NO;
-    isDisplayingSuggestionView = NO;
-    // 1. Display keyboard view
-    self.inputToolbar.contentView.textView.inputView = nil;
-    [self.inputToolbar.contentView.textView reloadInputViews];
-    
-    UIButton *addButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [addButton setImage:[UIImage SDKImageNamed:@"CCadd_widget_btn"] forState:UIControlStateNormal];
-    addButton.tintColor = [[CCConstants sharedInstance] baseColor];
-    self.inputToolbar.contentView.leftBarButtonItem = addButton;  ///triger for sticker menu
+    // create input toolbar menu view
+    self.inputToolbarMenuView = [self createInputToolbarMenuView:[[CCConstants sharedInstance] isAgent]];
+    if (self.inputToolbarMenuView.shouldShowSuggestion) {
+        if (self.inputToolbarMenuView.buttons.count > 1) {
+            UIButton *button = self.inputToolbarMenuView.buttons[1];
+            [button setTintColor:[UIColor lightGrayColor]];
+        }
+    }
+    [self.inputToolbar.contentView addSubview:self.inputToolbarMenuView];
+    [self showInputToolbarMenu];
 }
 
 - (void)displayFixedPhrase: (NSArray<NSDictionary*> *)contents {
-    // 1. Display fixed phrase menu
+    if (self.isPulldownSelectBoxDisplayed) {
+        return;
+    }
+
+    if (self.inputToolbarMenuView.shouldShowSuggestion) {
+        UIButton *button = self.inputToolbarMenuView.buttons[1];
+        [button setTintColor:[UIColor lightGrayColor]];
+    }
+    // Display fixed phrase menu
     UIScreen *screen = [UIScreen mainScreen];
     CGRect frame = CGRectMake(0.0, 0.0, screen.bounds.size.width, keyboardHeight);
     
@@ -4016,14 +4198,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     [inputAccessoryView setupWithData:contents owner:self];
     
     self.inputToolbar.contentView.textView.inputView = inputAccessoryView;
-    
-    // 2. Change left button to sticker button
-    UIButton *stickerButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [stickerButton setImage:[UIImage SDKImageNamed:@"CCadd_widget_btn"] forState:UIControlStateNormal];
-    stickerButton.tintColor = [[CCConstants sharedInstance] baseColor];
-    self.inputToolbar.contentView.leftBarButtonItem = stickerButton;
+    [self.inputToolbar.contentView.textView setHidden:NO];
     [self.inputToolbar.contentView.textView becomeFirstResponder];
     [self.inputToolbar.contentView.textView reloadInputViews];
+    self.marginBottomCollectionView.constant = 60;
+    [self.view setNeedsLayout];
+    isDisplayFixedPhrase = NO;
+    isDisplayingSuggestionView = NO;
+    [self scrollToBottomAnimated:YES];
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -4559,6 +4741,35 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         
         //--------------------------------------------------------------------
         //
+        // Freeword widget
+        //
+        //--------------------------------------------------------------------
+        if ([actionType isEqualToString:@"input"] && stickerActions != nil && stickerActions.count > 0) {
+            [self.view endEditing:YES];
+            NSDictionary *stkAction = stickerActions[0];
+            // Build dialog
+            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stkAction[@"input"]];
+            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                if ([cell respondsToSelector:@selector(resetSelection)]) {
+                    [cell resetSelection];
+                }
+                [_answeringStickers removeObject:data];
+            }];
+            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
+                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                        answer:stkAction
+                                                                   answerLabel:stkAction[@"input"]
+                                                                       replyTo:[msgId stringValue]
+                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                                 [_answeringStickers removeObject:data];
+                                                             }];
+            }];
+            [alert show];
+            return;
+        }
+        
+        //--------------------------------------------------------------------
+        //
         // Moon-style : Accepts multiple reactions
         //
         //--------------------------------------------------------------------
@@ -4566,13 +4777,22 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             // Build dialog
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:CCLocalizedString(@"Cancelled selections")];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                [cell resetSelection];
+                if ([cell respondsToSelector:@selector(resetSelection)]) {
+                    [cell resetSelection];
+                }
                 [_answeringStickers removeObject:data];
+                isDisplayingAlert = NO;
+                if (!isDisplayingSuggestionView) {
+                    [self shouldDisplayFixedPhraseIfNeed];
+                } else {
+                    [self displaySuggestionCallBack];
+                }
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
                 //
                 // Do send - multiple
                 //
+                isDisplayingAlert = NO;
                 [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
                                                                        answers:stickerActions
                                                                        replyTo:[msgId stringValue]
@@ -4580,6 +4800,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                                                                  [_answeringStickers removeObject:data];
                                                              }];
             }];
+            isDisplayingAlert = YES;
+            [self.inputToolbar.contentView.textView resignFirstResponder];
             [alert show];
             
             
@@ -4637,13 +4859,22 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             // Build dialog
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:message];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                [cell resetSelection];
+                if ([cell respondsToSelector:@selector(resetSelection)]) {
+                    [cell resetSelection];
+                }
+                isDisplayingAlert = NO;
+                if (!isDisplayingSuggestionView) {
+                    [self shouldDisplayFixedPhraseIfNeed];
+                } else {
+                    [self displaySuggestionCallBack];
+                }
                 [_answeringStickers removeObject:data];
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
                 //
                 // Do send - multiple
                 //
+                isDisplayingAlert = NO;
                 [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
                                                                        answers:stickerActions
                                                                        replyTo:[msgId stringValue]
@@ -4651,6 +4882,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                     [_answeringStickers removeObject:data];
                 }];
             }];
+            isDisplayingAlert = YES;
+            [self.inputToolbar.contentView.textView resignFirstResponder];
             [alert show];
         
             
@@ -4679,12 +4912,18 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stickerAction[@"label"]];
             [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
                 [cell resetSelection];
+                if (!isDisplayingSuggestionView) {
+                    [self shouldDisplayFixedPhraseIfNeed];
+                } else {
+                    [self displaySuggestionCallBack];
+                }
                 [_answeringStickers removeObject:data];
             }];
             [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
                 //
                 // Do send - single
                 //
+                isDisplayingAlert = NO;
                 [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
                                                                         answer:stickerAction
                                                                    answerLabel:stickerAction[@"label"]
@@ -4693,6 +4932,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                     [_answeringStickers removeObject:data];
                 }];
             }];
+            isDisplayingAlert = YES;
+            [self.inputToolbar.contentView.textView resignFirstResponder];
             [alert show];
             
         } else if ([actionType isEqualToString:@"confirm"]) {
@@ -4704,8 +4945,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
                     [cell resetSelection];
                     [_answeringStickers removeObject:data];
+                    isDisplayingAlert = NO;
+                    if (!isDisplayingSuggestionView) {
+                        [self shouldDisplayFixedPhraseIfNeed];
+                    } else {
+                        [self displaySuggestionCallBack];
+                    }
                 }];
                 [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
+                    isDisplayingAlert = NO;
                     [[ChatCenterClient sharedClient]
                      sendMessageResponseForChannel:self.channelId
                      answer:stickerAction
@@ -4715,6 +4963,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                          [_answeringStickers removeObject:data];
                      }];
                 }];
+                isDisplayingAlert = YES;
+                [self.inputToolbar.contentView.textView resignFirstResponder];
                 [alert show];
                 return;
             }
@@ -4722,12 +4972,128 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
 }
 
+- (void)onUserSelectionToPulldownWidget:(NSNotification *)notification {
+    NSDictionary *data = notification.userInfo;
+    if (data != nil) {
+        NSNumber *msgId = [data objectForKey:@"msgId"];
+        
+        // From Version Moon using this value is encouraged because it allows multiple selection
+        NSArray<NSDictionary*> *stickerActions = [data objectForKey:@"stickerActions"];
+        
+        NSString *stickerType = [data objectForKey:@"sticker_type"];
+        NSString *reacted = [data objectForKey:@"reacted"];
+        
+        if(_answeringStickers == nil) {
+            _answeringStickers = [[NSMutableArray alloc] init];
+        }
+        [_answeringStickers addObject:data];
+        
+        if(stickerActions && stickerActions.count>0) {
+            if (stickerActions[0][@"action"] != nil) {
+                [self performOpenAction:stickerActions[0]
+                            stickerType:stickerType
+                              messageId:msgId
+                                reacted:reacted];
+                return;
+            }
+
+            NSMutableString *message = [NSMutableString new];
+            
+            // Make dialog message with multiple labels
+            for (NSDictionary *actionItem in stickerActions) {
+                [message appendString:actionItem[@"label"]];
+                if(![actionItem isEqual:[stickerActions lastObject]]) {
+                    [message appendString:@"\n"];
+                }
+            }
+            
+            // Build dialog
+            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:message];
+            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
+                isDisplayingAlert = NO;
+                if (!isDisplayingSuggestionView) {
+                    [self shouldDisplayFixedPhraseIfNeed];
+                } else {
+                    [self displaySuggestionCallBack];
+                }
+                [_answeringStickers removeObject:data];
+            }];
+            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
+                CCCommonStickerCollectionViewCell *cell;
+                CCJSQMessage *msg;
+                // Find cell by message id
+                for (int index = 0; index < self.messages.count; index ++) {
+                    msg = self.messages[index];
+                    if ([[msgId stringValue] isEqualToString:[msg.uid stringValue]]) {
+                        cell = (CCCommonStickerCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+                        NSMutableDictionary *newContent = [msg.content mutableCopy];
+                        NSMutableDictionary *newStickerAction = [[newContent objectForKey:@"sticker-action"] mutableCopy];
+                        NSMutableArray *actionResponseData = [[NSMutableArray alloc] init];
+                        NSMutableDictionary *actions = [[NSMutableDictionary alloc] init];
+                        [actions setObject:stickerActions forKey:@"actions"];
+                        [actionResponseData addObject:actions];
+                        [newStickerAction setObject:actionResponseData forKey:@"action-response-data"];
+                        [newContent setObject:newStickerAction forKey:@"sticker-action"];
+                        msg.content = newContent;
+                        if (cell != nil) {
+                            [cell setupQuestionComponentWithMessage:msg needRecreateSubviews:NO];
+                        }
+                        break;
+                    }
+                }
+
+                //
+                // Do send - multiple
+                //
+                isDisplayingAlert = NO;
+                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                       answers:stickerActions
+                                                                       replyTo:[msgId stringValue]
+                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                                 [_answeringStickers removeObject:data];
+                                                             }];
+            }];
+            isDisplayingAlert = YES;
+            [self.inputToolbar.contentView.textView resignFirstResponder];
+            [alert show];
+            return;
+        }
+    }
+}
 
 - (void)performOpenAction:(NSDictionary*)stickerAction
               stickerType:(NSString*)stickerType
                 messageId:(NSNumber*)msgId
                   reacted:(NSString*)reacted {
-
+    
+    NSString *type = [stickerAction objectForKey:@"type"];
+    if (![type isEqual:[NSNull null]]) {
+        if ([type isEqualToString:@"file"]) {
+            [self openImagePicker:stickerAction msgId:msgId];
+            return;
+        } else if ([type isEqualToString:@"location"]) {
+            [self openLocationPicker:stickerAction msgId:msgId];
+            return;
+        } else if ([type isEqualToString:@"colocation"]) {
+            [self openCoLocationPicker:stickerAction msgId:msgId];
+            return;
+        } else if ([type isEqualToString:@"question"]) {
+            [self openQuestionWidgetEditor:stickerAction msgId:msgId];
+            return;
+        } else if ([type isEqualToString:@"calendar"]) {
+            //
+            // "open calendar" is specified
+            //
+            [self proposeOtherSlots:stickerAction msgId:msgId];
+            return;
+        } else if ([type isEqualToString:@"url"] && stickerAction[@"action"] != nil
+                   && [stickerAction[@"action"] isKindOfClass:[NSString class]]
+                   && ![stickerAction[@"action"] isEqual:[NSNull null]]) {
+            NSString *urlString = [stickerAction[@"action"] objectAtIndex:0];
+            [self openURL:[NSURL URLWithString:urlString]];
+            return;
+        }
+    }
     if (stickerAction[@"action"] != nil ) {
         if ([stickerAction[@"action"] isKindOfClass:[NSString class]] && ![stickerAction[@"action"] isEqual:[NSNull null]]) {
             //
@@ -4764,14 +5130,25 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                         //
                         // "reply suggestion" is specified
                         //
-                        self.inputToolbar.contentView.rightBarButtonItem.enabled = YES;
-                        if (![reacted isEqualToString:@"true"]) {
-                            [[ChatCenterClient sharedClient] sendSuggestionMessage:self.channelId answer:stickerAction text:stickerAction[@"message"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                            }];
-                        } else {
-                            [self.collectionView reloadData];
-                        }
-                        self.inputToolbar.contentView.textView.text = stickerAction[@"message"];
+                        NSMutableDictionary *stickerContentToPost = [stickerAction mutableCopy];
+
+                        CCJSQMessage *msg = [[CCJSQMessage alloc] initWithSenderId:@"" senderDisplayName:@"" date:[NSDate date] text:@""];
+                        msg.type = CC_RESPONSETYPEMESSAGE;
+                        [stickerContentToPost setObject:[self generateMessageUniqueId] forKey:@"uid"];
+                        [stickerContentToPost removeObjectForKey:@"message"];
+                        [stickerContentToPost setObject:stickerAction[@"message"] forKey:@"text"];
+                        msg.content = stickerContentToPost;
+                        
+                        CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
+                        [vc setMessage:msg];
+                        [vc setDelegate:self];
+                        vc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Cancel")
+                                                                                               style:UIBarButtonItemStylePlain target:vc action:@selector(cancelButtonPressed:)];
+                        
+                        UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:vc];
+                        [self presentViewController:rootNC animated:YES completion:^{
+                            self.isReturnFromStickerView = YES;
+                        }];
                         return;
                     } else if([urlString hasPrefix:@"reply:suggestion/sticker"]) {
                         // TODO: prevent from sending when "reacted" is true
@@ -4806,12 +5183,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                         //
                         // If it's a Suggestion Sticker just do it
                         //
+                        [self.inputToolbar.contentView.textView resignFirstResponder];
                         [self openURL:[NSURL URLWithString:urlString]];
                         return;
                     }else if(i == count - 1) {
                         //
                         // Else do it only for the last item of the action item list
                         //
+                        [self.inputToolbar.contentView.textView resignFirstResponder];
                         [self openURL:[NSURL URLWithString:urlString]];
                         return;
                     }
@@ -4836,6 +5215,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 return;
             } else if ([urlString hasPrefix: @"open:sticker/image"]) {
                 NSString *imageUrlString = [urlString substringFromIndex:[@"open:sticker/image?url=" length]];
+                [self.inputToolbar.contentView.textView resignFirstResponder];
                 [self openImageWithURLString:imageUrlString];
                 return;
             } else if (data[CC_STICKER_TYPE] != nil && [data[CC_STICKER_TYPE] isEqualToString:CC_STICKERTYPECOLOCATION]) {
@@ -4857,8 +5237,68 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             
             else if(i == count - 1) {
                 // open last item in safari if needed
+                [self.inputToolbar.contentView.textView resignFirstResponder];
                 [self openURL:[NSURL URLWithString:urlString]];
             }
+        }
+    }
+}
+
+- (void) onFreeWordTextviewDidBeginEditing:(NSNotification *)notification {
+    if (!isKeyboardShowing && self.inputToolbar.contentView.textView.inputView == nil) {
+        //  workaround for the first few messages not scrolling
+        //  when the collection view content size is too small, `scrollToItemAtIndexPath:` doesn't work properly
+        //  this seems to be a UIKit bug, see #256 on GitHub
+        //  35 is magic number but it works for now
+        self.marginBottomInputToolbar.constant = keyboardHeight;
+        self.marginBottomCollectionView.constant = 60;
+        [self.view setNeedsLayout];
+    }
+    isEditingFreewordTextView = YES;
+    NSDictionary *userInfo = notification.userInfo;
+    if (userInfo != nil) {
+        NSString *msgId = [[userInfo valueForKey:@"msgId"] stringValue];
+        if (msgId == nil) {
+            return;
+        }
+        NSInteger index = [self indexOfMessageWithId:msgId];
+        if (index >= self.messages.count) {
+            return;
+        }
+        
+        [self scrollToIndexPath:[NSIndexPath indexPathForItem:index inSection:0] animated:YES];
+    }
+}
+
+- (NSInteger) indexOfMessageWithId: (NSString *)msgId {
+    if (self.messages == nil) {
+        return 0;
+    }
+    
+    for (int index = 0; index < self.messages.count; index++) {
+        CCJSQMessage *message = self.messages[index];
+        if ([[message.uid stringValue] isEqualToString:msgId]) {
+            return index;
+        }
+    }
+    
+    return 0;
+}
+
+- (void) onUserDidReactPulldownWidget:(NSNotification *)notification {
+    self.isPulldownSelectBoxDisplayed = YES;
+    [self.view endEditing:YES];
+    CCPickerViewController *pickerVC = [[CCPickerViewController alloc] init];
+    pickerVC.chatViewController = self;
+    NSLog(@"Notification data = %@", notification);
+    NSString *msgId = [[notification.userInfo valueForKey:@"msgId"] stringValue];
+    for (CCJSQMessage *message in self.messages) {
+        if([[message.uid stringValue] isEqualToString:msgId]) {
+            [pickerVC setupWithMessage:message];
+            pickerVC.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+            pickerVC.modalPresentationStyle = UIModalPresentationOverCurrentContext;
+            [self showDetailViewController:pickerVC sender:self];
+            return;
         }
     }
 }
@@ -5269,16 +5709,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
 }
 
-- (UIViewController*) topMostController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    
-    return topController;
-}
-
 #pragma mark - Video Call Delegate
 - (void)receiveCallEvent:(NSString *)messageId content:(NSDictionary *)content {
     NSLog(@"receiveCallEvent = %@", content);
@@ -5290,6 +5720,118 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 #pragma mark - CCChatViewNavigationTitleDelegate delegate.
 - (void)pressNavigationTitleButton:(id)sender{
     [self pressInfo:sender];
+}
+
+#pragma mark - Display fixed phrase
+- (UIViewController *)topViewController{
+    return [self topViewController:[UIApplication sharedApplication].keyWindow.rootViewController];
+}
+
+- (UIViewController *)topViewController:(UIViewController *)rootViewController
+{
+    if ([rootViewController isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *navigationController = (UINavigationController *)rootViewController;
+        UIViewController *lastViewController = [[navigationController viewControllers] lastObject];
+        return [self topViewController:lastViewController];
+    }
+    
+    if (rootViewController.presentedViewController == nil) {
+        return rootViewController;
+    }
+    
+    UIViewController *presentedViewController = (UIViewController *)rootViewController.presentedViewController;
+    return [self topViewController:presentedViewController];
+}
+
+- (BOOL)isTopMostViewController {
+    if ([[self topViewController] isKindOfClass:[CCChatViewController class]]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (void) shouldDisplayFixedPhrase {
+    if (!isDisplayingAlert && self.fixedPhrases != nil && self.fixedPhrases.count > 0 && self.inputToolbar.contentView.inputView == nil && !isKeyboardShowing) {
+        [self displayFixedPhrase:self.fixedPhrases];
+    }
+}
+
+- (void) shouldDisplayFixedPhraseIfNeed {
+    if (![self isTopMostViewController]) {
+        return;
+    }
+    
+    CCJSQMessage *lastMessage;
+    if (self.messages != nil && self.messages.count > 0) {
+        lastMessage = [self.messages objectAtIndex:self.messages.count - 1];
+        if ([self checkHidedFixedPhraseWithLastMessage:lastMessage]) {
+            if (!isKeyboardShowing && ![lastMessage.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+                isDisplayFixedPhrase = NO;
+                [self.inputToolbar.contentView.textView endEditing:YES];
+                [self.inputToolbar.contentView.textView setHidden:YES];
+            } else if (!isKeyboardShowing && [lastMessage.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+                [self displaySuggestionCallBack];
+            }
+        } else {
+            [self shouldDisplayFixedPhrase];
+        }
+    } else {
+        [self shouldDisplayFixedPhrase];
+    }
+}
+
+- (void) displaySuggestionCallBack {
+    if (self.messages != nil && self.messages.count > 0) {
+        CCJSQMessage *lastMessage = [self.messages objectAtIndex:self.messages.count - 1];
+        if (lastMessage != nil && [lastMessage.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+            NSArray<NSDictionary*> *actionData = [[lastMessage.content objectForKey:@"sticker-action"] objectForKey:@"action-data"];
+            if (actionData != nil) {
+                [self displaySuggestionWithActionData:actionData];
+            }
+        }
+    }
+}
+
+
+- (BOOL) checkHidedFixedPhraseWithLastMessage:(CCJSQMessage *)lastMessage {
+    if (isKeyboardShowing) {
+        return YES;
+    }
+    if (lastMessage != nil && [lastMessage.type isEqualToString:CC_RESPONSETYPESUGGESTION] && !isDisplayingSuggestionView) {
+        
+        NSArray<NSDictionary*> *actionData = [[lastMessage.content objectForKey:@"sticker-action"] objectForKey:@"action-data"];
+        if (actionData != nil && !isDisplayingAlert && !isKeyboardShowing && self.inputToolbar.contentView.textView.inputView != nil) {
+            return YES;
+        }
+    }
+    if (lastMessage != nil && lastMessage.content != nil && ![lastMessage.type isEqualToString:CC_RESPONSETYPESUGGESTION]) {
+    
+        if ([lastMessage.type isEqualToString:CC_RESPONSETYPESTICKER]) {
+            NSString *stickerType = [lastMessage.content objectForKey:@"sticker-type"];
+            if ([stickerType isEqualToString:@"select"] ||
+                [stickerType isEqualToString:@"schedule"] ||
+                [stickerType isEqualToString:@"confirm"]) {
+                if (![lastMessage.senderId isEqualToString:self.uid]) {
+                    return YES;
+                }
+            } else {
+                if ([stickerType isEqualToString:@"file"] ||
+                    [stickerType isEqualToString:@"list"] ||
+                    [stickerType isEqualToString:@"location"] ) {
+                    NSDictionary * stickerAction = [lastMessage.content objectForKey:@"sticker-action"] ;
+                    if (stickerAction != nil && ![stickerAction isEqual:[NSNull null]]) {
+                        NSString *actionType = [[lastMessage.content objectForKey:@"sticker-action"] objectForKey:@"action-type"];
+                        if ([actionType isEqualToString:@"confirm"]||[actionType isEqualToString:@"select"]) {
+                            if (![lastMessage.senderId isEqualToString:self.uid]) {
+                                return YES;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return NO;
 }
 
 @end

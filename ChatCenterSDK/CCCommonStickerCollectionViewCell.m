@@ -401,8 +401,11 @@
     return YES;
 }
 
-
 - (void)setupQuestionComponentWithMessage:(CCJSQMessage*)msg {
+    [self setupQuestionComponentWithMessage:msg needRecreateSubviews:YES];
+}
+
+- (void)setupQuestionComponentWithMessage:(CCJSQMessage*)msg needRecreateSubviews:(BOOL)needRecreateSubviews {
     //
     // Extract sticker actions
     //
@@ -489,8 +492,16 @@
         // If the stickerActionType is "confirm" convert it to YesNo Question Widget
         action = [[self class] convertStickerActionToMoonStyleIfNeeded:action];
         
-        
-        CCQuestionComponent *v = [CCQuestionComponent componentForStickerAction:action  delegate:self];
+        CCQuestionComponent *v;
+        if (needRecreateSubviews) {
+            v = [CCQuestionComponent componentForStickerAction:action  delegate:self];
+        } else {
+            for (UIView *view in stickerActionsContainer.subviews) {
+                if ([view isKindOfClass:[CCQuestionComponent class]]) {
+                    v = (CCQuestionComponent *)view;
+                }
+            }
+        }
         
         CGFloat height = [CCQuestionComponent calculateHeightForStickerAction:action];
         v.frame = CGRectMake(0, 0, self.bounds.size.width, height);
@@ -578,6 +589,10 @@
     NSArray *stickerActions = [msg getArrayAtPath:@"sticker-action/action-data"];
     if (stickerActions != nil && stickerActions.count > 0) {
         img = [UIImage SDKImageNamed:@"questionBubbleIcon"];
+    }
+    NSString *stickerType = [msg getStringAtPath:@"sticker-type"];
+    if (stickerType != nil && [stickerType isEqualToString:@"file"]) {
+        img = [UIImage SDKImageNamed:@"CCmenu_icon_image"];
     }
 
     //
@@ -706,13 +721,27 @@
     
     
     // do action here!!!
-    
+    NSString * actionType = _msg.content[@"sticker-action"][@"action-type"];
+    if (actionType != nil) {
+        NSDictionary *data = @{         @"msgId" : _msg.uid,
+                                        @"action-type" : actionType,
+                                        @"stickerActions" : items,
+                                        @"sticker_type": _msg.type ,
+                                        @"reacted" : isReacted};
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
+    }
+}
+
+- (void)userDidReactOnPulldownWidget {
+    if(_msg == nil || _msg.status == CC_MESSAGE_STATUS_DELIVERING || _msg.status == CC_MESSAGE_STATUS_SEND_FAILED) {
+        return;
+    }
+
     NSDictionary *data = @{         @"msgId" : _msg.uid,
                                     @"action-type" : _msg.content[@"sticker-action"][@"action-type"],
-                                    @"stickerActions" : items,
-                                    @"sticker_type": _msg.type ,
-                                    @"reacted" : isReacted};
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
+                                    
+                                    @"sticker_type": _msg.type};
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToPulldownWidget object:self userInfo:data];
 }
 
 - (void) onActionClicked:(UIButton*)sender {
@@ -768,6 +797,11 @@
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToStickerContent object:nil userInfo:data];
     }
+}
+
+- (void)userDidBeginEditingTextView {
+    NSDictionary *data = @{@"msgId" : _msg.uid};
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_TextViewDidBeginEditing object:self userInfo:data];
 }
 
 + (CGSize) estimateSizeForMessage:(CCJSQMessage *)msg

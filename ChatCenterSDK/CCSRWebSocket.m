@@ -914,7 +914,7 @@
 }
 
 - (void)sendMessage:(NSString *)message {
-    if (_webSocket.readyState != SR_CONNECTING) {
+    if (_webSocket.readyState != SR_OPEN) {
         return;
     }
     [_webSocket send:message];

@@ -38,6 +38,9 @@ const int CCImageMaxSize = 100 * 1024; //Kilobytes
 NSString * const kCCNoti_UserReactionToSticker = @"kCCNoti_UserReactionToSticker";
 NSString * const kCCNoti_UserReactionToStickerContent = @"kCCNoti_UserReactionToStickerContent";
 NSString * const kCCNoti_UserReactionToCallAgain = @"kCCNoti_UserReactionToCallAgain";
+NSString * const kCCNoti_TextViewDidBeginEditing = @"kCCNoti_TextViewDidBeginEditing";
+NSString * const kCCNoti_UserReactionToPulldownWidget = @"kCCNoti_UserReactionToPulldownWidget";
+NSString * const kCCNoti_UserSelectionToPulldownWidget = @"kCCNoti_UserSelectionToPulldownWidget";
 
 // key for user information
 NSString *const kCCUserDefaults_userDisplayName = @"ChatCenterUserdefaults_currentDisplayName";

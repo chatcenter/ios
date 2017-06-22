@@ -11,11 +11,11 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="CCSuggestionInputView">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="D7w-TR-64N">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="200"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="250"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Suggestion" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BKN-Dd-Cex" customClass="CCLabel">
                             <rect key="frame" x="0.0" y="10" width="320" height="21"/>
@@ -38,24 +38,34 @@
                     </constraints>
                 </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="z7X-6P-6bR">
-                    <rect key="frame" x="0.0" y="43" width="320" height="120"/>
+                    <rect key="frame" x="0.0" y="43" width="320" height="140"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="120" id="nXV-PI-en1"/>
+                        <constraint firstAttribute="height" constant="140" id="5Pw-Uw-o6q"/>
                     </constraints>
-                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="Cfh-de-OJo">
+                    <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="13" minimumInteritemSpacing="10" id="JqJ-av-Os4">
                         <size key="itemSize" width="250" height="60"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                        <inset key="sectionInset" minX="40" minY="0.0" maxX="40" maxY="0.0"/>
+                        <inset key="sectionInset" minX="13" minY="0.0" maxX="13" maxY="0.0"/>
                     </collectionViewFlowLayout>
                 </collectionView>
+                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="There's no suggestion so far" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7h2-Uw-okK" customClass="CCLabel">
+                    <rect key="frame" x="51.5" y="114.5" width="217.5" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
             <constraints>
+                <constraint firstItem="7h2-Uw-okK" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="09E-e7-XhD"/>
                 <constraint firstItem="z7X-6P-6bR" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="43" id="4Ry-96-1aX"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="7h2-Uw-okK" secondAttribute="trailing" constant="10" id="4hM-6m-r0c"/>
+                <constraint firstItem="7h2-Uw-okK" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="5Pl-X0-lQ6"/>
                 <constraint firstItem="z7X-6P-6bR" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="6ib-ZA-3T0"/>
                 <constraint firstAttribute="trailing" secondItem="z7X-6P-6bR" secondAttribute="trailing" id="93X-S5-mZP"/>
+                <constraint firstItem="7h2-Uw-okK" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="UGU-yE-iF1"/>
                 <constraint firstItem="D7w-TR-64N" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="elq-lW-Lzy"/>
                 <constraint firstAttribute="bottom" secondItem="D7w-TR-64N" secondAttribute="bottom" id="gJc-6u-NIG"/>
                 <constraint firstAttribute="trailing" secondItem="D7w-TR-64N" secondAttribute="trailing" id="o3j-5C-nOz"/>
@@ -65,6 +75,7 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="collectionView" destination="z7X-6P-6bR" id="xS4-st-U2W"/>
+                <outlet property="noMessageLable" destination="7h2-Uw-okK" id="EkN-wD-TN7"/>
             </connections>
             <point key="canvasLocation" x="34" y="78"/>
         </view>

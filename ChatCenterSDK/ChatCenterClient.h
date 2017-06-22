@@ -157,4 +157,7 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
 
 //Video chat
 - (BOOL)isSupportVideoChat;
+
+#pragma mark - Watch api
+- (void)loadFixedPhraseAndUnreadChannels:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler;
 @end

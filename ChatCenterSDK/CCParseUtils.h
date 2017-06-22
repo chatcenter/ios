@@ -12,5 +12,5 @@
 
 + (long) longTryGet:(NSDictionary *)dictionary key:(NSString *) key;
 + (NSString *) stringTryGet:(NSDictionary *)dictionary key:(NSString *) key;
-
++ (NSDictionary *) removeUnsupportedTypesFrom: (NSDictionary *)dictionary;
 @end

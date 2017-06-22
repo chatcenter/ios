@@ -107,4 +107,8 @@
  */
 - (CCJSQMessagesToolbarContentView *)loadToolbarContentView;
 
+/**
+ *  Specifies the maximum line for the toolbar
+ */
+@property (assign, nonatomic) NSUInteger maximumNumberOfLine;
 @end

@@ -10,6 +10,8 @@
 @protocol CCQuestionComponentDelegate <NSObject>
 
 - (void)userDidSelectActionItems:(NSArray<NSDictionary*> *)items;
+- (void)userDidBeginEditingTextView;
+- (void)userDidReactOnPulldownWidget;
 
 @end
 

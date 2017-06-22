@@ -271,5 +271,6 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 #pragma mark - Watch App
 - (void) switchChannel: (NSString *)channelId;
 - (void) switchApp: (NSString *)appToken;
+- (void)loadFixedPhraseAndUnreadChannels:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler;
 #endif
 @end

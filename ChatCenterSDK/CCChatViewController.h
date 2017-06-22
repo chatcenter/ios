@@ -18,6 +18,7 @@
 #import "CCCommonWidgetEditorDelegate.h"
 #import "CCChatViewNavigationTitle.h"
 #import "CCVideoCallEventHandlerDelegate.h"
+#import "CCWidgetMenuView.h"
 
 @class CCChatViewController;
 
@@ -55,12 +56,28 @@
 @property BOOL isReturnFromRightMenuView;
 @property BOOL isReturnFromVideoCallView;
 @property BOOL isReturnFromStickerView;
+@property BOOL isPulldownSelectBoxDisplayed;
 @property BOOL shouldDisplayFixedPhraseMenu;
 @property (nonatomic, strong) NSArray *twilioInviteList;
+@property (nonatomic, strong) NSLayoutConstraint *marginBottomCollectionView;
+@property (nonatomic, strong) NSLayoutConstraint *marginBottomInputToolbar;
 
 @property (nonatomic, strong) NSString *pendingFixedPhrase;
 @property (nonatomic, strong) UINavigationController *navigationHistoryView;
 @property (nonatomic, weak)   id<CCVideoCallEventHandlerDelegate> delegateCall;
+
+///
+/// Input toolbar
+///
+@property (nonatomic, strong) UIView *inputToolbarContainerView;
+@property (nonatomic, strong) CCWidgetMenuView *inputToolbarMenuView;
+
+///
+/// Suggestion
+///
+@property (nonatomic, strong) NSArray<NSDictionary*> *suggestionActionData;
+
+
 - (void)loadLocalData:(BOOL)isOrgChange;
 -(void)receiveMessage:(NSString *)messageType
                   uid:(NSNumber *)uid
@@ -94,6 +111,9 @@
 
 
 //// Called from CCWidgetMenuView
+- (void) switchToInputTextMode;
+- (void) switchToSuggestionMode;
+- (void) switchToSaveWidget;
 - (void) pressCalendar;
 - (void) pressLocationWidget;
 - (void) pressThumb;

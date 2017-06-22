@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "CCAlertView.h"
 
-#define CC_SDK_VERSION                    @"1.1.3"
+#define CC_SDK_VERSION                    @"1.1.4"
 #define CC_SDK_SUPPORT_VIDEO_CHAT_VERSION @"1.0.8"
 
 #define CC_DEFAULT_VIDEO_ENABLED        1
@@ -102,6 +102,9 @@
 FOUNDATION_EXPORT NSString * const kCCNoti_UserReactionToSticker;
 FOUNDATION_EXPORT NSString * const kCCNoti_UserReactionToStickerContent;
 FOUNDATION_EXPORT NSString * const kCCNoti_UserReactionToCallAgain;
+FOUNDATION_EXPORT NSString * const kCCNoti_TextViewDidBeginEditing;
+FOUNDATION_EXPORT NSString * const kCCNoti_UserReactionToPulldownWidget;
+FOUNDATION_EXPORT NSString * const kCCNoti_UserSelectionToPulldownWidget;
 
 // key for user information
 extern NSString *const kCCUserDefaults_userDisplayName;

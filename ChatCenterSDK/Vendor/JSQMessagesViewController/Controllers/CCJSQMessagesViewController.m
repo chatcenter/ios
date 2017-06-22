@@ -1027,7 +1027,17 @@ CCJSQMessagesKeyboardControllerDelegate>
     }
 
     if (self.toolbarHeightConstraint.constant != finalHeight) {
-        self.toolbarHeightConstraint.constant = finalHeight;
+        NSDictionary *attr = @{NSFontAttributeName: self.inputToolbar.contentView.textView.font};
+        CGRect textRect = [self.inputToolbar.contentView.textView.text boundingRectWithSize:CGSizeMake(self.inputToolbar.contentView.textView.frame.size.width,MAXFLOAT)
+                                                  options:NSStringDrawingUsesLineFragmentOrigin
+                                               attributes:attr
+                                                  context:nil];
+        float numberOfLines = textRect.size.height / self.inputToolbar.contentView.textView.font.lineHeight;
+        if ( self.inputToolbar.maximumNumberOfLine > 0 && numberOfLines > self.inputToolbar.maximumNumberOfLine && self.inputToolbar.maximumHeight != NSNotFound && finalHeight < self.inputToolbar.maximumHeight) {
+            self.toolbarHeightConstraint.constant = self.inputToolbar.maximumHeight;
+        } else {
+            self.toolbarHeightConstraint.constant = finalHeight;
+        }
         [self.view setNeedsUpdateConstraints];
         [self.view layoutIfNeeded];
     }

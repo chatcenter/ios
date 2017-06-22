@@ -32,6 +32,8 @@
     if(users) {
         NSArray *receiversArray = msg.content[@"receivers"];
         receiverName = [self getReceiverNameFrom:receiversArray inUserArray:users];
+    } else {
+        receiverName = @"";
     }
 
 

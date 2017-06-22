@@ -13,8 +13,10 @@
 @interface CCWidgetMenuView : UIView
 
 @property (nonatomic, assign) CCChatViewController* owner;
+@property BOOL shouldShowSuggestion;
+@property (nonatomic, strong) NSMutableArray *buttons;
 
-- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner;
+- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner shouldShowSuggestion:(BOOL)shouldShowSuggestion;
 
 
 @end

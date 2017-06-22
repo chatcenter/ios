@@ -54,7 +54,15 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    return textView.text.length + (text.length - range.length) <= CCNoteInputtextLimit;
+    BOOL reached = textView.text.length + (text.length - range.length) <= CCNoteInputtextLimit;
+    if (!reached) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"" message:[NSString stringWithFormat:@"Please input %d characters or less.", CCNoteInputtextLimit] preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        }];
+        [alert addAction:okAction];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    return reached;
 }
 
 @end

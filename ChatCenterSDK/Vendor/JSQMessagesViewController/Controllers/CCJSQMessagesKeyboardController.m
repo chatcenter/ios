@@ -249,6 +249,9 @@ typedef void (^JSQAnimationCompletionBlock)(BOOL finished);
 {
     self.keyboardView.hidden = hidden;
     self.keyboardView.userInteractionEnabled = !hidden;
+    if (hidden) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIKeyboardDidHideNotification object:self userInfo:nil];
+    }
 }
 
 - (void)jsq_notifyKeyboardFrameNotificationForFrame:(CGRect)frame

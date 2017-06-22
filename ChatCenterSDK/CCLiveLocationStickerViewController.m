@@ -198,6 +198,7 @@ float MAP_ZOOM_BUILDINGS = 20;
     CCCommonWidgetPreviewViewController *vc = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];
     [vc setDelegate:self.delegate];
     [vc setMessage:msg];
+    vc.closeWidgetPreviewCallback = self.closeCoLocationStickerCallback;
     
     [self.navigationController pushViewController:vc animated:YES];
 }

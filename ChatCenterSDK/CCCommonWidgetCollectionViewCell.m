@@ -2,6 +2,10 @@
 //  CCCommonStickWidgetCollectionViewCell.m
 //  ChatCenterDemo
 //
+//  This is used for displaying widget on right side menu (also know as channel detail view)
+//  This file is the same with CCCommonStickerCollectionViewCell, but have some differences
+//  about layout and view components.
+//
 //  Created by GiapNH on 4/26/17.
 //  Copyright © 2017 AppSocially Inc. All rights reserved.
 //
@@ -614,13 +618,31 @@
     
     
     // do action here!!!
+    NSString * actionType = _msg.content[@"sticker-action"][@"action-type"];
+    if (actionType != nil) {
+        NSDictionary *data = @{         @"msgId" : _msg.uid,
+                                        @"action-type" : actionType,
+                                        @"stickerActions" : items,
+                                        @"sticker_type": _msg.type ,
+                                        @"reacted" : isReacted};
+        [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
+    }
+}
+
+- (void)userDidBeginEditingTextView {
+    NSDictionary *data = @{@"msgId" : _msg.uid};
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_TextViewDidBeginEditing object:self userInfo:data];
+}
+
+- (void)userDidReactOnPulldownWidget {
+    if(_msg == nil || _msg.status == CC_MESSAGE_STATUS_DELIVERING || _msg.status == CC_MESSAGE_STATUS_SEND_FAILED) {
+        return;
+    }
     
     NSDictionary *data = @{         @"msgId" : _msg.uid,
                                     @"action-type" : _msg.content[@"sticker-action"][@"action-type"],
-                                    @"stickerActions" : items,
-                                    @"sticker_type": _msg.type ,
-                                    @"reacted" : isReacted};
-    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToSticker object:self userInfo:data];
+                                    @"sticker_type": _msg.type};
+    [[NSNotificationCenter defaultCenter] postNotificationName:kCCNoti_UserReactionToPulldownWidget object:self userInfo:data];
 }
 
 - (void) onActionClicked:(UIButton*)sender {

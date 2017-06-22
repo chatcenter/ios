@@ -24,5 +24,6 @@
 - (void)preview;
 - (CCJSQMessage *) createMessage;
 - (NSString *)generateMessageUniqueId;
+@property (nullable, nonatomic, copy) void (^closeQuestionCallback)(void);
 
 @end

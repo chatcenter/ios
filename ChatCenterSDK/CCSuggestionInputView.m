@@ -10,6 +10,7 @@
 #import "CCSuggestionInputCell.h"
 #import "CCChatViewController.h"
 #import "CCConstants.h"
+#import "ChatCenterPrivate.h"
 
 @interface CCSuggestionInputView () {
     NSArray<NSDictionary*> *suggestionData;
@@ -28,8 +29,12 @@
     
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
+    if (suggestionData.count > 0) {
+        [self.noMessageLable setHidden:YES];
+    } else {
+        [self.noMessageLable setHidden:NO];
+    }
     [self.collectionView registerNib:[UINib nibWithNibName:@"CCSuggestionInputCell" bundle:SDK_BUNDLE] forCellWithReuseIdentifier:@"cell"];
-    
 }
 
 
@@ -41,7 +46,7 @@
     if (!suggestionData) {
         return 0;
     }
-    return suggestionData.count;
+    return suggestionData.count > 4 ? 4: suggestionData.count;
 }
 
 
@@ -50,10 +55,40 @@
     NSInteger row = indexPath.row;
     
     CCSuggestionInputCell *cell = (CCSuggestionInputCell*)[self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
-    
     if (row < suggestionData.count) {
-        NSString *label = [suggestionData[row] objectForKey:@"label"];
-        [cell setupWithLabel:label];
+        NSDictionary *message = suggestionData[row];
+        NSString *label = [message objectForKey:@"action-name"];
+        if (label == nil || [label isEqual:[NSNull null]] || [[label stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]) {
+            label = CCLocalizedString(@"No Title");
+        }
+        
+        NSString *contentType = CC_RESPONSETYPEMESSAGE;
+        NSString *stickerType = CC_RESPONSETYPEMESSAGE;
+        if (message != nil && [message valueForKey:@"content_type"] != nil) {
+            contentType = [message valueForKey:@"content_type"];
+            if (contentType != nil && ![contentType isEqual:[NSNull null]] && [contentType isEqualToString:CC_RESPONSETYPESTICKER]) {
+                // for sticker
+                NSMutableDictionary *content = [[message objectForKey:@"content"] mutableCopy];
+                if(([content objectForKey:@"message"] != nil && ![[message objectForKey:@"message"] isEqual:[NSNull null]])
+                   || ([content objectForKey:@"sticker-action"] != nil && ![[message objectForKey:@"sticker-action"] isEqual:[NSNull null]])
+                   || ([content objectForKey:@"sticker-content"] != nil && ![[message objectForKey:@"sticker-content"] isEqual:[NSNull null]]))
+                {
+                    contentType = CC_RESPONSETYPESTICKER;
+                }
+            }
+        } else if (message != nil && [message objectForKey:@"sticker"] != nil
+                   && ![[message objectForKey:@"sticker"] isEqual:[NSNull null]]
+                   && [[message objectForKey:@"sticker"] objectForKey:@"sticker-type"] != nil
+                   && ![[[message objectForKey:@"sticker"] objectForKey:@"sticker-type"] isEqual:[NSNull null]]) {
+            stickerType = [message valueForKeyPath:@"sticker.sticker-type"];
+        } else if (message != nil && [message valueForKey:@"type"] != nil) {
+            stickerType = [message valueForKey:@"type"];
+        }
+        if (message != nil && [message objectForKey:@"type"] != nil && ![[message objectForKey:@"type"] isEqual:[NSNull null]]) {
+            contentType = [message objectForKey:@"type"];
+        }
+
+        [cell setupWithLabel:label contentType:contentType stickerType:stickerType];
     }
 
     
@@ -77,9 +112,7 @@
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    return CGSizeMake(250, self.bounds.size.height);
+    return CGSizeMake(250, 60);
 }
-
-
 
 @end

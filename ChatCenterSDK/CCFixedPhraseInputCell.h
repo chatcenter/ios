@@ -12,7 +12,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 @property (weak, nonatomic) IBOutlet UIView *containerView;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *constraintTextViewHeight;
+@property (strong, nonatomic) IBOutlet NSLayoutConstraint *iconWidthConstraint;
 
-- (void)setupWithLabel:(NSString*)label;
+- (void)setupWithLabel:(NSString*)label contentType:(NSString *)contentType stickerType:(NSString *)stickerType;
 
 @end

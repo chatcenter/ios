@@ -11,6 +11,7 @@
 #import "CCChatViewController.h"
 #import "CCCommonWidgetPreviewViewController.h"
 #import "CCConstants.h"
+#import "ChatCenterPrivate.h"
 
 @interface CCFixedPhraseInputView () {
     NSArray<NSDictionary*> *fixedPhraseData;
@@ -55,18 +56,39 @@
     if (row < fixedPhraseData.count) {
         NSLog(@"fixed phrase = %@", fixedPhraseData[row]);
         NSDictionary *message = fixedPhraseData[row];
-        NSString *text = [message valueForKeyPath:@"content.message.text"];
-        if (text == nil) {
-            text = [message valueForKeyPath:@"content.text"];
+        NSString *text ;
+        if (message != nil && [message objectForKey:@"description"] != nil && ![[message objectForKey:@"description"] isEqual:[NSNull null]]) {
+            text = [message objectForKey:@"description"];
         }
-        [cell setupWithLabel:text];
+        if (text == nil || [text isEqual:[NSNull null]] || [[text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]){
+            text = CCLocalizedString(@"No Title");
+        }
+        NSString *contentType = CC_RESPONSETYPEMESSAGE;
+        NSString *stickerType = CC_RESPONSETYPEMESSAGE;
+        if (message != nil && [message valueForKey:@"content_type"] != nil) {
+            contentType = [message valueForKey:@"content_type"];
+            if (contentType != nil && ![contentType isEqual:[NSNull null]] && [contentType isEqualToString:CC_RESPONSETYPESTICKER]) {
+                // for sticker
+                NSMutableDictionary *content = [[message objectForKey:@"content"] mutableCopy];
+                NSString *stickerTypeMsg = [content objectForKey:@"sticker-type"];
+                if (stickerTypeMsg != nil && ![stickerType isEqual: [NSNull null]] &&
+                    ([stickerTypeMsg isEqualToString:@"file"] || [stickerTypeMsg isEqualToString:@"location"]) ) {
+                    stickerType = stickerTypeMsg;
+                }
+                if(([content objectForKey:@"message"] != nil && ![[message objectForKey:@"message"] isEqual:[NSNull null]])
+                   || ([content objectForKey:@"sticker-action"] != nil && ![[message objectForKey:@"sticker-action"] isEqual:[NSNull null]])
+                   || ([content objectForKey:@"sticker-content"] != nil && ![[message objectForKey:@"sticker-content"] isEqual:[NSNull null]]))
+                {
+                    contentType = CC_RESPONSETYPESTICKER;
+                }
+            }
+        }
+        [cell setupWithLabel:text contentType:contentType stickerType:stickerType];
     }
 
-    
     return cell;
 
 }
-
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
@@ -121,13 +143,13 @@
 }
 
 - (NSString *)generateMessageUniqueId {
-    NSString *generatedUniqueId = [NSString stringWithFormat:@"%@-%@-%ld", _owner.channelId, _owner.uid, (long)([[NSDate date] timeIntervalSince1970] * 1000)];
+    NSString *generatedUniqueId = [NSString stringWithFormat:@"%@-%@-%f", _owner.channelId, _owner.uid, (double)([[NSDate date] timeIntervalSince1970] * 1000)];
     return generatedUniqueId;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    return CGSizeMake(250, self.bounds.size.height);
+    return CGSizeMake(250, 60);
 }
 
 

@@ -70,6 +70,7 @@
     CCCommonWidgetPreviewViewController *previewController = [[CCCommonWidgetPreviewViewController alloc] initWithNibName:@"CCCommonWidgetPreviewViewController" bundle:SDK_BUNDLE];    
     [previewController setMessage:[self createMessage]];
     previewController.delegate = delegate;
+    previewController.closeWidgetPreviewCallback = self.closeQuestionCallback;
     [self.navigationController pushViewController:previewController animated:YES];
 }
 

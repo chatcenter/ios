@@ -35,6 +35,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *titleDiscriptionLabel;
 @property (weak, nonatomic) IBOutlet UIView *navigationBarView;
 @property (nonatomic, copy) void (^closeCalendarTimePickerCallback)(NSArray *dateTimes);
+@property (nonatomic, copy) void (^closeWidgetCalendarCallback)(void);
 
 - (instancetype)initWithDelegate:(id<CCCommonWidgetEditorDelegate>)delegate;
 

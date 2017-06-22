@@ -7,10 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CCLabel.h"
 
 @class CCChatViewController;
 
 @interface CCSuggestionInputView : UIView <UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
+@property (strong, nonatomic) IBOutlet CCLabel *noMessageLable;
 
 - (void)setupWithData:(NSArray<NSDictionary *> *)data owner:(CCChatViewController *)owner;
 

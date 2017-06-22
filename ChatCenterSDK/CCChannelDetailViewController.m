@@ -21,6 +21,7 @@
 #import "UIView+CCToast.h"
 #import "UIImageView+CCWebCache.h"
 #import "UIImage+CCSDKImage.h"
+#import "CCSVProgressHUD.h"
 
 @interface CCChannelDetailViewController(){
     float circleAvatarSize;
@@ -54,6 +55,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [CCSVProgressHUD show];
     self.profileUser = nil;
     [self viewSetup];
     [self loadChannelInformation:self.channelId];
@@ -702,10 +704,12 @@
 
 -(void)loadChannelInformation:(NSString *)channelId{
     if (![[CCConstants sharedInstance] getKeychainUid]) {
+        [CCSVProgressHUD dismiss];
         return;
     }
     // Load channel
     [[CCConnectionHelper sharedClient] loadChannel:NO channelUid:self.channelId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        [CCSVProgressHUD dismiss];
         if(result != nil){
             self.channelInfo = result;
             // Funnel information

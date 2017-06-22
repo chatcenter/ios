@@ -132,7 +132,11 @@
             }
         } else {
             [delegate sendWidgetWithType:message.type andContent:message.content];
-            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                if (self.closeWidgetPreviewCallback != nil) {
+                    self.closeWidgetPreviewCallback();
+                }
+            }];
         }
     }
 }

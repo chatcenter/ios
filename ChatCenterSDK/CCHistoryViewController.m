@@ -544,28 +544,28 @@ int const CCTopRowTableView = 0;
     cell.backgroundColor = [[CCConstants sharedInstance] historySelectedCellBackgroundColor];
     selectedIndexPath = indexPath;
     
+    ///Update unread message num and toatal unread message num
+    UILabel *title          = (UILabel*)[cell viewWithTag:4];
+    UILabel *lastMessage    = (UILabel*)[cell viewWithTag:1];
+    UILabel *lastUpdateDate = (UILabel*)[cell viewWithTag:2];
+    title.font          = [UIFont systemFontOfSize:17.0];
+    lastUpdateDate.font = [UIFont systemFontOfSize:14.0];
+    lastMessage.font    = [UIFont systemFontOfSize:14.0];
+    NSDictionary * channel = [self.ChannelLabels objectAtIndex:indexPath.row];
+    NSNumber *admin = channel[@"admin"];
+    [self.ChannelLabels removeObjectAtIndex:indexPath.row];
+    NSDictionary *channelLabel = @{@"uid":labels[@"uid"],
+                                   @"channelId":labels[@"channelId"],
+                                   @"title":labels[@"title"],
+                                   @"lastUpdatedAt":labels[@"lastUpdatedAt"],
+                                   @"message":labels[@"message"],
+                                   @"status":labels[@"status"],
+                                   @"iconImage":labels[@"iconImage"],
+                                   @"senderName":labels[@"senderName"],
+                                   @"unreadMessageNum":@"0",
+                                   @"admin":admin};
+    [self.ChannelLabels insertObject:channelLabel atIndex:indexPath.row];
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES) { ///SplitView
-        ///Update unread message num and toatal unread message num
-        UILabel *title          = (UILabel*)[cell viewWithTag:4];
-        UILabel *lastMessage    = (UILabel*)[cell viewWithTag:1];
-        UILabel *lastUpdateDate = (UILabel*)[cell viewWithTag:2];
-        title.font          = [UIFont systemFontOfSize:17.0];
-        lastUpdateDate.font = [UIFont systemFontOfSize:14.0];
-        lastMessage.font    = [UIFont systemFontOfSize:14.0];
-        NSDictionary * channel = [self.ChannelLabels objectAtIndex:indexPath.row];
-        NSNumber *admin = channel[@"admin"];
-        [self.ChannelLabels removeObjectAtIndex:indexPath.row];
-        NSDictionary *channelLabel = @{@"uid":labels[@"uid"],
-                                       @"channelId":labels[@"channelId"],
-                                       @"title":labels[@"title"],
-                                       @"lastUpdatedAt":labels[@"lastUpdatedAt"],
-                                       @"message":labels[@"message"],
-                                       @"status":labels[@"status"],
-                                       @"iconImage":labels[@"iconImage"],
-                                       @"senderName":labels[@"senderName"],
-                                       @"unreadMessageNum":@"0",
-                                       @"admin":admin};
-        [self.ChannelLabels insertObject:channelLabel atIndex:indexPath.row];
         // Show right side menu button
         if ([self isVideocallEnabled:labels[@"canUseVideoChat"]]){
             self.chatAndHistoryViewController.navigationItem.rightBarButtonItems = @[_rightSpacer, _inforButton, _videoCallButton, _voiceCallButton];

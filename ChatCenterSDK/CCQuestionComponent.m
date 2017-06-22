@@ -12,6 +12,8 @@
 #import "CCCheckboxQuestionComponent.h"
 #import "CCYesNoQuestionComponent.h"
 #import "CCLinearScaleQuestionComponent.h"
+#import "CCFreewordInputComponent.h"
+#import "CCPulldownSelectionQuestionComponent.h"
 #import "CCConstants.h"
 
 @implementation CCQuestionComponent
@@ -19,17 +21,30 @@
 + (instancetype)componentForStickerAction:(NSDictionary*)stickerAction delegate:(id<CCQuestionComponentDelegate>)delegate {
     
     NSDictionary *vi = (NSDictionary*)[stickerAction objectForKey:@"view-info"];
+    NSString *actionType = [stickerAction valueForKey:@"action-type"];
     NSString *nibName = @"CCDefaultSelectionQuestionComponent";
-    if ( vi != nil ) {
-        NSString *type = [vi objectForKey:@"type"];
-        if ([type isEqualToString:@"default"]) {
-            nibName = @"CCDefaultSelectionQuestionComponent";
-        } else if([type isEqualToString:@"checkbox"]) {
-            nibName = @"CCCheckboxQuestionComponent";
-        } else if([type isEqualToString:@"yesno"]) {
-            nibName = @"CCYesNoQuestionComponent";
-        } else if([type isEqualToString:@"linear"]) {
-            nibName = @"CCLinearScaleQuestionComponent";
+
+    if (actionType != nil) {
+        //
+        // Action type is select
+        //
+        if ([actionType isEqualToString:@"select"]) {
+            if ( vi != nil ) {
+                NSString *type = [vi objectForKey:@"type"];
+                if ([type isEqualToString:@"default"]) {
+                    nibName = @"CCDefaultSelectionQuestionComponent";
+                } else if([type isEqualToString:@"checkbox"]) {
+                    nibName = @"CCCheckboxQuestionComponent";
+                } else if([type isEqualToString:@"yesno"]) {
+                    nibName = @"CCYesNoQuestionComponent";
+                } else if([type isEqualToString:@"linear"]) {
+                    nibName = @"CCLinearScaleQuestionComponent";
+                } else if ([type isEqualToString:@"selectbox"]) {
+                    nibName = @"CCPulldownSelectionQuestionComponent";
+                }
+            }
+        } else if ([actionType isEqualToString:@"input"]) {
+            nibName = @"CCFreewordInputComponent";
         }
     }
     NSArray *nibs = [SDK_BUNDLE loadNibNamed:nibName owner:nil options:0];
@@ -52,21 +67,30 @@
 + (CGFloat)calculateHeightForStickerAction:(NSDictionary *)stickerAction {
 
     NSDictionary *vi = (NSDictionary*)[stickerAction objectForKey:@"view-info"];
-    if ( vi != nil ) {
-        NSString *type = [vi objectForKey:@"type"];
-        if ([type isEqualToString:@"default"]) {
-            return [CCDefaultSelectionQuestionComponent calculateHeightForStickerAction:stickerAction];
-        } else if ([type isEqualToString:@"checkbox"]) {
-            return [CCCheckboxQuestionComponent calculateHeightForStickerAction:stickerAction];
-        } else if ([type isEqualToString:@"yesno"]) {
-            return [CCYesNoQuestionComponent calculateHeightForStickerAction:stickerAction];
-        
-        } else if ([type isEqualToString:@"linear"]) {
-            return [CCLinearScaleQuestionComponent calculateHeightForStickerAction:stickerAction];
-            
+    NSString *actionType = [stickerAction valueForKey:@"action-type"];
+    if (actionType != nil) {
+        //
+        // Action type is select
+        //
+        if ([actionType isEqualToString:@"select"]) {
+            if ( vi != nil ) {
+                NSString *type = [vi objectForKey:@"type"];
+                if ([type isEqualToString:@"default"]) {
+                    return [CCDefaultSelectionQuestionComponent calculateHeightForStickerAction:stickerAction];
+                } else if ([type isEqualToString:@"checkbox"]) {
+                    return [CCCheckboxQuestionComponent calculateHeightForStickerAction:stickerAction];
+                } else if ([type isEqualToString:@"yesno"]) {
+                    return [CCYesNoQuestionComponent calculateHeightForStickerAction:stickerAction];
+                } else if ([type isEqualToString:@"linear"]) {
+                    return [CCLinearScaleQuestionComponent calculateHeightForStickerAction:stickerAction];
+                } else if ([type isEqualToString:@"selectbox"]) {
+                    return [CCPulldownSelectionQuestionComponent calculateHeightForStickerAction:stickerAction];
+                }
+            }
+        } else if ([actionType isEqualToString:@"input"]) {
+            return [CCFreewordInputComponent calculateHeightForStickerAction:stickerAction];
         }
     }
-    
     return [CCDefaultSelectionQuestionComponent calculateHeightForStickerAction:stickerAction];
 }
 

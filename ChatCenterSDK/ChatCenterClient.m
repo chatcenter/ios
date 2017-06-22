@@ -1486,4 +1486,25 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
         }];
 }
 
+#pragma mark - Watch api
+- (void)loadFixedPhraseAndUnreadChannels:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    NSString *url = [NSString stringWithFormat:@"/api/channels/watch"];
+    NSDictionary *params = @{@"limit_channel":[NSNumber numberWithInteger: 10],
+                             @"limit_message":[NSNumber numberWithInteger:10]
+                             };
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    NSString *authentication = [NSString stringWithFormat:@"%@", token];
+    [self.requestSerializer setValue:authentication forHTTPHeaderField:@"Authentication"];
+    [self GET:url
+   parameters:params
+     progress:^(NSProgress * _Nonnull uploadProgress) {
+     }
+      success:^(NSURLSessionDataTask *operation, id responseObject) {
+          NSLog(@"get message response: %@", responseObject);
+          if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+      } failure:^(NSURLSessionDataTask *operation, NSError *error) {
+          if(completionHandler != nil) completionHandler(nil, error, operation);
+          NSLog(@"error:%@", error);
+      }];
+}
 @end

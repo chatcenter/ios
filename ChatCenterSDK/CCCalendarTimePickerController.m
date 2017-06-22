@@ -1232,6 +1232,7 @@ const int VIEW_COUNT = 3;
     
     [previewController setMessage:msg];
     previewController.delegate = self.delegate;
+    previewController.closeWidgetPreviewCallback = self.closeWidgetCalendarCallback;
     [self.navigationController pushViewController:previewController animated:YES];
 }
 
@@ -1284,7 +1285,7 @@ const int VIEW_COUNT = 3;
     NSString *uid = [self.delegate generateMessageUniqueId];
     
     NSDictionary *content = @{@"uid":uid,
-                              @"message":@{@"text":CCLocalizedString(@"Please select your available time.")},
+                              @"message":@{@"text":CCLocalizedString(@"Please select date and time.")},
                               @"sticker-action":@{@"action-type":@"select",
                                                   @"action-data":actionsDatas},
                               @"sticker-type": @"schedule"
