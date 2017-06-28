@@ -46,7 +46,7 @@
     if (!suggestionData) {
         return 0;
     }
-    return suggestionData.count > 4 ? 4: suggestionData.count;
+    return suggestionData.count;
 }
 
 

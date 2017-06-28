@@ -28,20 +28,28 @@
     self.textView.text = label;
     
     UIColor *bc = [[CCConstants sharedInstance] baseColor];
+    BOOL shouldHideIcon = NO;
     if (![contentType isEqualToString:CC_RESPONSETYPEMESSAGE]) {
         NSString *imageName = @"questionBubbleIcon";
         if ([stickerType isEqualToString:CC_RESPONSETYPELOCATION]) {
             imageName = @"CCmenu_icon_location";
         } else if ([stickerType isEqualToString:@"file"]) {
             imageName = @"CCmenu_icon_image";
+        } else if ([stickerType isEqualToString:@"text"]) {
+            shouldHideIcon = YES;
         }
-        UIImage *img = [UIImage SDKImageNamed:imageName];
-        img = [img imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        [self.imageView setHidden:NO];
-        self.iconWidthConstraint.constant = 45;
-        [self.imageView setTintColor:bc];
-        [self.imageView setImage:img];
+        if (!shouldHideIcon) {
+            UIImage *img = [UIImage SDKImageNamed:imageName];
+            img = [img imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            [self.imageView setHidden:NO];
+            self.iconWidthConstraint.constant = 45;
+            [self.imageView setTintColor:bc];
+            [self.imageView setImage:img];
+        }
     } else {
+        shouldHideIcon = YES;
+    }
+    if (shouldHideIcon) {
         // Hide image
         [self.imageView setHidden:YES];
         self.iconWidthConstraint.constant = 5;

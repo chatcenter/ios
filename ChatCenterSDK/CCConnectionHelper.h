@@ -267,6 +267,15 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
  completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (BOOL)isSupportVideoChat;
 
+#pragma mark - Landing page
+- (void)sendLandingPageUrl:(NSString *)channelUid
+                    userId:(NSString *)userId
+         completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+
+- (void)sendLandingPageQRCode:(NSString *)channelUid
+                    userId:(NSString *)userId
+         completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+
 #ifdef CC_WATCH
 #pragma mark - Watch App
 - (void) switchChannel: (NSString *)channelId;

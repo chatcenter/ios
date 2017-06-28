@@ -2549,6 +2549,30 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
     return [[ChatCenterClient sharedClient] isSupportVideoChat];
 }
 
+#pragma mark - Landing page
+- (void)sendLandingPageUrl:(NSString *)channelUid userId:(NSString *)userId completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    [[ChatCenterClient sharedClient] sendLandingPageUrl:channelUid userId:userId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        [CCSVProgressHUD dismiss];
+        if (result != nil) {
+            if(completionHandler != nil) completionHandler(result, nil, task);
+        }else{
+            [self checkNetworkStatus];
+            if(completionHandler != nil) completionHandler(nil, error, task);
+        }
+    }];
+}
+
+- (void)sendLandingPageQRCode:(NSString *)channelUid userId:(NSString *)userId completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    [[ChatCenterClient sharedClient] sendLandingPageQRCode:channelUid userId:userId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        [CCSVProgressHUD dismiss];
+        if (result != nil) {
+            if(completionHandler != nil) completionHandler(result, nil, task);
+        }else{
+            [self checkNetworkStatus];
+            if(completionHandler != nil) completionHandler(nil, error, task);
+        }
+    }];
+}
 #pragma mark - WCSessionDelegate
 #ifdef CC_WATCH
 - (void)session:(WCSession *)session activationDidCompleteWithState:(WCSessionActivationState)activationState error:(NSError *)error {

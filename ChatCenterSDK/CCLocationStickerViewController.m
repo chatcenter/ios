@@ -66,7 +66,9 @@ int mapTapCount = 0; // Count times tap on the MapView
                                                                        message:CCLocalizedString(@"Location services are not enabled on this device. Please enable location services in settings.")
                                                                 preferredStyle:UIAlertControllerStyleAlert];
         UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Dismiss") style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * action) {}];
+                                                              handler:^(UIAlertAction * action) {
+                                                                  [self closeModal];
+                                                              }];
         
         [alert addAction:defaultAction];
         [self presentViewController:alert animated:YES completion:nil];

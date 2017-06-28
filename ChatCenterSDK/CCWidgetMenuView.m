@@ -36,7 +36,8 @@
                 && ![stickers[i] isEqualToString:CC_STICKERTYPECAMERA]
                 && ![stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]
                 && ![stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]
-                && ![stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]){
+                && ![stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]
+                && ![stickers[i] isEqualToString:CC_STICKERLANDINGPAGE]){
                 [stickers removeObject:stickers[i]];
                 continue;
             }
@@ -71,7 +72,7 @@
                     break;
                 }
             }
-        }
+        }        
         
         float stickerButtonWidth = 50.0;
         float stickerButtonHeight = 44.0;
@@ -151,6 +152,9 @@
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_fixed_phrase"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 [stickerButton addTarget:_owner action:@selector(pressPhrase) forControlEvents:UIControlEventTouchUpInside];
+            } else if ([stickers[i] isEqualToString:CC_STICKERLANDINGPAGE]) {
+                iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_landingpage"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                [stickerButton addTarget:_owner action:@selector(pressLandingPage) forControlEvents:UIControlEventTouchUpInside];
             }
             [stickerButton setTintColor:[UIColor lightGrayColor]];
             [stickerButton setImage:iconImage forState:UIControlStateNormal];

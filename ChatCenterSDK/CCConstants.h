@@ -70,6 +70,7 @@
 #define CC_STICKERTYPEVOICECHAT            @"voice_chat"
 #define CC_STICKERTYPEIMAGE                @"sticker_image"
 #define CC_STICKERTYPECAMERA               @"camera_upload"
+#define CC_STICKERLANDINGPAGE              @"landing_page"
 
 #define CC_WIDGETTYPECALENDER               @"calendar"
 

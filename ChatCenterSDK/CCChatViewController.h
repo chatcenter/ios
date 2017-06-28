@@ -42,6 +42,7 @@
 @property (nonatomic, strong) NSString *token;
 @property (nonatomic, strong) NSString *orgUid;
 @property (nonatomic, strong) NSString *orgName;
+@property (nonatomic, strong) NSString *currentGuestId;
 @property (nonatomic, copy) void (^closeChatViewCallback)(void);
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) NSMutableArray *sendingMessages;
@@ -120,6 +121,7 @@
 - (void) pressImage;
 - (void) takePhoto;
 - (void) pressPhrase;
+- (void) pressLandingPage;
 - (void) pressVideoCall;
 - (void) pressVoiceCall;
 - (BOOL)processChannelUserVideoChatInfo;

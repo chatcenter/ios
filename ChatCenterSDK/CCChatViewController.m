@@ -1287,6 +1287,21 @@ int kInputFixedPhraseMenuMode = 2;
 /// Location widget editor
 ///
 -(void)pressLocation{
+    if ([CLLocationManager locationServicesEnabled] == NO) {
+        // Display alert to the user.
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Location services")
+                                                                       message:CCLocalizedString(@"Location services are not enabled on this device. Please enable location services in settings.")
+                                                                preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Dismiss") style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction * action) {
+                                                                  
+                                                              }];
+        
+        [alert addAction:defaultAction];
+        [self presentViewController:alert animated:YES completion:nil];
+        return ;
+    }
+    
     [self openLocationPicker:nil msgId:nil callbackHandler:nil];
 }
 
@@ -1546,6 +1561,52 @@ int kInputFixedPhraseMenuMode = 2;
     }else{
         [[CCConnectionHelper sharedClient] displyAlert:CCLocalizedString(@"Connection Failed") message:nil alertType:SingleButtonAlert];
     }
+}
+
+-(void)pressLandingPage {
+    UIAlertController *alertVC;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        alertVC = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Landing Page") message:nil preferredStyle:UIAlertControllerStyleAlert];
+    } else {
+        alertVC = [UIAlertController alertControllerWithTitle:CCLocalizedString(@"Landing Page") message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    }
+
+    UIAlertAction *sendUrlAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Send URL") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self sendLandingPageURL];
+    }];
+    UIAlertAction *sendQRCodeAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Send QR Code") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self sendLandingPageQRCode];
+    }];
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+    }];
+    [alertVC addAction:sendUrlAction];
+    [alertVC addAction:sendQRCodeAction];
+    [alertVC addAction:cancelAction];
+    [self.inputToolbar.contentView.textView resignFirstResponder];
+    [self presentViewController:alertVC animated:YES completion:^{
+    }];
+}
+
+- (void) sendLandingPageURL {
+    [[CCConnectionHelper sharedClient] sendLandingPageUrl:self.channelId userId:self.currentGuestId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        NSString *url = result[@"url"];
+        self.marginBottomCollectionView.constant = 60;
+        [self.view layoutIfNeeded];
+        self.inputToolbar.contentView.textView.text = [NSString stringWithFormat:CCLocalizedString(@"You can go to this link to continue talking to us: %@"), url];
+        isKeyboardShowing = YES;
+        [self.inputToolbar.contentView.textView setHidden:NO];
+        [self.inputToolbar.contentView.textView becomeFirstResponder];
+        self.inputToolbar.contentView.textView.inputView = nil;
+        [self.inputToolbar.contentView.textView reloadInputViews];
+        [self.inputToolbar toggleSendButtonEnabled];
+        [self.inputToolbarMenuView setHidden:YES];
+    }];
+}
+
+- (void) sendLandingPageQRCode {
+    [[CCConnectionHelper sharedClient] sendLandingPageQRCode:self.channelId userId:self.currentGuestId completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
+        // Do nothing
+    }];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker
@@ -3262,6 +3323,19 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             }
             [self loadLocalDisplayname:channelId];
             [self loadAllFixedPhrases:self.orgUid];
+            NSArray *guests = [self filteredGuestFrom:self.userVideoChat];
+            if(guests.count == 0) {
+                return;
+            } else {
+                for(NSDictionary * guest in guests) {
+                    NSString *guestId = [guest valueForKey:@"id"];
+                    if (guestId != nil) {
+                        self.currentGuestId = guestId;
+                        break;
+                    }
+                }
+                
+            }
         }
     }];
 }
@@ -3473,6 +3547,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         userIconUrl = user[@"icon_url"];
         int admin = [user[@"admin"] intValue];
         userAdmin = (admin == 1)? YES: NO;
+        
         ///
         ///add avatar-image
         ///
@@ -3627,7 +3702,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 NSArray<NSDictionary*> *actionData = [[[message content] objectForKey:@"sticker-action"] objectForKey:@"action-data"];
                 self.suggestionActionData = [actionData mutableCopy];
             }
-            
             [self.messages addObject:message];
         }
     }
@@ -5099,7 +5173,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             //
             // "action" is string and is specifying "open:sticker/calender"
             //
-            if ([stickerAction[@"action"] isEqualToString:@"open:sticker/calender"]) {
+            if ([stickerAction[@"action"] isEqualToString:@"open:sticker/calender"] && [type isEqualToString:@"calendar"]) {
                 [self proposeOtherSlots:stickerAction msgId:msgId];
                 return;
             } else {
@@ -5326,7 +5400,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     /// Create an array to store IDMPhoto objects
     NSMutableArray *photos = [NSMutableArray new];
     for (NSURL *url in photosURL) {
-        CCIDMPhoto *photo = [CCIDMPhoto photoWithURL:url];
+        CCIDMPhoto *photo;
+        photo = [CCIDMPhoto photoWithURL:url];
         [photos addObject:photo];
     }
     CCIDMPhotoBrowser *browser = [[CCIDMPhotoBrowser alloc] initWithPhotos:photos];
@@ -5745,6 +5820,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 - (BOOL)isTopMostViewController {
     if ([[self topViewController] isKindOfClass:[CCChatViewController class]]) {
+        return YES;
+    } else if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == YES && [[self topViewController] isKindOfClass:[CCChatAndHistoryViewController class]]) {
         return YES;
     }
     return NO;

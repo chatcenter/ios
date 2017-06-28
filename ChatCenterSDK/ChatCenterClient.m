@@ -1486,6 +1486,51 @@ completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTas
         }];
 }
 
+#pragma mark - Landing page
+- (void)sendLandingPageUrl:(NSString *)channelUid userId:(NSString *)userId completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    if (_appToken == nil || channelUid == nil) { ///Should specify an app
+        if(completionHandler != nil) completionHandler(nil, nil, nil);
+        return;
+    }
+    
+    NSString* url = [NSString stringWithFormat:@"/api/channels/%@/landing_pages", channelUid];
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    [self.requestSerializer setValue:token forHTTPHeaderField:@"Authentication"];
+    [self setDeviceInfo];
+    NSDictionary *param = @{@"user_id": userId};
+    [self POST:url
+    parameters:param
+      progress:^(NSProgress * _Nonnull uploadProgress) {
+      }
+       success:^(NSURLSessionDataTask * _Nonnull operation, id  _Nonnull responseObject) {
+           if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+       } failure:^(NSURLSessionDataTask * _Nonnull operation, NSError * _Nonnull error) {
+           if(completionHandler != nil) completionHandler(nil, error, operation);
+       }];
+}
+
+- (void)sendLandingPageQRCode:(NSString *)channelUid userId:(NSString *)userId completionHandler:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
+    if (_appToken == nil || channelUid == nil) { ///Should specify an app
+        if(completionHandler != nil) completionHandler(nil, nil, nil);
+        return;
+    }
+    
+    NSString* url = [NSString stringWithFormat:@"/api/channels/%@/landing_pages/qr", channelUid];
+    NSString *token  = [[CCConstants sharedInstance] getKeychainToken];
+    [self.requestSerializer setValue:token forHTTPHeaderField:@"Authentication"];
+    [self setDeviceInfo];
+    NSDictionary *param = @{@"user_id": userId};
+    [self POST:url
+    parameters:param
+      progress:^(NSProgress * _Nonnull uploadProgress) {
+      }
+       success:^(NSURLSessionDataTask * _Nonnull operation, id  _Nonnull responseObject) {
+           if(completionHandler != nil) completionHandler(responseObject, nil, operation);
+       } failure:^(NSURLSessionDataTask * _Nonnull operation, NSError * _Nonnull error) {
+           if(completionHandler != nil) completionHandler(nil, error, operation);
+       }];
+}
+
 #pragma mark - Watch api
 - (void)loadFixedPhraseAndUnreadChannels:(void (^)(NSDictionary *, NSError *, NSURLSessionDataTask *))completionHandler {
     NSString *url = [NSString stringWithFormat:@"/api/channels/watch"];

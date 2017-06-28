@@ -194,9 +194,10 @@ int const CCTopRowTableView = 0;
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
     }
-    [[CCConnectionHelper sharedClient] setDelegate:nil];
+
     if ([CCConnectionHelper sharedClient].twoColumnLayoutMode == NO) {
         [[CCConnectionHelper sharedClient] setCurrentView:nil];
+        [[CCConnectionHelper sharedClient] setDelegate:nil];
     }
     
     [super viewWillDisappear:animated];
