@@ -19,7 +19,7 @@
 
 @implementation CCPhoneStickerCollectionViewCell
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options userList:(NSArray*)users {
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options userList:(NSArray*)users {
 
     
     NSString *userId = [NSString stringWithFormat:@"%@", [[NSUserDefaults standardUserDefaults] valueForKey:kCCUserDefaults_userId]];
@@ -45,6 +45,7 @@
     [super setupWithIndex:indexPath
                   message:msg
                    avatar:avatar
+         textviewDelegate:nil
                  delegate:delegate
                   options:options];
     

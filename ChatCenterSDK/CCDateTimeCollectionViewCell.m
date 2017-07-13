@@ -23,7 +23,7 @@ extern const int CHOICE_MARGIN;
     self.stickerContainer.layer.cornerRadius = 18.0f;
 }
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options {
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options {
 
     // Initialization code
     

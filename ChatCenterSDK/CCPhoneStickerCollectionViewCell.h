@@ -10,5 +10,5 @@
 
 @interface CCPhoneStickerCollectionViewCell : CCCommonStickerCollectionViewCell
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options userList:(NSArray*)users;
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)options userList:(NSArray*)users;
 @end

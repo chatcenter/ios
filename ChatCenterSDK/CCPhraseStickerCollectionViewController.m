@@ -132,7 +132,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     closeButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
     [closeButton addTarget:self action:@selector(closeModal) forControlEvents:UIControlEventTouchUpInside];
     [titleView addSubview:closeButton];
-    
+    self.navigationController.navigationBar.translucent = NO;
     [self.collectionView setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
     
     if (![[CCConstants sharedInstance] isAgent]){
@@ -203,7 +203,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     CCCommonStickerCollectionViewCell *cell;
     cell = [collectionView dequeueReusableCellWithReuseIdentifier:kCCCommonStickerPreviewCollectionViewCell forIndexPath:indexPath];
     
-    [cell setupWithIndex:nil message:message avatar:nil delegate:nil options:CCStickerCollectionViewCellOptionShowAsWidget];
+    [cell setupWithIndex:nil message:message avatar:nil textviewDelegate:nil delegate:nil options:CCStickerCollectionViewCellOptionShowAsWidget];
     
     UITapGestureRecognizer* cellTappGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellTapped:)];
     [cell addGestureRecognizer:cellTappGes];

@@ -61,7 +61,7 @@
     self.stickerStatusLabel.text = @"";
 }
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)inOptions {
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<CCStickerCollectionViewCellActionProtocol>)delegate options:(CCStickerCollectionViewCellOptions)inOptions {
     
     options = inOptions;
     self.avatarImage.image = avatar.avatarImage;
@@ -117,8 +117,6 @@
     } else {
         self.cellTopLabelHeight.constant = 0;
     }
-    
-
     
     index = indexPath.row;
     NSLog(@"index = %ld", (long)index);
@@ -176,7 +174,9 @@
         
         self.discriptionView.attributedText = message;
         self.discriptionViewHeight.constant = params.textAreaSize.height + 5; // 5 for bottom margin
-        
+        if (textviewDelegate != nil) {
+            self.discriptionView.delegate = textviewDelegate;
+        }
         //
         // Setting color 
         //
@@ -222,13 +222,9 @@
             // Setup container
             //
             CGRect stickerObjectContainerFrame = stickerObjectContainer.frame;
-            if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-                stickerObjectContainerHeight.constant = 255.0f;
-                stickerObjectContainerFrame.size.height = 255.0f;
-            }else {
-                stickerObjectContainerHeight.constant =  150.0f;
-                stickerObjectContainerFrame.size.height = 150.0f;
-            }
+            stickerObjectContainerHeight.constant = 150.0f;
+            stickerObjectContainerFrame.size.height = 150.0f;
+            
             stickerObjectContainerFrame.size.width = CC_STICKER_BUBBLE_WIDTH;
             [stickerObjectContainer setFrame:stickerObjectContainerFrame];
             
@@ -270,13 +266,9 @@
             // Setup container
             //
             CGRect stickerObjectContainerFrame = stickerObjectContainer.frame;
-            if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-                stickerObjectContainerHeight.constant = 255.0f;
-                stickerObjectContainerFrame.size.height = 255.0f;
-            }else {
-                stickerObjectContainerHeight.constant =  150.0f;
-                stickerObjectContainerFrame.size.height = 150.0f;
-            }
+            stickerObjectContainerHeight.constant =  150.0f;
+            stickerObjectContainerFrame.size.height = 150.0f;
+            
             stickerObjectContainerFrame.size.width = CC_STICKER_BUBBLE_WIDTH;
             [stickerObjectContainer setFrame:stickerObjectContainerFrame];
             CGRect imageFrame = stickerObjectContainer.frame;
@@ -593,6 +585,11 @@
     NSString *stickerType = [msg getStringAtPath:@"sticker-type"];
     if (stickerType != nil && [stickerType isEqualToString:@"file"]) {
         img = [UIImage SDKImageNamed:@"CCmenu_icon_image"];
+    } else if (stickerType != nil && [stickerType isEqualToString:@"confirm"]) {
+        NSString *actionType = [msg getStringAtPath:@"sticker-action/action-type"];
+        if (actionType != nil && [actionType isEqualToString:@"confirm"]) {
+            img = [UIImage SDKImageNamed:@"CCmenu_icon_confirm"];
+        }
     }
 
     //
@@ -614,6 +611,13 @@
     NSNumber *st = [msg getNumberAtPath:@"sticker-action/action-data/0#/value/start"];
     if(st != nil ) {
         img = [UIImage SDKImageNamed:@"CCmenu_icon_calendar"];
+    }
+    
+    //
+    // Payment widget
+    //
+    if (stickerType != nil && [stickerType isEqualToString:CC_STICKERTYPESPAYMENT]) {
+        img = [UIImage SDKImageNamed:@"CCmenu_icon_payment"];
     }
     
     NSAttributedString *message = [self createMessageString:msg];
@@ -856,17 +860,9 @@
         && ![msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] isEqual:[NSNull null]]) {
         NSURL *thumbnailUrl = [NSURL URLWithString:[msg.content[CC_STICKERCONTENT][CC_THUMBNAILURL] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         if (thumbnailUrl && thumbnailUrl.host && thumbnailUrl.scheme) {
-            if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-                height += 255.0f;
-            }else {
-                height += 150.0f;
-            }
+            height += 150.0f;
         } else if ([msg.type isEqualToString:CC_STICKERTYPEIMAGE]){
-            if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-                height += 255.0f;
-            }else {
-                height += 150.0f;
-            }
+            height += 150.0f;
         }
     }
     
@@ -929,5 +925,4 @@
     
     [self setupQuestionComponentWithMessage:_msg];
 }
-
 @end

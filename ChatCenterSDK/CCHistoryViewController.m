@@ -431,7 +431,9 @@ int const CCTopRowTableView = 0;
     CCMGSwipeButton *assignButton = [CCMGSwipeButton buttonWithTitle:CCLocalizedString(@"Assign") backgroundColor:[UIColor colorWithRed:246.0/255 green:166.0/255 blue:35.0/255 alpha:1] callback:^BOOL(CCMGSwipeTableCell *sender) {
         // handle assign
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
-        CCAssignAssigneeViewController *vc = [storyboard  instantiateViewControllerWithIdentifier:@"assignAssigneeViewController"];;
+        CCAssignAssigneeViewController *vc = [storyboard  instantiateViewControllerWithIdentifier:@"assignAssigneeViewController"];
+        NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+        currentOrgId = [ud stringForKey:@"ChatCenterUserdefaults_currentOrgUid"];
         vc.orgUid = currentOrgId;
         vc.channelUid = [self.ChatChannelIds objectAtIndex:indexPath.row];
         [self.navigationController pushViewController:vc animated:YES];

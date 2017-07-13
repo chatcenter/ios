@@ -20,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self setTitle:CCLocalizedString(@"Note")];
-    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithTitle:CCLocalizedString(@"Save") style:UIBarButtonItemStylePlain target:self action:@selector(pressSave)];
+    UIBarButtonItem *saveButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(pressSave)];
     self.navigationItem.rightBarButtonItem = saveButton;
     self.automaticallyAdjustsScrollViewInsets = NO;
     

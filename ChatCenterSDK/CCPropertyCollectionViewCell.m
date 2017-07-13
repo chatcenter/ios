@@ -16,7 +16,7 @@
     self.stickerContainer.layer.borderWidth = 0.0f;
 }
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<UITextViewDelegate>)delegate options:(CCStickerCollectionViewCellOptions)options {
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<UITextViewDelegate>)delegate options:(CCStickerCollectionViewCellOptions)options {
 
     
     // title

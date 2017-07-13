@@ -12,7 +12,7 @@
 #import "CCJSQMessagesAvatarImage.h"
 #import "CCQuestionComponent.h"
 
-@interface CCCommonStickerCollectionViewCell : CCStickerCollectionViewCell<CCQuestionComponentDelegate>
+@interface CCCommonStickerCollectionViewCell : CCStickerCollectionViewCell<CCQuestionComponentDelegate, UITextViewDelegate>
 {
     CCJSQMessage *_msg;
     

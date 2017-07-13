@@ -69,19 +69,6 @@
 #pragma mark - Update view information
 -(void)viewSetup {
     // Update menu title
-    self.titleMenuAsignee.text = CCLocalizedString(@"Assignee");
-    self.titleMenuFollower.text = CCLocalizedString(@"Followers");
-    self.titleMenuFunnel.text = CCLocalizedString(@"Funnel");
-    self.titleMenuNote.text = CCLocalizedString(@"Note");
-    self.titleMenuAbout.text = CCLocalizedString(@"About ChatCenter.iO");
-    self.titleMenuClose.text = CCLocalizedString(@"Close Conversation");
-    self.titleMenuDelete.text = CCLocalizedString(@"Delete Conversation");
-    self.titleMenuSchedule.text = CCLocalizedString(@"Schedule");
-    self.titleMenuQuestion.text = CCLocalizedString(@"Question");
-    self.titleMenuFileWidget.text = CCLocalizedString(@"File");
-    
-    self.assigneeNotFound.text = CCLocalizedString(@"No assignee");
-    self.followerNotFound.text = CCLocalizedString(@"No followers");
     self.assigneeNotFound.hidden = true;
     self.followerNotFound.hidden = true;
     circleAvatarSize = 48.0f;
@@ -572,6 +559,7 @@
     if (channelStatus != nil && [channelStatus isEqualToString:@"closed"]) {
         [[CCConnectionHelper sharedClient] openChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
             if (error == nil) {
+                self.closeChannelLabel.text = CCLocalizedString(@"Close Conversation");
                 NSString *saveImageString = CCLocalizedString(@"Conversation Opened");
                 [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
                 [self loadChannelInformation:self.channelId];
@@ -582,6 +570,7 @@
         UIAlertAction *okAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"OK") style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [[CCConnectionHelper sharedClient] closeChannels:@[self.channelId] completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
                 if (error == nil) {
+                    self.closeChannelLabel.text = CCLocalizedString(@"Open Conversation");
                     NSString *saveImageString = CCLocalizedString(@"Conversation Closed");
                     [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
                     [self loadChannelInformation:self.channelId];
@@ -589,8 +578,8 @@
             }];
         }];
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:CCLocalizedString(@"Cancel") style:UIAlertActionStyleDefault handler:nil];
-        [alertVC addAction:okAction];
         [alertVC addAction:cancelAction];
+        [alertVC addAction:okAction];
         [self presentViewController:alertVC animated:YES completion:nil];
     }
 }
@@ -797,9 +786,7 @@
             ///
             /// For Agent
             ///
-            if ([CCConstants sharedInstance].isAgent) {
-                [self updateView];
-            }
+            [self updateView];
         }
     }];
 }
