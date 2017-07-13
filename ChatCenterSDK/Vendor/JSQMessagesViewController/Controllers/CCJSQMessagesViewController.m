@@ -890,7 +890,8 @@ CCJSQMessagesKeyboardControllerDelegate>
             CGSize newContentSize = [[change objectForKey:NSKeyValueChangeNewKey] CGSizeValue];
 
             CGFloat dy = newContentSize.height - oldContentSize.height;
-            BOOL needUpdateHeight = (newContentSize.height < self.inputToolbar.maximumHeight);
+            BOOL needUpdateHeight = (newContentSize.height < self.inputToolbar.maximumHeight) || (oldContentSize.height < self.inputToolbar.maximumHeight);
+
             [self jsq_adjustInputToolbarForComposerTextViewContentSizeChange:dy needUpdateHeight:needUpdateHeight];
             [self jsq_updateCollectionViewInsets];
             if (self.automaticallyScrollsToMostRecentMessage) {
@@ -908,7 +909,7 @@ CCJSQMessagesKeyboardControllerDelegate>
         return;
     }
 
-    CGFloat heightFromBottom = CGRectGetMaxY(self.collectionView.frame) + 60 - CGRectGetMinY(keyboardFrame);
+    CGFloat heightFromBottom = CGRectGetMaxY(self.collectionView.frame) + 44 - CGRectGetMinY(keyboardFrame);
 
     heightFromBottom = MAX(0.0, heightFromBottom);
 

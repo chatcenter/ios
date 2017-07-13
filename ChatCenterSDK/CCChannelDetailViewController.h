@@ -28,18 +28,6 @@
 
 @interface CCChannelDetailViewController : UITableViewController<UICollectionViewDataSource, UICollectionViewDelegate>
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
-// Menu Section Title
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuAsignee;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuFollower;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuFunnel;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuNote;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuAbout;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuClose;
-@property (strong, nonatomic) IBOutlet UILabel *titleMenuDelete;
-@property (weak, nonatomic) IBOutlet UILabel *titleMenuFileWidget;
-@property (weak, nonatomic) IBOutlet UILabel *titleMenuSchedule;
-@property (weak, nonatomic) IBOutlet UILabel *titleMenuQuestion;
-
 
 // Channel information (can be Guest, Assignee
 @property (strong, nonatomic) IBOutlet UIImageView *channelAvatar;

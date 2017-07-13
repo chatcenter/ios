@@ -16,7 +16,7 @@
 @property BOOL shouldShowSuggestion;
 @property (nonatomic, strong) NSMutableArray *buttons;
 
-- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner shouldShowSuggestion:(BOOL)shouldShowSuggestion;
+- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner;
 
 
 @end

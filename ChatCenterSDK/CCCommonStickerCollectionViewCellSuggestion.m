@@ -23,7 +23,7 @@
     [super awakeFromNib];
 }
 
-- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar delegate:(id<CCStickerCollectionViewCellActionProtocol>)inDelegate options:(CCStickerCollectionViewCellOptions)options {
+- (BOOL)setupWithIndex:(NSIndexPath *)indexPath message:(CCJSQMessage *)msg avatar:(CCJSQMessagesAvatarImage *)avatar textviewDelegate:(id<UITextViewDelegate>)textviewDelegate delegate:(id<CCStickerCollectionViewCellActionProtocol>)inDelegate options:(CCStickerCollectionViewCellOptions)options {
     
     message = msg;
     delegate = inDelegate;

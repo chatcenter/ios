@@ -14,19 +14,20 @@
 
 @implementation CCWidgetMenuView
 
-- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner shouldShowSuggestion:(BOOL)shouldShowSuggestion {
+- (instancetype)initWithFrame:(CGRect)frame owner:(CCChatViewController*)owner {
     if(self =[super initWithFrame:frame]) {
-        self.shouldShowSuggestion = shouldShowSuggestion;
+        self.shouldShowSuggestion = [CCConstants sharedInstance].isAgent;
         self.buttons = [[NSMutableArray alloc] init];
         self.backgroundColor = [UIColor whiteColor];
         
         NSMutableArray *stickers = [[CCConstants sharedInstance].stickers mutableCopy];
+        NSLog(@"stickers = %@", stickers);
         for (int i = 0;i < stickers.count; i++) {
             if ([stickers[i] isEqualToString:CC_STICKERTYPEFILE]) {
                 [stickers insertObject: CC_STICKERTYPECAMERA atIndex:i + 1]; // user can upload file from library and camera
             }
         }
-
+        
         ///Remove unexpected sticker
         for (int i = 0;i < stickers.count; i++) {
             if (![stickers[i] isEqualToString:CC_STICKERTYPEDATETIMEAVAILABILITY]
@@ -37,7 +38,9 @@
                 && ![stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]
                 && ![stickers[i] isEqualToString:CC_STICKERTYPEVIDEOCHAT]
                 && ![stickers[i] isEqualToString:CC_STICKERTYPEVOICECHAT]
-                && ![stickers[i] isEqualToString:CC_STICKERLANDINGPAGE]){
+                && ![stickers[i] isEqualToString:CC_STICKERTYPESPAYMENT]
+                && ![stickers[i] isEqualToString:CC_STICKERLANDINGPAGE]
+                && ![stickers[i] isEqualToString:CC_STICKERCONFIRM]){
                 [stickers removeObject:stickers[i]];
                 continue;
             }
@@ -81,7 +84,7 @@
         // Add scroll view
         //
         UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:frame];
-        if (shouldShowSuggestion) {
+        if (self.shouldShowSuggestion) {
             scrollView.contentSize = CGSizeMake((stickers.count + 2) * stickerButtonWidth, stickerButtonHeight);
         } else {
             scrollView.contentSize = CGSizeMake((stickers.count + 1) * stickerButtonWidth, stickerButtonHeight);
@@ -107,7 +110,7 @@
         ///
         /// Add suggestion mode button
         ///
-        if (shouldShowSuggestion) {
+        if (self.shouldShowSuggestion) {
             UIButton *suggestionModeButton = [UIButton buttonWithType:UIButtonTypeCustom];
             CGRect suggestionModeButtonFrame = CGRectMake(1 * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
             suggestionModeButton.frame = suggestionModeButtonFrame;
@@ -124,7 +127,7 @@
         for (int i = 0;i < stickers.count; i++) {
             UIButton *stickerButton = [UIButton buttonWithType:UIButtonTypeCustom];
             CGRect stickerButtonFrame;
-            if (shouldShowSuggestion) {
+            if (self.shouldShowSuggestion) {
                 stickerButtonFrame = CGRectMake((i + 2) * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
             } else {
                 stickerButtonFrame = CGRectMake((i + 1) * stickerButtonWidth, 0, stickerButtonWidth, stickerButtonHeight);
@@ -152,9 +155,15 @@
             }else if ([stickers[i] isEqualToString:CC_STICKERTYPEFIXEDPHRASE]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_fixed_phrase"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 [stickerButton addTarget:_owner action:@selector(pressPhrase) forControlEvents:UIControlEventTouchUpInside];
+            } else if ([stickers[i] isEqualToString:CC_STICKERTYPESPAYMENT]) {
+                iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_payment"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                [stickerButton addTarget:_owner action:@selector(pressStripePayment) forControlEvents:UIControlEventTouchUpInside];
             } else if ([stickers[i] isEqualToString:CC_STICKERLANDINGPAGE]) {
                 iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_landingpage"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 [stickerButton addTarget:_owner action:@selector(pressLandingPage) forControlEvents:UIControlEventTouchUpInside];
+            } else if ([stickers[i] isEqualToString:CC_STICKERCONFIRM]) {
+                iconImage = [[UIImage SDKImageNamed:@"CCmenu_icon_confirm"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                [stickerButton addTarget:_owner action:@selector(pressConfirmWidget) forControlEvents:UIControlEventTouchUpInside];
             }
             [stickerButton setTintColor:[UIColor lightGrayColor]];
             [stickerButton setImage:iconImage forState:UIControlStateNormal];
@@ -163,8 +172,5 @@
         }
     }
     return self;
-    
 }
-
-
 @end

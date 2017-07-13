@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name         = "ChatCenterSDK"
   s.authors      = "AppSocially Inc."
   s.homepage     = "http://chatcenter.io"
-  s.version      = "1.1.5"  
+  s.version      = "1.1.6"  
   s.ios.deployment_target  = '8.1'
   s.summary      = "ChatCenterSDK: SDK for ChatCenter iO"
   s.description  = "ChatCenter iO helps your business"

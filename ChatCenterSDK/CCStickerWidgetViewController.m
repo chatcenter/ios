@@ -139,7 +139,7 @@ NSString *kCCStickerWidgetNoContentView = @"CCStickerWidgetNoContentView";
     // Initialization
     //
     if (cell) {
-        BOOL success = [cell setupWithIndex:indexPath message:msg avatar:nil delegate:nil options:options];
+        BOOL success = [cell setupWithIndex:indexPath message:msg avatar:nil textviewDelegate:nil delegate:nil options:options];
         if(success) {
             [cell setUserInteractionEnabled:NO];
             return cell;
@@ -266,7 +266,7 @@ NSString *kCCStickerWidgetNoContentView = @"CCStickerWidgetNoContentView";
                || ([content objectForKey:@"sticker-action"] != nil && ![[message objectForKey:@"sticker-action"] isEqual:[NSNull null]])
                || ([content objectForKey:@"sticker-content"] != nil && ![[message objectForKey:@"sticker-content"] isEqual:[NSNull null]]))
             {
-                long createDate = [CCParseUtils longTryGet:message  key:@"created"];
+                long createDate = [CCParseUtils getLongAtPath:@"created" fromObject:message];
                 NSDate *date = [NSDate dateWithTimeIntervalSince1970:createDate];
                 NSString *displayName = message[@"user"][@"display_name"];
                 NSString *senderId = [message[@"user"][@"id"] respondsToSelector:@selector(stringValue)] ? [message[@"user"][@"id"] stringValue]: message[@"user"][@"id"];

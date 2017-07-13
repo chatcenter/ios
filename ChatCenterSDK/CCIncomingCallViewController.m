@@ -11,6 +11,7 @@
 #import "CCOpenTokVideoCallViewController.h"
 #import "CCConnectionHelper.h"
 #import "CCConstants.h"
+#import "CCParseUtils.h"
 
 @interface CCIncomingCallViewController () {
     NSString *uid;
@@ -85,7 +86,11 @@
 #pragma mark - Actions
 - (IBAction)reject:(id)sender {
     [[CCConnectionHelper sharedClient] rejectCall:self.channelUid messageId:self.messageId reason:@{@"type": @"error", @"message": @"Invite to Participant was canceled"} user:@{@"user_id":@([uid integerValue])}  completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task) {
-        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        if (![[CCConstants sharedInstance] isAgent] && self.navigationController != nil ) {
+            [self.navigationController popViewControllerAnimated:YES];
+        } else {
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+        }
     }];
 }
 
@@ -213,10 +218,10 @@
             continue;
         }
         
-        NSString *rejectedUserId = [eventContent[@"user"][@"user_id"] stringValue];
+        NSString *rejectedUserId = [CCParseUtils getStringAtPath:@"user_id" fromObject:eventContent[@"user"]];
         BOOL rejectedUserInReceivers = NO;
         for(NSDictionary *user in receivers) {
-            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            NSString *userID = [CCParseUtils getStringAtPath:@"user_id" fromObject:user];
             if (userID != nil && [userID isEqualToString:rejectedUserId]) {
                 rejectedUserInReceivers = YES;
                 break;
@@ -243,9 +248,9 @@
         if(action == nil) {
             continue;
         }
-        NSString *rejectedUserId = [eventContent[@"user"][@"user_id"] stringValue];
+        NSString *rejectedUserId = [CCParseUtils getStringAtPath:@"user_id" fromObject:eventContent[@"user"]];
         for(NSDictionary *user in tempReceivers) {
-            NSString *userID = [[user objectForKey:@"user_id"] stringValue];
+            NSString *userID = [CCParseUtils getStringAtPath:@"user_id" fromObject:user];
             if (userID != nil && [userID isEqualToString:rejectedUserId]) {
                 [tempReceivers removeObject:user];
                 break;
@@ -267,7 +272,7 @@
     /// Close incoming call view if other agent already accepted the call
     ///
     BOOL otherAcceptedCall = YES;
-    NSString *acceptedUserId = [content[@"user"][@"user_id"] stringValue];
+    NSString *acceptedUserId = [CCParseUtils getStringAtPath:@"user_id" fromObject:content[@"user"]];
     if([acceptedUserId isEqualToString:uid]) {
         otherAcceptedCall = NO;
     }

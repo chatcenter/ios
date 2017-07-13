@@ -11,5 +11,5 @@
 @interface CCWebViewController : UIViewController<UIWebViewDelegate>
 
 - (id)initWithURL:(NSString *)url title:(NSString *)title;
-- (id)initWithURL:(NSString *)url title:(NSString *)title isOpenDashboard: (BOOL) isOpenDashboard;
+- (id)initWithURL:(NSString *)url title:(NSString *)title needAuthentication: (BOOL) needAuthentication;
 @end

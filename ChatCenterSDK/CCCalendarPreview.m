@@ -78,7 +78,7 @@ const int CHOICE_MARGIN = 10;
     CCCommonStickerPreviewCollectionViewCell *previewCell = (CCCommonStickerPreviewCollectionViewCell *)[self viewFromNib:@"CCCommonStickerPreviewCollectionViewCell"];
     previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, 10, previewCellSize.width, previewCellSize.height);
     
-    [previewCell setupWithIndex:nil message:msg avatar:nil delegate:nil options:0];
+    [previewCell setupWithIndex:nil message:msg avatar:nil textviewDelegate:nil delegate:nil options:0];
     
     [self.scrollView addSubview:previewCell];
     self.scrollView.contentSize = CGSizeMake(previewCellSize.width, previewCellSize.height + 30);

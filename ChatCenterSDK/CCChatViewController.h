@@ -18,7 +18,9 @@
 #import "CCCommonWidgetEditorDelegate.h"
 #import "CCChatViewNavigationTitle.h"
 #import "CCVideoCallEventHandlerDelegate.h"
+#import "CCCommonStickerCollectionViewCell.h"
 #import "CCWidgetMenuView.h"
+#import "CCConfirmWidgetViewController.h"
 
 @class CCChatViewController;
 
@@ -60,7 +62,7 @@
 @property BOOL isPulldownSelectBoxDisplayed;
 @property BOOL shouldDisplayFixedPhraseMenu;
 @property (nonatomic, strong) NSArray *twilioInviteList;
-@property (nonatomic, strong) NSLayoutConstraint *marginBottomCollectionView;
+//@property (nonatomic, strong) NSLayoutConstraint *marginBottomCollectionView;
 @property (nonatomic, strong) NSLayoutConstraint *marginBottomInputToolbar;
 
 @property (nonatomic, strong) NSString *pendingFixedPhrase;
@@ -121,15 +123,18 @@
 - (void) pressImage;
 - (void) takePhoto;
 - (void) pressPhrase;
+- (void) pressStripePayment;
 - (void) pressLandingPage;
 - (void) pressVideoCall;
 - (void) pressVoiceCall;
+- (void) pressConfirmWidget;
 - (BOOL)processChannelUserVideoChatInfo;
 
 //// Called locally and from CCSuggestionInputView
 - (void)performOpenAction:(NSDictionary*)stickerAction
               stickerType:(NSString*)stickerType
                 messageId:(NSNumber*)msgId
-                  reacted:(NSString*)reacted;
+                  reacted:(NSString*)reacted
+                reactedOn:(CCCommonStickerCollectionViewCell *)cell;
 
 @end

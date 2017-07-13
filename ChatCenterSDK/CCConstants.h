@@ -48,11 +48,13 @@
 #define CC_RESPONSETYPESUGGESTION       @"suggestion"
 #define CC_RESPONSETYPECALLINVITE       @"call-invite"
 
+#define CC_MESSAGE                      @"message"
 #define CC_STICKERCONTENT               @"sticker-content"
-#define CC_STICKER_DATA                  @"sticker-data"
+#define CC_STICKER_DATA                 @"sticker-data"
 #define CC_STICKER_TYPE                 @"sticker-type"
 #define CC_STICKERCONTENT_ACTION        @"action"
 #define CC_CONTENTACTION                @"content-action"
+#define CC_STICKER_ACTION               @"sticker-action"
 #define CC_ACTIONTYPE                   @"action-type"
 #define CC_ACTIONDATA                   @"action-data"
 #define CC_THUMBNAILURL                 @"thumbnail-url"
@@ -70,7 +72,9 @@
 #define CC_STICKERTYPEVOICECHAT            @"voice_chat"
 #define CC_STICKERTYPEIMAGE                @"sticker_image"
 #define CC_STICKERTYPECAMERA               @"camera_upload"
+#define CC_STICKERTYPESPAYMENT             @"payment"
 #define CC_STICKERLANDINGPAGE              @"landing_page"
+#define CC_STICKERCONFIRM                  @"confirm"
 
 #define CC_WIDGETTYPECALENDER               @"calendar"
 

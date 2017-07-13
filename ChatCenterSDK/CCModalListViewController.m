@@ -597,9 +597,11 @@ int const CCMaxLoadOrg = 10000;
                                                      error:&error];
                 dispatch_async(q_main, ^{
                     UIImage *newIconImage = [[UIImage alloc] initWithData:dt scale:[UIScreen mainScreen].scale];
-                    CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:newIconImage diameter:circleAvatarSize];
-                    if (newIconImageAvatar != nil) {
-                        self.avatar.image = newIconImageAvatar.avatarImage;
+                    if (newIconImage != nil) {
+                        CCJSQMessagesAvatarImage *newIconImageAvatar = [CCJSQMessagesAvatarImageFactory avatarImageWithImage:newIconImage diameter:circleAvatarSize];
+                        if (newIconImageAvatar != nil) {
+                            self.avatar.image = newIconImageAvatar.avatarImage;
+                        }
                     }
                 });
             });
@@ -656,7 +658,7 @@ int const CCMaxLoadOrg = 10000;
     }
     
     NSString *title = CCLocalizedString(@"ChatCenter iO for iOS");
-    CCWebViewController *webViewController = [[CCWebViewController alloc] initWithURL:URL.absoluteString title:title isOpenDashboard: YES];
+    CCWebViewController *webViewController = [[CCWebViewController alloc] initWithURL:URL.absoluteString title:title needAuthentication: YES];
     webViewController.modalPresentationStyle = UIModalPresentationOverCurrentContext;
     webViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:webViewController];

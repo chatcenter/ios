@@ -75,7 +75,7 @@
 //    [previewCell setMessage:msg atIndexPath:nil withListUser:nil];
     
     
-    [previewCell setupWithIndex:nil message:msg avatar:nil delegate:nil options:0];
+    [previewCell setupWithIndex:nil message:msg avatar:nil textviewDelegate:nil delegate:nil options:0];
     
     view.contentSize = CGSizeMake(previewCellSize.width, previewCellSize.height + 20);
     [view addSubview:previewCell];

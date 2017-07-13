@@ -145,11 +145,11 @@ const int VIEW_COUNT = 3;
         for (NSDictionary *calendar in calendars) {
             NSDate *startDate;
             NSDate *endDate;
-
-            NSString *summary = [CCParseUtils stringTryGet:calendar key:@"summary"];
-            long startDateTime = [CCParseUtils longTryGet:calendar  key:@"start"];
-            long endDateTime = [CCParseUtils longTryGet:calendar  key:@"end"];
-            BOOL isAllDay = [calendar[@"isAllDay"] boolValue];
+            
+            NSString *summary = [CCParseUtils getStringAtPath:@"summary" fromObject:calendar];
+            long startDateTime = [CCParseUtils getLongAtPath:@"start" fromObject:calendar];
+            long endDateTime = [CCParseUtils getLongAtPath:@"end" fromObject:calendar];
+            BOOL isAllDay = [CCParseUtils getBoolAtPath:@"isAllDay" fromObject:calendar];
             NSDate *startEvent = [NSDate dateWithTimeIntervalSince1970:startDateTime];
             NSDate * endEvent = [NSDate dateWithTimeIntervalSince1970:endDateTime];
 
@@ -167,7 +167,7 @@ const int VIEW_COUNT = 3;
             long dulation = (endComponents.hour - fromComponents.hour) * 60 +  (endComponents.minute - fromComponents.minute);
             
             if (isAllDay || dulation <= 0) {
-                NSString *strStartAllDay = [CCParseUtils stringTryGet:calendar key:@"startAllDay"];
+                NSString *strStartAllDay = [CCParseUtils getStringAtPath:@"startAllDay" fromObject:calendar];
                 NSDate *startAllDay = [formaterFrom dateFromString:strStartAllDay];
                 
                 if ([self date:fromDate isBetweenDate:startAllDay andDate:toDate]) {

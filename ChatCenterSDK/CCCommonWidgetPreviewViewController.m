@@ -91,7 +91,7 @@
     float previewFrameY = height / 2 - previewCellSize.height / 2 - 64> 0 ? height / 2 - previewCellSize.height / 2 - 64: 0;
     _previewCell.frame = CGRectMake(width / 2 - previewCellSize.width / 2, previewFrameY, previewCellSize.width, previewCellSize.height);
     
-    [_previewCell setupWithIndex:nil message:message avatar:nil delegate:nil options:options];
+    [_previewCell setupWithIndex:nil message:message avatar:nil textviewDelegate:nil delegate:nil options:options];
     _previewCell.userInteractionEnabled = NO;
     
     [_widgetContainer addSubview:_previewCell];

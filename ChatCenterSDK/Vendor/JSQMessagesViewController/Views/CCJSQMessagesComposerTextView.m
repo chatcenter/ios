@@ -142,9 +142,15 @@
 
 - (void)paste:(id)sender
 {
-    if (!self.pasteDelegate || [self.pasteDelegate composerTextView:self shouldPasteWithSender:sender]) {
-        [super paste:sender];
-    }
+    //
+    // To prevent crash on iOS8
+    // The bug is: [CCJSQMessagesComposerTextView pasteDelegate]: unrecognized selector sent to instance
+    //
+    [super paste:sender];
+    return;
+//    if (!self.pasteDelegate || [self.pasteDelegate composerTextView:self shouldPasteWithSender:sender]) {
+//        [super paste:sender];
+//    }
 }
 
 #pragma mark - Drawing

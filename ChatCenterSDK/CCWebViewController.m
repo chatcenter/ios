@@ -13,7 +13,7 @@
 }
 @property (weak, nonatomic) IBOutlet UIWebView *webview;
 @property (nonatomic, strong) NSString *urlString;
-@property (nonatomic) BOOL isOpenDashboard;
+@property (nonatomic) BOOL needAuthentication;
 @end
 
 @implementation CCWebViewController
@@ -25,12 +25,12 @@
     instance.title = title;
     return instance;
 }
-- (id)initWithURL:(NSString *)url title:(NSString *)title isOpenDashboard: (BOOL) isOpenDashboard {
+- (id)initWithURL:(NSString *)url title:(NSString *)title needAuthentication: (BOOL) needAuthentication {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"ChatCenter" bundle:SDK_BUNDLE];
     CCWebViewController *instance = [storyboard  instantiateViewControllerWithIdentifier:@"CCWebViewController"];
     instance.urlString = url;
     instance.title = title;
-    instance.isOpenDashboard = isOpenDashboard;
+    instance.needAuthentication = needAuthentication;
     return instance;
 }
 
@@ -41,7 +41,7 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
     NSURL *URL = [NSURL URLWithString:self.urlString];
     NSURLRequest *request = [NSURLRequest requestWithURL:URL];
-    if (self.isOpenDashboard) {
+    if (self.needAuthentication) {
         NSMutableURLRequest *mutableRequest = [request mutableCopy];
         NSString *token = [[CCConstants sharedInstance] getKeychainToken];
         [mutableRequest addValue:token forHTTPHeaderField:@"Authentication"];

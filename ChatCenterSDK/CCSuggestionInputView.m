@@ -105,7 +105,7 @@
         return;
     }
     NSDictionary *sticerAction = suggestionData[row];
-    [_owner performOpenAction:sticerAction stickerType:CC_RESPONSETYPESUGGESTION messageId:@(0) reacted:@"false"]; // TODO: send "true" if this reaction is already selected
+    [_owner performOpenAction:sticerAction stickerType:CC_RESPONSETYPESUGGESTION messageId:@(0) reacted:@"false" reactedOn:nil]; // TODO: send "true" if this reaction is already selected
     
     
 }
