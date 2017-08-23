@@ -561,7 +561,7 @@
             if (error == nil) {
                 self.closeChannelLabel.text = CCLocalizedString(@"Close Conversation");
                 NSString *saveImageString = CCLocalizedString(@"Conversation Opened");
-                [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
+                [[UIApplication sharedApplication].keyWindow makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
                 [self loadChannelInformation:self.channelId];
             }
         }];
@@ -572,7 +572,7 @@
                 if (error == nil) {
                     self.closeChannelLabel.text = CCLocalizedString(@"Open Conversation");
                     NSString *saveImageString = CCLocalizedString(@"Conversation Closed");
-                    [self.view makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
+                    [[UIApplication sharedApplication].keyWindow makeToast:saveImageString duration:1.0f position:CSToastPositionCenter];
                     [self loadChannelInformation:self.channelId];
                 }
             }];

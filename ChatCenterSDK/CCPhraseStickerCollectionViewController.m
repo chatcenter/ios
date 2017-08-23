@@ -34,6 +34,7 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *constraintSegmentedViewHeight;
+@property BOOL isLoadingData;
 
 @end
 
@@ -56,6 +57,7 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
     
     self.collectionView.backgroundColor = [UIColor whiteColor];
     
+    self.isLoadingData = NO;
     // register nib for CCCommonStickerViewCell
     UINib *nib = [UINib nibWithNibName:kCCCommonStickerPreviewCollectionViewCell bundle:SDK_BUNDLE];
     [self.collectionView registerNib:nib forCellWithReuseIdentifier:kCCCommonStickerPreviewCollectionViewCell];
@@ -81,9 +83,11 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
 }
 
 -(void)reloadData: (NSString *) orgUid {
+    _isLoadingData = YES;
     [[CCConnectionHelper sharedClient] loadFixedPhrase:orgUid showProgress:YES
                                      completionHandler:^(NSDictionary *result, NSError *error, NSURLSessionDataTask *task)
      {
+         _isLoadingData = NO;
          if(result != nil) {
              //Received list of phrases, show them on tableview
              [self createFixedPhraseMessageObjects:result];
@@ -260,6 +264,9 @@ NSString *kCCFixedPhraseSectionNoContentView = @"CCFixedPhraseSectionNoContentVi
             } else {
                 messageStr = CCLocalizedString(@"No fixed phrases.");
             }
+        }
+        if (_isLoadingData) {
+            messageStr = @"";
         }
         title.text = messageStr;
     }

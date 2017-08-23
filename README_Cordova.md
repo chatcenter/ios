@@ -1,4 +1,4 @@
-# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.6
+# ChatCenteriO iOS SDK Installation guide for Cordova Ver. 1.1.7
 
 ## Table of contents
 * [Getting Started](#GettingStarted)

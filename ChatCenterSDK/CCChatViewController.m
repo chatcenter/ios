@@ -1050,7 +1050,7 @@ int kInputFixedPhraseMenuMode = 2;
 
 - (void) openLocationPicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
     [self openLocationPicker:stickerAction msgId:msgId callbackHandler:^{
-        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId msgUid:[self generateMessageUniqueId] answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         }];
     }];
 }
@@ -1081,7 +1081,7 @@ int kInputFixedPhraseMenuMode = 2;
 
 - (void)openCoLocationPicker:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
     [self openLiveLocationWidgetEditor:stickerAction msgId:msgId callbackHandler:^{
-        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId msgUid:[self generateMessageUniqueId] answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         }];
     }];
 }
@@ -1122,7 +1122,7 @@ int kInputFixedPhraseMenuMode = 2;
 - (void)proposeOtherSlots:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
     CCCalendarTimePickerController *calendarView = [[CCCalendarTimePickerController alloc] initWithDelegate:self];
     [calendarView setCloseWidgetCalendarCallback:^{
-        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId msgUid:[self generateMessageUniqueId] answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         }];
     }];
     UINavigationController *rootNC = [[UINavigationController alloc] initWithRootViewController:calendarView];
@@ -1168,7 +1168,7 @@ int kInputFixedPhraseMenuMode = 2;
 ///
 - (void)openQuestionWidgetEditor:(NSDictionary*)stickerAction msgId:(NSNumber*)msgId {
     [self openQuestionWidgetEditor:stickerAction msgId:msgId callbackHandler:^{
-        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+        [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId msgUid:[self generateMessageUniqueId] answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         }];
     }];
 }
@@ -1240,7 +1240,7 @@ int kInputFixedPhraseMenuMode = 2;
             picker.modalPresentationStyle = UIModalPresentationCurrentContext;
             picker.sourceType = sourceType;
             picker.delegate = self;
-            [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+            [[CCConnectionHelper sharedClient] sendMessageResponseForChannel:self.channelId msgUid:[self generateMessageUniqueId] answer:stickerAction answerLabel:stickerAction[@"label"] replyTo:[msgId stringValue] completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
             }];
             [self presentViewController:picker animated:YES completion:^{
                 self.isReturnFromStickerView = YES;
@@ -1982,8 +1982,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             //       This id is generated with CCChatViewController#generateMessageUniqueId (and some duplicated methods)
             //
             NSString *uniqueId = (message.content != nil) ? [message.content objectForKey:@"uid"] : @"unique-id";
-            NSString *newUniqueId = (content != nil) ? [content objectForKey:@"uid"] : @"new-unique-id";
-            if (uniqueId != nil && ![uniqueId isEqual:[NSNull null]] && [uniqueId isEqualToString:newUniqueId]) {
+            NSString *newUniqueId = (content != nil) ? [CCParseUtils getStringAtPath:@"uid" fromObject:content] : @"new-unique-id";
+            if (uniqueId != nil && ![uniqueId isEqual:[NSNull null]]
+                && uniqueId != nil && ![uniqueId isEqual:[NSNull null]]
+                && [uniqueId respondsToSelector:@selector(isEqualToString:)]
+                && [uniqueId isEqualToString:newUniqueId]) {
                 [self.messages removeObject:message];
                 [[CCCoredataBase sharedClient] deleteTempMessage:message.uid];
                 foundDuplicate = YES;
@@ -2995,7 +2998,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     }
     if (![self.uid isEqualToString:userId]) {
         typingLabel = [[UILabel alloc] init];
-        typingLabel.frame = CGRectMake(0, - 20, self.view.frame.size.width, 20);
+        typingLabel.frame = CGRectMake(0, - 21, self.view.frame.size.width, 20);
         typingLabel.font = [UIFont systemFontOfSize:12];
         typingLabel.textColor = [UIColor lightGrayColor];
         typingLabel.backgroundColor = [UIColor whiteColor];
@@ -3005,7 +3008,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSDictionary *attrsDictionary = @{NSParagraphStyleAttributeName: paragraphStyle};
         typingLabel.attributedText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ %@", displayName, CCLocalizedString(@"is typing")] attributes:attrsDictionary];
         [self.inputToolbar addSubview:typingLabel];
-        [self.inputToolbar bringSubviewToFront:typingLabel];
+        [self.inputToolbar sendSubviewToBack:typingLabel];
         [NSTimer scheduledTimerWithTimeInterval:3 target:self selector:@selector(removeTypingLabel) userInfo:nil repeats:NO];
     }
 }
@@ -4567,24 +4570,23 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         if ([actionType isEqualToString:@"input"] && stickerActions != nil && stickerActions.count > 0) {
             [self.view endEditing:YES];
             NSDictionary *stkAction = stickerActions[0];
-            // Build dialog
-            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stkAction[@"input"]];
-            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                if ([cell respondsToSelector:@selector(resetSelection)]) {
-                    [cell resetSelection];
-                }
-                [_answeringStickers removeObject:data];
-            }];
-            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
-                                                                        answer:stkAction
-                                                                   answerLabel:stkAction[@"input"]
-                                                                       replyTo:[msgId stringValue]
-                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                                                                 [_answeringStickers removeObject:data];
-                                                             }];
-            }];
-            [alert show];
+            NSString *message = stkAction[@"input"];
+            //
+            // Append temp message
+            //
+            NSString *uid = [self generateMessageUniqueId];
+            NSDictionary *content = @{@"text":message, @"uid": uid};
+            CCJSQMessage *msg = [self appendTempMessage:CC_RESPONSETYPEMESSAGE content:content];
+            
+            [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                    msgUid:uid
+                                                                    answer:stkAction
+                                                               answerLabel:stkAction[@"input"]
+                                                                   replyTo:[msgId stringValue]
+                                                         completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                             [_answeringStickers removeObject:data];
+                                                             [self updateTempMessage:msg withResult:result];
+                                                         }];
             return;
         }
         
@@ -4595,36 +4597,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         //--------------------------------------------------------------------
         if(stickerActions && stickerActions.count==0) { // Cancelled all selections(on Checkbox Widget)
             // Build dialog
-            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:CCLocalizedString(@"Cancelled selections")];
-            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                if ([cell respondsToSelector:@selector(resetSelection)]) {
-                    [cell resetSelection];
-                }
-                [_answeringStickers removeObject:data];
-                isDisplayingAlert = NO;
-                if (!isDisplayingSuggestionView) {
-                    [self displayFixedPhraseOrSuggestionIfNeed];
-                } else {
-                    [self displaySuggestionIfNeed];
-                }
-            }];
-            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                //
-                // Do send - multiple
-                //
-                isDisplayingAlert = NO;
-                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
-                                                                       answers:stickerActions
-                                                                       replyTo:[msgId stringValue]
-                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                                                                 [_answeringStickers removeObject:data];
-                                                             }];
-            }];
-            isDisplayingAlert = YES;
-            [self.inputToolbar.contentView.textView resignFirstResponder];
-            [alert show];
-            
-            
+            [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                    msgUid:[self generateMessageUniqueId]
+                                                                   answers:stickerActions
+                                                                   replyTo:[msgId stringValue]
+                                                         completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                             [_answeringStickers removeObject:data];
+                                                         }];
+            [self scrollToBottomAnimated:YES];
             return;
 
         }
@@ -4667,47 +4647,52 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             // (You don't have to care about B-1 or B-2 here though, because you can just throw it as object)
             //
 
+            for (CCJSQMessage * msg in self.messages) {
+                if ([msg.uid integerValue] == [msgId integerValue]) {
+                    NSMutableDictionary *messageContent = [msg.content mutableCopy];
+                    NSMutableArray<NSDictionary*> *actionResponse = [[NSMutableArray alloc] init];
+                    NSMutableDictionary *stickerAction = [[messageContent valueForKey:@"sticker-action"] mutableCopy];
+                    NSDictionary *action = @{@"action":[[NSDictionary alloc] init],
+                                   @"actions":stickerActions};
+                    [actionResponse addObject:action];
+                    
+                    stickerAction[@"action-response-data"] = actionResponse;
+                    messageContent[@"sticker-action"] = stickerAction;
+                    msg.content = [messageContent mutableCopy];
+                    break;
+                }
+            }
+
             NSMutableString *message = [NSMutableString new];
             
             // Make dialog message with multiple labels
             for (NSDictionary *actionItem in stickerActions) {
                 [message appendString:actionItem[@"label"]];
                 if(![actionItem isEqual:[stickerActions lastObject]]) {
-                    [message appendString:@"\n"];
+                    [message appendString:@" ,"];
                 }
             }
             
-            // Build dialog
-            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:message];
-            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                if ([cell respondsToSelector:@selector(resetSelection)]) {
-                    [cell resetSelection];
-                }
-                isDisplayingAlert = NO;
-                if (!isDisplayingSuggestionView) {
-                    [self displayFixedPhraseOrSuggestionIfNeed];
-                } else {
-                    [self displaySuggestionIfNeed];
-                }
-                [_answeringStickers removeObject:data];
-            }];
-            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                //
-                // Do send - multiple
-                //
-                isDisplayingAlert = NO;
-                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
-                                                                       answers:stickerActions
-                                                                       replyTo:[msgId stringValue]
-                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                    [_answeringStickers removeObject:data];
-                }];
-            }];
-            isDisplayingAlert = YES;
-            [self.inputToolbar.contentView.textView resignFirstResponder];
-            [alert show];
-        
+            //
+            // Do send - multiple
+            //
             
+            //
+            // Append temp message
+            //
+            NSString *uid = [self generateMessageUniqueId];
+            NSDictionary *content = @{@"text":message, @"uid":uid};
+            CCJSQMessage *msg = [self appendTempMessage:CC_RESPONSETYPEMESSAGE content:content];
+            
+            [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                    msgUid:uid
+                                                                   answers:stickerActions
+                                                                   replyTo:[msgId stringValue]
+                                                         completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                             [self updateTempMessage:msg withResult:result];
+                                                             [_answeringStickers removeObject:data];
+                                                         }];
+            [self scrollToBottomAnimated:YES];
             return;
         }
         
@@ -4731,63 +4716,33 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
             
             // *** sticker action item type B : Just sending back a string from the provided list ***
 
-            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stickerAction[@"label"]];
-            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                [cell resetSelection];
-                if (!isDisplayingSuggestionView) {
-                    [self displayFixedPhraseOrSuggestionIfNeed];
-                } else {
-                    [self displaySuggestionIfNeed];
-                }
-                [_answeringStickers removeObject:data];
-            }];
-            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                //
-                // Do send - single
-                //
-                isDisplayingAlert = NO;
-                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
-                                                                        answer:stickerAction
-                                                                   answerLabel:stickerAction[@"label"]
-                                                                       replyTo:[msgId stringValue]
-                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                    [_answeringStickers removeObject:data];
-                }];
-            }];
-            isDisplayingAlert = YES;
-            [self.inputToolbar.contentView.textView resignFirstResponder];
-            [alert show];
-            
+            //
+            // Do send - single
+            //
+            [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                    msgUid:[self generateMessageUniqueId]
+                                                                    answer:stickerAction
+                                                               answerLabel:stickerAction[@"label"]
+                                                                   replyTo:[msgId stringValue]
+                                                         completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                             [_answeringStickers removeObject:data];
+                                                         }];
+            [self scrollToBottomAnimated:YES];
         } else if ([actionType isEqualToString:@"confirm"]) {
             //
             // Only for yes-no question
             //
             if (stickerAction[@"value"] != nil) {
-                CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:stickerAction[@"label"]];
-                [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                    [cell resetSelection];
-                    [_answeringStickers removeObject:data];
-                    isDisplayingAlert = NO;
-                    if (!isDisplayingSuggestionView) {
-                        [self displayFixedPhraseOrSuggestionIfNeed];
-                    } else {
-                        [self displaySuggestionIfNeed];
-                    }
-                }];
-                [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                    isDisplayingAlert = NO;
-                    [[ChatCenterClient sharedClient]
-                     sendMessageResponseForChannel:self.channelId
-                     answer:stickerAction
-                     answerLabel:stickerAction[@"label"]
-                     replyTo:[msgId stringValue]
-                     completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                         [_answeringStickers removeObject:data];
-                     }];
-                }];
-                isDisplayingAlert = YES;
-                [self.inputToolbar.contentView.textView resignFirstResponder];
-                [alert show];
+                [[ChatCenterClient sharedClient]
+                 sendMessageResponseForChannel:self.channelId
+                 msgUid:[self generateMessageUniqueId]
+                 answer:stickerAction
+                 answerLabel:stickerAction[@"label"]
+                 replyTo:[msgId stringValue]
+                 completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                     [_answeringStickers removeObject:data];
+                 }];
+                [self scrollToBottomAnimated:YES];
                 return;
             }
         }
@@ -4830,55 +4785,40 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
                 }
             }
             
-            // Build dialog
-            CCAlertView *alert = [[CCAlertView alloc] initWithController:self title:CCLocalizedString(@"You are about to send following message.") message:message];
-            [alert addActionWithTitle:CCLocalizedString(@"Cancel") handler:^(CCAlertAction * _Nonnull action) {
-                isDisplayingAlert = NO;
-                if (!isDisplayingSuggestionView) {
-                    [self displayFixedPhraseOrSuggestionIfNeed];
-                } else {
-                    [self displaySuggestionIfNeed];
-                }
-                [_answeringStickers removeObject:data];
-            }];
-            [alert addActionWithTitle:CCLocalizedString(@"OK") handler:^(CCAlertAction * _Nonnull action) {
-                CCCommonStickerCollectionViewCell *cell;
-                CCJSQMessage *msg;
-                // Find cell by message id
-                for (int index = 0; index < self.messages.count; index ++) {
-                    msg = self.messages[index];
-                    if ([[msgId stringValue] isEqualToString:[msg.uid stringValue]]) {
-                        cell = (CCCommonStickerCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
-                        NSMutableDictionary *newContent = [msg.content mutableCopy];
-                        NSMutableDictionary *newStickerAction = [[newContent objectForKey:@"sticker-action"] mutableCopy];
-                        NSMutableArray *actionResponseData = [[NSMutableArray alloc] init];
-                        NSMutableDictionary *actions = [[NSMutableDictionary alloc] init];
-                        [actions setObject:stickerActions forKey:@"actions"];
-                        [actionResponseData addObject:actions];
-                        [newStickerAction setObject:actionResponseData forKey:@"action-response-data"];
-                        [newContent setObject:newStickerAction forKey:@"sticker-action"];
-                        msg.content = newContent;
-                        if (cell != nil) {
-                            [cell setupQuestionComponentWithMessage:msg needRecreateSubviews:NO];
-                        }
-                        break;
+            CCCommonStickerCollectionViewCell *cell;
+            CCJSQMessage *msg;
+            // Find cell by message id
+            for (int index = 0; index < self.messages.count; index ++) {
+                msg = self.messages[index];
+                if ([[msgId stringValue] isEqualToString:[msg.uid stringValue]]) {
+                    cell = (CCCommonStickerCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:index inSection:0]];
+                    NSMutableDictionary *newContent = [msg.content mutableCopy];
+                    NSMutableDictionary *newStickerAction = [[newContent objectForKey:@"sticker-action"] mutableCopy];
+                    NSMutableArray *actionResponseData = [[NSMutableArray alloc] init];
+                    NSMutableDictionary *actions = [[NSMutableDictionary alloc] init];
+                    [actions setObject:stickerActions forKey:@"actions"];
+                    [actionResponseData addObject:actions];
+                    [newStickerAction setObject:actionResponseData forKey:@"action-response-data"];
+                    [newContent setObject:newStickerAction forKey:@"sticker-action"];
+                    msg.content = newContent;
+                    if (cell != nil) {
+                        [cell setupQuestionComponentWithMessage:msg needRecreateSubviews:NO];
                     }
+                    break;
                 }
-
-                //
-                // Do send - multiple
-                //
-                isDisplayingAlert = NO;
-                [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
-                                                                       answers:stickerActions
-                                                                       replyTo:[msgId stringValue]
-                                                             completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
-                                                                 [_answeringStickers removeObject:data];
-                                                             }];
-            }];
-            isDisplayingAlert = YES;
-            [self.inputToolbar.contentView.textView resignFirstResponder];
-            [alert show];
+            }
+            
+            //
+            // Do send - multiple
+            //
+            [[ChatCenterClient sharedClient] sendMessageResponseForChannel:self.channelId
+                                                                    msgUid:[self generateMessageUniqueId]
+                                                                   answers:stickerActions
+                                                                   replyTo:[msgId stringValue]
+                                                         completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+                                                             [_answeringStickers removeObject:data];
+                                                         }];
+            [self scrollToBottomAnimated:YES];
             return;
         }
     }
@@ -5300,7 +5240,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     return nil;
 }
 
-- (void)updateTempMessage:(CCJSQMessage *)tmpMessage withResult:(NSDictionary *)result {
+- (void)updateTempMessage:(CCJSQMessage *)tmpMessage withResult:(id)result {
     if (tmpMessage == nil) {
         return;
     }
