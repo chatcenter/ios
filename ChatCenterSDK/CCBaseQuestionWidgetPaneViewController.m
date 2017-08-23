@@ -10,6 +10,7 @@
 
 @interface CCBaseQuestionWidgetPaneViewController () {
     UIView *viewToShow;
+    BOOL needToBringViewUp;
 }
 
 @end
@@ -54,19 +55,24 @@ CGFloat keyboardHeight;
     NSDictionary* info = [aNotification userInfo];
     CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
     keyboardHeight = kbSize.height + 40;
-    [self.scrollViewDelegate setViewMovedUp:keyboardHeight viewToShow:viewToShow];
+    if (needToBringViewUp) {
+        [self.scrollViewDelegate setViewMovedUp:keyboardHeight viewToShow:viewToShow];
+    }
 }
 
 -(void)keyboardWillHide:(NSNotification*)aNotification  {
     keyboardHeight = 0;
-    [self.scrollViewDelegate setViewMovedUp:0 viewToShow:viewToShow];
+    if (needToBringViewUp) {
+        [self.scrollViewDelegate setViewMovedUp:0 viewToShow:viewToShow];
+        needToBringViewUp = NO;
+    }
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
     UIScreen *screen = [UIScreen mainScreen];
     float y = screen.bounds.size.height - textField.bounds.origin.y;
     NSLog(@"textFieldDidBeginEditing = %f", y);
-    
+    needToBringViewUp = YES;
     viewToShow = textField;
     
     if (keyboardHeight>0) {

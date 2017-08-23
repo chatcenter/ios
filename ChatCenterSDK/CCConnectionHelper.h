@@ -235,7 +235,7 @@ providerRefreshToken:(NSString *)providerRefreshToken
 
 - (void)loadFixedPhrase: (NSString *)orgUid showProgress:(BOOL)showProgress completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (void)getOrgOnlineStatus:orgUid completeHandler:(void (^)(BOOL isOnline))completionHandler;
-- (void)sendMessageResponseForChannel:(NSString *)channelId answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+- (void)sendMessageResponseForChannel:(NSString *)channelId msgUid:(NSString *)uid answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 -(void)loadBusinessFunnels:(BOOL)showProgress
          completionHandler:(void (^)(NSString *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 -(void)setBusinessFunnelToChannel:(NSString *)channelId

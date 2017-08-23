@@ -59,8 +59,9 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
            files:(NSArray *)files
 completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 - (void)sendMessageStatus:(NSString *)channelId messageIds:(NSArray *)messageIds completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
--(void)sendMessageResponseForChannel:(NSString *)channelId answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
+-(void)sendMessageResponseForChannel:(NSString *)channelId msgUid:(NSString *)uid answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;
 -(void)sendMessageResponseForChannel:(NSString *)channelId
+                              msgUid:(NSString *)uid
                              answers:(NSArray *)answers
                              replyTo:(NSString *)replyTo
                    completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler;

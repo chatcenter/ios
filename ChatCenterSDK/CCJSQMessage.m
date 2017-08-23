@@ -562,7 +562,6 @@
 
 }
 
-
 //
 //
 #pragma mark Object Retrieval Utility
@@ -653,16 +652,11 @@
     return [[self class] getNumberAtPath:path fromObject:self.content];
 }
 
-
-
-
-
 + (NSString *)styledHTMLwithHTML:(NSString *)HTML {
     NSString *style = @"<meta charset=\"UTF-8\"><style> * { -webkit-touch-callout: none; -webkit-user-select: none; /* Disable selection/copy in UIWebView */} body { font-family: 'HelveticaNeue'; font-size: 13; } b {font-family: 'MarkerFelt-Wide'; } </style>";
     
     return [NSString stringWithFormat:@"%@%@", style, HTML];
 }
-
 
 + (NSAttributedString *)attributedStringWithHTML:(NSString *)HTML {
     NSDictionary *options = @{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,NSCharacterEncodingDocumentAttribute : @(NSUTF8StringEncoding)};
@@ -673,6 +667,4 @@
     });
     return attributedString;
 }
-
-
 @end

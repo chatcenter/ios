@@ -499,6 +499,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 }
 
 -(void)sendMessageResponseForChannel:(NSString *)channelId
+                              msgUid:(NSString *)uid
                               answer:(NSObject *)answer
                          answerLabel:(NSString *)answerLabel
                              replyTo:(NSString *)replyTo
@@ -509,7 +510,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
     NSString *authentication = [NSString stringWithFormat:@"%@", token];
     NSLog(@"authentication: %@", authentication);
     NSDictionary *param = @{@"type"   :@"response",
-                            @"content": @{ @"answer" : answer, @"answer_label" : answerLabel, @"reply_to" : replyTo } };
+                            @"content": @{ @"answer" : answer, @"uid":uid, @"answer_label" : answerLabel, @"reply_to" : replyTo } };
     [self.requestSerializer setValue:authentication forHTTPHeaderField:@"Authentication"];
     [self setDeviceInfo]; ///Just in case can not get infomation, calling this evertime
     [self POST:url
@@ -526,6 +527,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
 }
 
 -(void)sendMessageResponseForChannel:(NSString *)channelId
+                                 msgUid:(NSString *)uid
                               answers:(NSArray *)answers
                              replyTo:(NSString *)replyTo
                    completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *operation))completionHandler
@@ -547,6 +549,7 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
     
     NSDictionary *param = @{@"type"   :@"response",
                             @"content": @{ @"answer" : dummyAnswer,
+                                           @"uid": uid,
                                            @"answer_label" : dummyLabel,
                                            @"answers" : answers,
                                            @"reply_to" : replyTo } };

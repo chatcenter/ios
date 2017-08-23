@@ -17,6 +17,9 @@
 
 @end
 
+#define LIMITATION_AMOUNT_USD   99999.99
+#define LIMITATION_AMOUNT_JPY   9999999
+
 @implementation CCStripePaymentWidgetViewController
 
 - (void)viewDidLoad {
@@ -80,9 +83,15 @@
             [self showAlert:CCLocalizedString(@"Requires the payment amount to be at least 50 cent(or 100 JPY)")];
             return NO;
         }
+        if (amount > LIMITATION_AMOUNT_USD) {
+            return NO;
+        }
     } else if ([_btnCurrency.titleLabel.text.lowercaseString isEqualToString:@"jpy"]) {
         if (amount < 100) {
             [self showAlert:CCLocalizedString(@"Requires the payment amount to be at least 50 cent(or 100 JPY)")];
+            return NO;
+        }
+        if (amount > LIMITATION_AMOUNT_JPY) {
             return NO;
         }
     }

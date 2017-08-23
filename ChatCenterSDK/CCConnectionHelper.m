@@ -2464,8 +2464,8 @@ completionHandler:(void (^)(NSDictionary *result, NSError *error, NSURLSessionDa
         }
     }];
 }
-- (void)sendMessageResponseForChannel:(NSString *)channelId answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
-    [[ChatCenterClient sharedClient] sendMessageResponseForChannel:channelId answer:answer answerLabel:answerLabel replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
+- (void)sendMessageResponseForChannel:(NSString *)channelId msgUid:(NSString *)uid answer:(NSObject *)answer answerLabel:(NSString *)answerLabel replyTo:(NSString *)replyTo completionHandler:(void (^)(NSArray *result, NSError *error, NSURLSessionDataTask *task))completionHandler {
+    [[ChatCenterClient sharedClient] sendMessageResponseForChannel:channelId msgUid:uid answer:answer answerLabel:answerLabel replyTo:replyTo completionHandler:^(NSArray *result, NSError *error, NSURLSessionDataTask *task) {
         if (result != nil) {
             if (completionHandler != nil) completionHandler(result, nil, task);
         }else {
